@@ -1,0 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
+@import "tailwindcss";
+
+
+.body, html {
+    background-color: #242424;
+    color: white;
+    font-family: "Inter", sans-serif;
+}
+
+body::-webkit-scrollbar {
+  display: none;           /* Chrome, Safari */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
