@@ -82,7 +82,7 @@ function Hero({ slides }) {
                 <h1 className="text-4xl md:text-6xl font-black drop-shadow-md">
                     {`${slides[currentBG].title}`}
                 </h1>
-                <p className="text-md md:text-lg drop-shadow-md">
+                <p className="text-md md:text-lg drop-shadow-md line-clamp-4">
                     {`${slides[currentBG].overview}`}
                 </p>
                 <div className='flex gap-2'>
