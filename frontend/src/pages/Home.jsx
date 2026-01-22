@@ -1,57 +1,181 @@
-import React, { useEffect, useState } from 'react'
-import Hero from '../components/Hero';
-import { fetchPopularMovies } from '../lib/api/popular';
-import Tiles from '../components/Tiles';
-import MoreModal from '../components/MoreModal';
-import { fetchTrendingMovies } from '../lib/api/trending';
-import { fetchAllTimeMovies } from '../lib/api/alltime';
-import GenreCards from '../components/GenreCards';
-import CommunityCard from '../components/CommunityCard';
+import { Suspense, useEffect, useLayoutEffect, useState, useRef, lazy } from "react";
+
+import { fetchPopularMovies } from "../lib/api/popular";
+import { fetchTrendingMovies } from "../lib/api/trending";
+import { fetchAllTimeMovies } from "../lib/api/alltime";
+
+const Tiles = lazy(() => import("../components/Tiles"));
+const GenreCards = lazy(() => import("../components/GenreCards"));
+const CommunityCard = lazy(() => import("../components/CommunityCard"));
 
 function Home() {
-    const [popular, setPopular] = useState([]);
-    const [trending, setTrending] = useState([]);
-    const [alltime, setAllTime] = useState([]);
+  const [slides, setSlides] = useState([]);
+  const [heroLoading, setHeroLoading] = useState(true);
+  const [currentBG, setCurrentBG] = useState(0);
 
-    useEffect(() => {
-        const getMovies = async () => {
-            const moviesData1 = await fetchPopularMovies();
-            const moviesData2 = await fetchTrendingMovies();
-            const moviesData3 = await fetchAllTimeMovies();
-            setPopular(moviesData1);
-            setTrending(moviesData2);
-            setAllTime(moviesData3);
-        }
-        getMovies();
-    }, [])
+  const [popular, setPopular] = useState([]);
+  const [trending, setTrending] = useState([]);
+  const [alltime, setAllTime] = useState([]);
+  const [rowsLoading, setRowsLoading] = useState(true);
 
-    return (
-        <>
-            <Hero slides={popular.slice(0, 5)} />
-            <div className='px-5 md:px-20 flex flex-col gap-5 mt-5'>
-                <div>
-                    <p className='text-2xl md:text-3xl font-bold mb-4'>Trending This Week</p>
-                    <Tiles movies={trending} title={"Trending This Week"} />
-                </div>
-                <div>
-                    <p className='text-2xl md:text-3xl font-bold mb-4'>Popular Now</p>
-                    <Tiles movies={popular} title={"Popular Now"} />
-                </div>
-                <div>
-                    <p className='text-2xl md:text-3xl font-bold mb-4'>Best of All Time</p>
-                    <Tiles movies={alltime} title={"Best of All Time"} />
-                </div>
-                <div>
-                    <p className='text-2xl md:text-3xl font-bold mb-4'>Search by Genre</p>
-                    <GenreCards />
-                </div>
-                <div>
-                    <p className='text-2xl md:text-3xl font-bold mb-4'>From the community...</p>
-                    <CommunityCard/>
-                </div>
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
+
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  function nextSlide() {
+    setCurrentBG((prev) => (slides.length ? (prev + 1) % slides.length : 0));
+  }
+
+  function prevSlide() {
+    setCurrentBG((prev) =>
+      slides.length ? (prev - 1 + slides.length) % slides.length : 0
+    );
+  }
+
+  useEffect(() => {
+    if (heroLoading || slides.length === 0) return;
+    const timer = setTimeout(nextSlide, 5000);
+    return () => clearTimeout(timer);
+  }, [currentBG, heroLoading, slides]);
+
+  function handleTouchStart(e) {
+    touchStartX.current = e.touches[0].clientX;
+  }
+
+  function handleTouchMove(e) {
+    touchEndX.current = e.touches[0].clientX;
+  }
+
+  function handleTouchEnd() {
+    if (touchStartX.current - touchEndX.current > 50) nextSlide();
+    if (touchEndX.current - touchStartX.current > 50) prevSlide();
+  }
+
+  useEffect(() => {
+    fetchPopularMovies().then((data) => {
+      setSlides(data.slice(0, 5));
+      setPopular(data);
+      setHeroLoading(false);
+    });
+
+    Promise.all([fetchTrendingMovies(), fetchAllTimeMovies()]).then(
+      ([t, a]) => {
+        setTrending(t);
+        setAllTime(a);
+        setRowsLoading(false);
+      }
+    );
+  }, []);
+
+  return (
+    <>
+      <div
+        className="relative w-full h-dvh z-1"
+        aria-busy={heroLoading}
+        onTouchStart={!heroLoading ? handleTouchStart : undefined}
+        onTouchMove={!heroLoading ? handleTouchMove : undefined}
+        onTouchEnd={!heroLoading ? handleTouchEnd : undefined}
+      >
+        {heroLoading && (
+          <div className="absolute inset-0 animate-pulse bg-linear-to-b from-[#55555584] to-[#24242476]" />
+        )}
+
+        {!heroLoading && (
+          <>
+            {slides.map((slide, index) => (
+              <img
+                key={slide.id}
+                src={
+                  slide.backdrop_path
+                    ? `https://image.tmdb.org/t/p/w1280${slide.backdrop_path}`
+                    : "/fallback.jpg"
+                }
+                alt={slide.title || "Movie backdrop"}
+                loading="eager"
+                fetchPriority="high"
+                className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-700 ease-in-out ${
+                  index === currentBG
+                    ? "opacity-100"
+                    : "opacity-0 pointer-events-none"
+                }`}
+              />
+            ))}
+
+            <div className="absolute inset-0 bg-linear-to-b from-[#464e8263] to-[#242424]" />
+
+            <div className="relative z-10 h-full flex flex-col justify-end px-5 md:px-20 gap-6 text-white bottom-20 md:bottom-25">
+              <h1 className="text-4xl md:text-6xl font-black drop-shadow-md">
+                {slides[currentBG]?.title}
+              </h1>
+
+              <p className="text-md md:text-lg drop-shadow-md line-clamp-4">
+                {slides[currentBG]?.overview}
+              </p>
+
+              <div className="flex gap-2">
+                <button className="border rounded-full p-3 px-4 flex items-center gap-2 text-[14px] font-bold">
+                  Play Trailer
+                  <img src="play.png" alt="" aria-hidden="true" className="size-3" />
+                </button>
+
+                <button className="border rounded-full p-3 px-4 flex items-center gap-2 text-[14px] bg-[#464E82] border-[#464E82] font-bold">
+                  Visit Page
+                  <img src="visit.png" alt="" aria-hidden="true" className="size-3" />
+                </button>
+              </div>
+
+              <div className="w-full flex items-center justify-center gap-4 px-20">
+                {slides.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentBG(index)}
+                    aria-label={`Go to slide ${index + 1}`}
+                    className={`w-2 h-2 rounded-full -mb-10 transition-opacity duration-700 ${
+                      index === currentBG
+                        ? "bg-white opacity-100"
+                        : "bg-white/50 opacity-50"
+                    }`}
+                  />
+                ))}
+              </div>
             </div>
-        </>
-    )
+          </>
+        )}
+      </div>
+
+      <Suspense fallback={null}>
+        <div className="px-5 md:px-20 flex flex-col gap-5 mt-5">
+          <section>
+            <p className="text-2xl md:text-3xl font-bold mb-4">Trending This Week</p>
+            <Tiles movies={trending} title="Trending This Week" loading={rowsLoading} />
+          </section>
+
+          <section>
+            <p className="text-2xl md:text-3xl font-bold mb-4">Popular Now</p>
+            <Tiles movies={popular} title="Popular Now" loading={rowsLoading} />
+          </section>
+
+          <section>
+            <p className="text-2xl md:text-3xl font-bold mb-4">Best of All Time</p>
+            <Tiles movies={alltime} title="Best of All Time" loading={rowsLoading} />
+          </section>
+
+          <section>
+            <p className="text-2xl md:text-3xl font-bold mb-4">Search by Genre</p>
+            <GenreCards loading={rowsLoading} />
+          </section>
+
+          <section>
+            <p className="text-2xl md:text-3xl font-bold mb-4">From the community…</p>
+            <CommunityCard loading={rowsLoading} />
+          </section>
+        </div>
+      </Suspense>
+    </>
+  );
 }
 
-export default Home
+export default Home;

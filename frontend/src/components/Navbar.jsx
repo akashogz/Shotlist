@@ -6,7 +6,7 @@ function Navbar() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     return (
-        <div className="fixed w-full z-50 bg-linear-to-b from-[#464e8241] to-[#24242400] items-center">
+        <div className="sticky top-0 w-full z-10 items-center h-16 -mb-18 pt-0.5">
             <div className="flex justify-between md:px-20 px-5 mt-2 mb-2 z-10">
                 <div className="flex gap-2 items-center justify-center">
                     <img src="/logo.png" className="size-10 object-fill rounded-full shadow-2xl"></img>
