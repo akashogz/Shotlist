@@ -25,7 +25,7 @@ function CommunityCard() {
         <div className='grid md:grid-cols-2 gap-3 md:gap-6 items-stretch'>
             {
                 reviews.map((review, index) => (
-                    <div className='bg-[#60606071] hover:bg-[#393939] ease-in-out duration-300 rounded-lg p-3 flex flex-col gap-3 items-center'>
+                    <div className='bg-[#60606071] hover:bg-[#393939] ease-in-out duration-300 rounded-lg p-3 flex flex-col gap-3 items-center' key={index}>
                         <div className='flex gap-2 w-full items-center'>
                             <img src={`${review.userAvatar}`} className='size-9 md:size-11'></img>
                             <div className='md:flex md:justify-between w-full h-full items-center'>
