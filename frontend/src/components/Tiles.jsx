@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import MoreModal from "./MoreModal";
+import { useNavigate } from "react-router-dom";
 
 function Tiles({ movies = [], title, loading }) {
   const [openMore, setOpenMore] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <div className="flex gap-8 md:gap-25 overflow-x-auto rounded-lg no-scrollbar">
@@ -20,6 +22,7 @@ function Tiles({ movies = [], title, loading }) {
           <div
             key={movie.id}
             className="flex flex-col group overflow-hidden h-50 md:h-55 min-w-32 gap-2"
+            onClick={() => navigate(`/movie/${movie.id}`)}
           >
             <img
               src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}

@@ -13,15 +13,15 @@ function Navbar() {
         <div className="sticky top-0 w-full z-10 items-center h-16 -mb-18 pt-0.5">
             <div className="flex justify-between md:px-20 px-5 mt-2 mb-2 z-10">
                 <div className="flex gap-2 items-center justify-center">
-                    <img src="logo.png" className="size-10 object-fill rounded-full shadow-2xl"></img>
+                    <img src="../public/logo.png" className="size-10 object-fill rounded-full shadow-2xl"></img>
                     <NavLink to={"/"} className="font-bold text-2xl md:text-3xl shadow-2xl">shotlist</NavLink>
                 </div>
-                <div className="fixed w-full items-center flex justify-center pr-38 pointer-events-none">
+                <div className="-mr-35 items-center flex justify-center pr-38 z-10">
                     <div className="border rounded-full md:flex p-1 gap-2 items-center pr-2 hidden shadow-sm w-80">
                         <div className="border rounded-full p-1">
                             <img src="/search.png" className="size-6"></img>
                         </div>
-                        <input type="text" placeholder="Search for anything..." className="font-light text-[14px] focus:outline-0 w-60" />
+                        <input type="text" placeholder="Search for anything..." className="font-semibold text-[14px] focus:outline-0 w-60 shadow-2xl" />
                     </div>
                 </div>
                 <div className="md:flex gap-5 font-light items-center text-[14px] hidden">

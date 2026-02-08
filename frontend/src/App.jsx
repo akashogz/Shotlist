@@ -9,6 +9,8 @@ import { Toaster } from "react-hot-toast";
 import { useEffect } from 'react'
 import { useAuthStore } from './store/authStore'
 import Profile from './pages/Profile'
+import Info from './pages/Info'
+import ScrollToTop from './components/ScrollToTop'
 
 function App() {
   const fetchMe = useAuthStore((s) => s.fetchMe);
@@ -28,9 +30,11 @@ function App() {
           duration: 3000,
         }}
       />
+      <ScrollToTop />
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
+          <Route path='/movie/:movieId' element={<Info />} />
         </Route>
         <Route element={<ProfileLayout/>}>
           <Route path='/profile' element={<Profile/>} />

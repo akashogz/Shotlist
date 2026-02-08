@@ -8,7 +8,6 @@ createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     
     <App>
-      <ScrollToTop />
     </App>
   </BrowserRouter>
 );

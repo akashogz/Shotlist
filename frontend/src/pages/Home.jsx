@@ -3,6 +3,7 @@ import { Suspense, useEffect, useLayoutEffect, useState, useRef, lazy } from "re
 import { fetchPopularMovies } from "../lib/api/popular";
 import { fetchTrendingMovies } from "../lib/api/trending";
 import { fetchAllTimeMovies } from "../lib/api/alltime";
+import { useNavigate } from "react-router-dom";
 
 const Tiles = lazy(() => import("../components/Tiles"));
 const GenreCards = lazy(() => import("../components/GenreCards"));
@@ -12,7 +13,7 @@ function Home() {
   const [slides, setSlides] = useState([]);
   const [heroLoading, setHeroLoading] = useState(true);
   const [currentBG, setCurrentBG] = useState(0);
-
+  const navigate = useNavigate();
   const [popular, setPopular] = useState([]);
   const [trending, setTrending] = useState([]);
   const [alltime, setAllTime] = useState([]);
@@ -121,7 +122,7 @@ function Home() {
                   <img src="play.png" alt="" aria-hidden="true" className="size-3" />
                 </button>
 
-                <button className="border rounded-full p-3 px-4 flex items-center gap-2 text-[14px] bg-[#464E82] border-[#464E82] font-bold">
+                <button className="border rounded-full p-3 px-4 flex items-center gap-2 text-[14px] bg-[#464E82] border-[#464E82] font-bold" onClick={() => navigate(`movie/${slides[currentBG]?.id}`)}>
                   Visit Page
                   <img src="visit.png" alt="" aria-hidden="true" className="size-3" />
                 </button>
