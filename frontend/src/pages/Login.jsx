@@ -1,9 +1,12 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 function Logup() {
+    const [email, setMail] = useState("");
+    const [password, setPassword] = useState("");
+    
     return (
         <div className='w-full h-dvh flex items-center justify-center text-sm '>
-          <img src='wp10615910.jpg ' className='w-full h-dvh fixed -z-10 object-cover brightness-30 blur-xs'></img>
+            <img src='wp10615910.jpg ' className='w-full h-dvh fixed -z-10 object-cover brightness-30 blur-xs'></img>
             <div className='bg-linear-to-b from-[#2a2a2a7b] to-[#2a2a2ad1] p-3 md:p-5 rounded-lg flex gap-5 flex-col border border-[#6666669d]'>
                 <p className='font-bold text-2xl md:text-3xl h-full text-center'>Log in to Shotlist</p>
                 <div className='flex flex-col gap-4 w-70 md:w-120'>
@@ -17,9 +20,9 @@ function Logup() {
                     </div>
                     <a className='w-full text-center'>Forgot your password?</a>
                     <button className='bg-[#464E82] p-3 rounded-lg font-bold text-md hover:brightness-110 ease-in-out duration-300'>Login</button>
-                    <button onClick={() => {window.location.href = "http://localhost:3000/api/auth/google";}}
-                            className='flex gap-2 bg-white rounded-lg p-3 text-black font-bold items-center justify-center'>
-                        <img src='google.svg.png' className='size-6'/>
+                    <button onClick={() => { window.location.href = "http://localhost:3000/api/auth/google"; }}
+                        className='flex gap-2 bg-white rounded-lg p-3 text-black font-bold items-center justify-center'>
+                        <img src='google.svg.png' className='size-6' />
                         Continue with Google
                     </button>
                 </div>

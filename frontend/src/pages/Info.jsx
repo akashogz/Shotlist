@@ -79,7 +79,7 @@ function Info() {
                             alt={movie.title}
                         />
                         <div className="w-full flex justify-center">
-                            <button className="flex gap-1 text-sm font-semibold items-center justify-center bg-[#464E82] rounded-full p-3 shadow-2xl md:w-auto">
+                            <button className="flex gap-1 text-sm font-semibold items-center justify-center bg-[#464E82] rounded-full p-3 shadow-2xl md:w-full">
                                 <Plus size={16} /> Add to Watched
                             </button>
                         </div>
@@ -137,7 +137,7 @@ function Info() {
                         </select>
                     </div>
 
-                    <div className="flex flex-wrap gap-4">
+                    <div className="flex sm:flex-row flex-col sm:flex-wrap gap-4">
                         {movie["watch/providers"]?.results?.[country]?.buy?.length ? (
                             movie["watch/providers"].results[country].buy.map((p, i) => (
                                 <div key={i} className="flex gap-2 items-center">
@@ -300,7 +300,7 @@ function Info() {
                 {/* MORE LIKE THIS */}
                 <div className="flex flex-col gap-4">
                     <h1 className="font-bold text-2xl sm:text-3xl">More like this</h1>
-                    <div className="flex justify-between gap-5 overflow-x-scroll md:overflow-visible">
+                    <div className="flex justify-between gap-5 overflow-x-scroll no-scrollbar">
                         {recc.slice(0, 5).map((m, i) => (
                             <img
                                 key={i}

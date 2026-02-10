@@ -4,6 +4,7 @@ import { configDotenv } from "dotenv";
 import cookieParser from "cookie-parser";
 import { register } from "./controllers/auth.controller.js";
 import authRoutes from "./routes/auth.routes.js";
+import userRoutes from "./routes/user.routes.js";
 import cors from "cors";
 
 configDotenv()
@@ -25,6 +26,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/user", userRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

@@ -11,6 +11,7 @@ import { useAuthStore } from './store/authStore'
 import Profile from './pages/Profile'
 import Info from './pages/Info'
 import ScrollToTop from './components/ScrollToTop'
+import Browse from './pages/Browse'
 
 function App() {
   const fetchMe = useAuthStore((s) => s.fetchMe);
@@ -35,6 +36,7 @@ function App() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
           <Route path='/movie/:movieId' element={<Info />} />
+          <Route path='/browse' element={<Browse />}/>
         </Route>
         <Route element={<ProfileLayout/>}>
           <Route path='/profile' element={<Profile/>} />
