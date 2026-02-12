@@ -8,6 +8,7 @@ import React, { useEffect, useState } from "react";
 import { getMovieDetails } from "../lib/api/movie.js";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAuthStore } from "../store/authStore.js";
+import ReviewField from "../components/ReviewField.jsx";
 
 function Info() {
     const [movie, setMovie] = useState(null);
@@ -294,6 +295,11 @@ function Info() {
                             </Link>
                         </div>
                     )}
+                    {
+                        loggedIn && (
+                            <ReviewField />
+                        )
+                    }
                 </div>
 
 

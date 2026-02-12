@@ -31,8 +31,8 @@ function Profile() {
         <div className='md:p-20 p-5 pt-20 h-full w-screen flex items-center flex-col gap-2 justify-between'>
             <div className='flex flex-col justify-end items-end'>
                 <img src={`https://api.dicebear.com/9.x/glass/svg?seed=${user.avatarSeed}`} className='size-18 rounded-full border-3' />
-                <div className='bg-white p-1 rounded-full absolute justify-end'  onClick={() => setOpenProfileModal(true)}>
-                    <Pencil size={12} color='black' className='shadow-md'/>
+                <div className='bg-white p-1 rounded-full absolute justify-end shadow-md'  onClick={() => setOpenProfileModal(true)}>
+                    <Pencil size={12} color='black' className=''/>
                 </div>
             </div>
             <div className='flex flex-col items-center gap-5'>
