@@ -5,6 +5,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 
 export const useAuthStore = create((set) => ({
     user: null,
+    setUser: (userData) => set({ user: userData }),
     loading: true,
     isLoggedIn: false,
 

@@ -17,7 +17,6 @@ const reviewSchema = new Schema(
 
     text: {
       type: String,
-      required: true,
       trim: true,
     },
 
@@ -29,6 +28,13 @@ const reviewSchema = new Schema(
     likesCount: {
       type: Number,
       default: 0,
+    },
+
+    rating: {
+      type: Number,
+      min: 1,
+      max: 10,
+      required: true,
     }
   },
   { timestamps: true }

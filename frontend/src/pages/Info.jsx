@@ -1,5 +1,5 @@
 import {
-    BookOpen, Brain, Clock, Columns4Icon, ExternalLink, EyeIcon,
+    BookOpen, Brain, Check, Clock, Columns4Icon, ExternalLink, EyeIcon,
     FilmIcon, GhostIcon, HandFistIcon, Heart, HeartIcon, KeyIcon,
     LaughIcon, MountainIcon, MoveRight, Music, Plus, ReceiptText,
     ShieldAlert, Sparkles, Star, Theater, TrainTrack, Tv, UsersIcon
@@ -9,9 +9,12 @@ import { getMovieDetails } from "../lib/api/movie.js";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAuthStore } from "../store/authStore.js";
 import ReviewField from "../components/ReviewField.jsx";
+import api from "../lib/api/api.js";
+import toast from "react-hot-toast";
 
 function Info() {
     const [movie, setMovie] = useState(null);
+    const [review, setReview] = useState(null);
     const { movieId } = useParams();
     const navigate = useNavigate();
 
@@ -39,15 +42,19 @@ function Info() {
 
     const [country, setCountry] = useState("US");
     const user = useAuthStore((s) => s.user);
+    const setUser = useAuthStore((s) => s.setUser);
     const loggedIn = !!user;
 
     useEffect(() => {
-        const fetchMovie = async () => {
-            const data = await getMovieDetails(movieId);
-            setMovie(data);
+        const fetchAll = async () => {
+            const movieData = await getMovieDetails(movieId);
+            setMovie(movieData);
+
+            const reviewData = await api.post('/user/findUserReview', { tmdbId: movieData.id });
+            setReview(reviewData);
         };
-        fetchMovie();
-    }, [movieId]);
+        fetchAll();
+    }, [movieId, user]);
 
     if (!movie) return null;
 
@@ -55,6 +62,25 @@ function Info() {
         movie.recommendations.results.length !== 0
             ? movie.recommendations.results
             : movie.similar.results;
+
+    const handleAddToWatched = async () => {
+        let updatedWatched;
+
+        if (user.watched.some(m => m.movieId === movie.id)) {
+            const res = await api.post('/user/removeFromWatched', { tmdbId: movie.id });
+            toast.success(res.data.message);
+            updatedWatched = user.watched.filter(m => m.movieId !== movie.id);
+        } else {
+            const res = await api.post('/user/addToWatched', { movieId: movie.id, title: movie.title, posterPath: movie.poster_path });
+            toast.success(res.data.message);
+            updatedWatched = [...user.watched, { movieId: movie.id, title: movie.title, posterPath: movie.poster_path }];
+        }
+
+        setUser({
+            ...user,
+            watched: updatedWatched
+        });
+    };
 
     return (
         <div>
@@ -80,8 +106,8 @@ function Info() {
                             alt={movie.title}
                         />
                         <div className="w-full flex justify-center">
-                            <button className="flex gap-1 text-sm font-semibold items-center justify-center bg-[#464E82] rounded-full p-3 shadow-2xl md:w-full">
-                                <Plus size={16} /> Add to Watched
+                            <button className={`flex gap-1 text-sm font-semibold items-center justify-center ${user?.watched?.some(m => m.movieId === movie.id) ? `bg-white text-black outline-2 outline-offset-2 outline-white` : `bg-[#464E82]`} cursor-pointer hover:brightness-85 rounded-full p-3 shadow-2xl md:w-full sm:w-48 w-40 transition-color ease-in-out duration-1000`} onClick={() => handleAddToWatched()}>
+                                {user?.watched?.some(m => m.movieId === movie.id) ? <Check size={16} color="black" /> : <Plus size={16} />} {user?.watched?.some(m => m.movieId === movie.id) ? `Added` : `Add to Watched`}
                             </button>
                         </div>
                     </div>
@@ -297,7 +323,7 @@ function Info() {
                     )}
                     {
                         loggedIn && (
-                            <ReviewField />
+                            <ReviewField tmdbId={movie.id} />
                         )
                     }
                 </div>

@@ -70,7 +70,7 @@ function Profile() {
                     <div className='p-4 flex gap-2 bg-[#303030] rounded-lg items-center justify-center shadow-md'>
                         <div className='flex gap-2 items-center'>
                             <Bookmark size={18} strokeWidth={3} />
-                            <p className='text-white/50'>Reviews</p>
+                            <p className='text-white/50'>Watchlist</p>
                         </div>
                         <p className='font-bold'>{user.watchlist.length}</p>
                     </div>
@@ -78,10 +78,10 @@ function Profile() {
             </div>
             <div className='w-full items-center justify-between pt-3'>
                 <div className='w-full grid sm:grid-cols-4 grid-cols-2 text-center text-sm sm:text-md'>
-                    <p className={`cursor-pointer  border-white/50 p-2  font-bold  border-r ${active.label == "Watched" ? `underline underline-offset-4` : `hover:underline hover:decoration-white/50 hover:underline-offset-4`}`} onClick={() => setActive(tabs[0])}>Watched</p>
-                    <p className={`cursor-pointer sm:border-r border-white/50 p-2  font-bold ${active.label == "Reviews" ? `underline underline-offset-4` : ` hover:underline hover:decoration-white/50 hover:underline-offset-4`}`} onClick={() => setActive(tabs[1])}>Reviews</p>
-                    <p className={`cursor-pointer border-r border-white/50 p-2  font-bold ${active.label == "Ratings" ? `underline underline-offset-4` : ` hover:underline hover:decoration-white/50 hover:underline-offset-4`}`} onClick={() => setActive(tabs[2])}>Ratings</p>
-                    <p className={`cursor-pointer p-2  font-bold ${active.label == "Watchlist" ? `underline underline-offset-4` : ` hover:underline hover:decoration-white/50 hover:underline-offset-4`}`} onClick={() => setActive(tabs[3])}>Watchlist</p>
+                    <p className={`cursor-pointer  border-white/50 p-2  font-bold  border-r ${active.label == "Watched" ? `underline underline-offset-4` : `hover:underline hover:decoration-white/50 hover:underline-offset-4`}  transition-all ease-in-out duration-500`} onClick={() => setActive(tabs[0])}>Watched</p>
+                    <p className={`cursor-pointer sm:border-r border-white/50 p-2  font-bold ${active.label == "Reviews" ? `underline underline-offset-4` : ` hover:underline hover:decoration-white/50 hover:underline-offset-4`}   transition-all ease-in-out duration-500`} onClick={() => setActive(tabs[1])}>Reviews</p>
+                    <p className={`cursor-pointer border-r border-white/50 p-2  font-bold ${active.label == "Ratings" ? `underline underline-offset-4` : ` hover:underline hover:decoration-white/50 hover:underline-offset-4`}  transition-all ease-in-out duration-500`} onClick={() => setActive(tabs[2])}>Ratings</p>
+                    <p className={`cursor-pointer p-2  font-bold ${active.label == "Watchlist" ? `underline underline-offset-4` : ` hover:underline hover:decoration-white/50 hover:underline-offset-4`}  transition-all ease-in-out duration-500`} onClick={() => setActive(tabs[3])}>Watchlist</p>
                 </div>
             </div>
             <ProfileCards tab={active}/>
