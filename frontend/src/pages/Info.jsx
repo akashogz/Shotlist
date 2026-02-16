@@ -66,6 +66,11 @@ function Info() {
     const handleAddToWatched = async () => {
         let updatedWatched;
 
+        if (!loggedIn) {
+            toast.error("Log in to interact")
+            navigate('/login');
+        }
+
         if (user.watched.some(m => m.movieId === movie.id)) {
             const res = await api.post('/user/removeFromWatched', { tmdbId: movie.id });
             toast.success(res.data.message);
@@ -323,7 +328,7 @@ function Info() {
                     )}
                     {
                         loggedIn && (
-                            <ReviewField tmdbId={movie.id} />
+                            <ReviewField tmdbId={movie.id} movieName={movie.title} posterPath={movie.poster_path} />
                         )
                     }
                 </div>

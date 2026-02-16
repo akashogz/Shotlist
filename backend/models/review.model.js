@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { type } from "os";
 
 const { Schema, model } = mongoose;
 
@@ -7,6 +8,16 @@ const reviewSchema = new Schema(
     user: {
       type: Schema.Types.ObjectId,
       ref: "User",
+      required: true,
+    },
+    
+    posterPath : {
+      type: String,
+      required: true,
+    },
+
+    movieName : {
+      type: String,
       required: true,
     },
 

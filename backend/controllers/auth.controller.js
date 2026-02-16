@@ -150,3 +150,17 @@ export const googleCallback = async (req, res) => {
   }
 };
 
+export const logout = async (req, res) => {
+  try {
+    res
+      .clearCookie("token", {
+        ...cookieOptions,
+        expires: new Date(0),
+      })
+      .status(200)
+      .json({ message: "Logged out successfully" });
+  } catch (error) {
+    console.error("Logout error:", error);
+    res.status(500).json({ message: "Server error during logout" });
+  }
+};

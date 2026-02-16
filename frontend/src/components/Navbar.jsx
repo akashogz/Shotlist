@@ -6,6 +6,8 @@ function Navbar() {
     const [profileIsOpen, setProfileIsOpen] = useState(false);
     const [searchIsOpen, setSearchIsOpen] = useState(false);
     const user = useAuthStore((s) => s.user);
+    const logout = useAuthStore((s) => s.logout);
+    console.log(user)
     const isLoggedIn = !!user;
     const navigate = useNavigate()
 
@@ -31,7 +33,7 @@ function Navbar() {
                         : <NavLink to={"/signup"} className="shadow-2xl">Login/Signup</NavLink>
                     }
                 </div>
-                <div className="flex gap-5 items-center md:hidden">
+                <div className="flex gap-5 items-center md:hidden z-10">
                     <img src="/search.png" className="size-7" onClick={() => setSearchIsOpen(!searchIsOpen)}></img>
                     {
                         isLoggedIn? <img src={`https://api.dicebear.com/9.x/glass/svg?seed=${user.avatarSeed}&backgroundColor=242424,3D3D3D,464E82,303030`} className="size-8 rounded-full" onClick={() => setProfileIsOpen(!profileIsOpen)}></img> 
@@ -39,11 +41,11 @@ function Navbar() {
                     }
                 </div>
 
-                <div className={`fixed bg-[#202020] right-6 md:right-21 mt-13 text-[14px] rounded-b-md rounded-tl-md ${profileIsOpen ? `opacity-100` : `opacity-0`} z-10 transition-opacity ease-in-out duration-400`}>
-                    <div className="fixed bg-[#202020] w-4 h-4 right-7 md:right-22 -mt-2 rotate-45 border-l border-t border-[#505050]"></div>
-                    <p onClick={() => navigate('/profile')} className="border-t border-l border-r border-[#505050] px-8 text-center p-2 rounded-tl-md hover:underline underline-offset-5">Profile</p>
+                <div className={`fixed bg-[#202020] right-16 md:right-21 mt-13 text-[14px] rounded-b-md rounded-tl-md ${profileIsOpen ? `opacity-100` : `opacity-0`} z-10 transition-opacity ease-in-out duration-400`}>
+                    <div className="fixed bg-[#202020] w-4 h-4 right-17 md:right-22 -mt-2 rotate-45 border-l border-t border-[#505050]"></div>
+                    <p onClick={() => navigate(`/profile/${user.username}`)} className="border-t border-l border-r border-[#505050] px-8 text-center p-2 rounded-tl-md hover:underline underline-offset-5">Profile</p>
                     <p className="border px-8 p-2 border-[#505050] text-center hover:underline underline-offset-5">Settings</p>
-                    <p className="border-b border-l border-r px-8 p-2 border-[#505050] rounded-b-md hover:underline underline-offset-5">Sign Out</p>
+                    <p className="border-b border-l border-r px-8 p-2 border-[#505050] rounded-b-md hover:underline underline-offset-5" onClick={() => logout()}>Sign Out</p>
                 </div>
 
                 <div className={`mt-12 -ml-5 flex w-full justify-center ${searchIsOpen ? `absolute` : `hidden`} md:hidden`}>

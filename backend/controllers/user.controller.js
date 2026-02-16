@@ -2,6 +2,7 @@ import reviewModel from "../models/review.model.js";
 import userModel from "../models/user.model.js";
 import User from "../models/user.model.js";
 import mongoose from "mongoose";
+import { Types } from "mongoose";
 
 export const changePFP = async (req, res) => {
     try {
@@ -30,18 +31,25 @@ export const changePFP = async (req, res) => {
 
 export const addReview = async (req, res) => {
     try {
-        const { tmdbId, text, rating } = req.body;
+        const { tmdbId, text, rating, username, avatarSeed, movieName, posterPath } = req.body;
         const userId = req.user._id;
 
-        if (!tmdbId || !rating) {
+        if (!tmdbId || !rating || !username || !movieName) {
             return res.status(400).json({ message: "Missing required fields" });
         }
+
+        const exists = await reviewModel.findOne({ tmdbId, user: new mongoose.Types.ObjectId(userId) });
+        if (exists) return res.status(400).json({message:"Already reviewed!"})
 
         const review = await reviewModel.create({
             user: userId,
             tmdbId,
             text,
-            rating
+            rating,
+            username,
+            avatarSeed,
+            movieName,
+            posterPath
         });
 
         res.status(201).json({ message: "Review added successfully", review });
@@ -126,3 +134,76 @@ export const getUserInteraction = async (req, res) => {
         res.status(500).json({ message: "Internal Server Error" });
     }
 }
+
+export const fetchReviews = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const { viewerId } = req.query;
+
+        if (!userId) {
+            return res.status(400).json({ message: "User ID is required" });
+        }
+
+        const pipeline = [
+            { $match: { user: new Types.ObjectId(userId) } },
+            
+            {
+                $lookup: {
+                    from: "users", 
+                    localField: "user",
+                    foreignField: "_id",
+                    as: "userDetails"
+                }
+            },
+            { $unwind: { path: "$userDetails", preserveNullAndEmptyArrays: true } },
+            {
+                $addFields: {
+                    username: "$userDetails.username",
+                    avatarSeed: "$userDetails.avatarSeed"
+                }
+            },
+            { $project: { userDetails: 0 } }
+        ];
+
+        if (viewerId && Types.ObjectId.isValid(viewerId)) {
+            pipeline.push(
+                {
+                    $lookup: {
+                        from: "reviewlikes",
+                        let: { reviewId: "$_id" },
+                        pipeline: [
+                            {
+                                $match: {
+                                    $expr: {
+                                        $and: [
+                                            { $eq: ["$review", "$$reviewId"] },
+                                            { $eq: ["$user", new Types.ObjectId(viewerId)] }
+                                        ]
+                                    }
+                                }
+                            }
+                        ],
+                        as: "userLike"
+                    }
+                },
+                {
+                    $addFields: {
+                        isLiked: { $gt: [{ $size: "$userLike" }, 0] }
+                    }
+                },
+                { $project: { userLike: 0 } }
+            );
+        } else {
+            pipeline.push({ $addFields: { isLiked: false } });
+        }
+
+        pipeline.push({ $sort: { createdAt: -1 } });
+
+        const reviews = await reviewModel.aggregate(pipeline);
+        res.status(200).json({ reviews: reviews || [] });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};

@@ -1,11 +1,10 @@
 import { create } from "zustand";
 import api from "../lib/api/api.js";
 import toast from "react-hot-toast";
-import { Navigate, useNavigate } from "react-router-dom";
 
 export const useAuthStore = create((set) => ({
     user: null,
-    setUser: (userData) => set({ user: userData }),
+    profile: null,
     loading: true,
     isLoggedIn: false,
 
@@ -19,37 +18,57 @@ export const useAuthStore = create((set) => ({
             set({ loading: false });
         }
     },
-
-    // 📝 signup
-    signup: async (data) => {
-        const res = await api.post("/auth/signup", data);
-        set({ user: res.data.user });
+    
+    fetchProfile: async (username) => {
+        try {
+            set({ loading: true });
+            const res = await api.get(`/auth/profile/${username}`);
+            set({ profile: res.data });
+        } catch (error) {
+            console.error("Fetch profile error:", error);
+            set({ profile: null });
+        } finally {
+            set({ loading: false });
+        }
     },
 
     handleSignUp: async (data) => {
         try {
+            set({ loading: true });
             const res = await api.post("/auth/signup", data);
-
-            set({
-                user: res.data.user,
-                isLoggedIn: true,
+            set({ 
+                user: res.data.user, 
+                isLoggedIn: true 
             });
-
             toast.success("Account created!");
         } catch (err) {
-            const message =
-                err.response?.data?.message ||
-                "Signup failed";
-
-            console.error(message);
+            const message = err.response?.data?.message || "Signup failed";
             toast.error(message);
+        } finally {
+            set({ loading: false });
         }
     },
 
-
-    // 🚪 logout
+    handleLogin: async (data) => {
+        try {
+            set({ loading: true });
+            const res = await api.post("/auth/login", data);
+            set({ user: res.data.user, isLoggedIn: true });
+            toast.success("Welcome back!");
+        } catch (err) {
+            toast.error(err.response?.data?.message || "Login failed");
+        } finally {
+            set({ loading: false });
+        }
+    },
+    
     logout: async () => {
-        await api.post("/auth/logout");
-        set({ user: null });
+        try {
+            await api.get("/auth/logout");
+            set({ user: null, isLoggedIn: false, profile: null });
+            toast.success("Logged out");
+        } catch (error) {
+            console.error("Logout error", error);
+        }
     },
 }));

@@ -1,93 +1,121 @@
-import React from 'react'
-import { useAuthStore } from '../store/authStore'
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../store/authStore';
 import { Bookmark, Check, MessageSquareMore, Pencil, Star } from 'lucide-react';
 import ProfileCards from '../components/ProfileCards';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import ProfileModal from '../components/ProfileModal';
 
 function Profile() {
-    const user = useAuthStore((s) => s.user);
+    const { username } = useParams();
+    const navigate = useNavigate();
+
+    const currentUser = useAuthStore((s) => s.user);
+    const profileData = useAuthStore((s) => s.profile);
+    const fetchProfile = useAuthStore((s) => s.fetchProfile);
     const loading = useAuthStore((s) => s.loading);
+
+    const [openProfileModal, setOpenProfileModal] = useState(false);
+    const isOwnProfile = currentUser?.username === username;
+    const displayUser = profileData;
+
+    useEffect(() => {
+        if (username) {
+            fetchProfile(username);
+            console.log(displayUser)
+        }
+    }, [username, fetchProfile]);
+
     const tabs = [
         { label: "Watched", icon: Check, path: "watched" },
         { label: "Reviews", icon: MessageSquareMore, path: "reviews" },
-        { label: "Ratings", icon: Star, path: "ratings" },
         { label: "Watchlist", icon: Bookmark, path: "watchlist" },
     ];
     const [active, setActive] = useState(tabs[0]);
-    const navigate = useNavigate();
-    const [openProfileModal, setOpenProfileModal] = useState(false);
 
     if (loading) {
-        return <div className='min-h-screen w-full p-20 flex justify-between items-center'><p>Loading profile...</p></div>;
+        return <div className='min-h-screen w-full flex justify-center items-center text-white'><p className="animate-pulse">Loading profile...</p></div>;
     }
 
-    if (!loading && !user){
-        navigate('/login')
+    if (!displayUser) {
+        return <div className='min-h-screen w-full flex justify-center items-center text-white'><p>User not found</p></div>;
     }
 
     return (
-        <div className='md:p-20 p-5 pt-20 h-full w-screen flex items-center flex-col gap-2 justify-between'>
-            <div className='flex flex-col justify-end items-end'>
-                <img src={`https://api.dicebear.com/9.x/glass/svg?seed=${user.avatarSeed}`} className='size-18 rounded-full border-3' />
-                <div className='bg-white p-1 rounded-full absolute justify-end shadow-md'  onClick={() => setOpenProfileModal(true)}>
-                    <Pencil size={12} color='black' className=''/>
-                </div>
+        <div className='md:p-20 p-5 pt-20 md:pt-28 h-full w-full flex items-center flex-col gap-2'>
+            <div className='relative flex flex-col items-center group justify-center'>
+                <img
+                    src={`https://api.dicebear.com/9.x/glass/svg?seed=${displayUser.avatarSeed}`}
+                    className='size-20 rounded-full border-4 border-white shadow-2xl transition-transform group-hover:scale-105'
+                    alt="avatar"
+                />
+
+                {isOwnProfile && (
+                    <div
+                        className='bg-white p-2 rounded-full absolute bottom-0 right-0 cursor-pointer shadow-lg hover:bg-gray-200 transition-colors'
+                        onClick={() => setOpenProfileModal(true)}
+                    >
+                        <Pencil size={14} color='black' />
+                    </div>
+                )}
             </div>
-            <div className='flex flex-col items-center gap-5'>
-                <div className='flex flex-col items-center gap-1'>
-                    <p className='font-bold text-xl text-center'>{user.name.toUpperCase()}</p>
-                    <p className='font-sm text-sm'>@{user.username}</p>
-                    <div className='flex gap-2 text-sm text-white/50'>
-                        <p>{user.followers.length} Followers</p>
+
+            <div className='flex flex-col items-center gap-6 w-full justify-center tracking-tight'>
+                <div className='flex flex-col items-center gap-3'>
+                    <div className='flex flex-col items-center'>
+                        <h1 className='font-bold text-2xl text-center text-white'>
+                        {(displayUser.name || displayUser.username)}
+                    </h1>
+                    <p className='text-gray-400'>@{displayUser.username}</p>
+                    </div>
+                    <div className='flex gap-4 text-sm text-white/50 px-4 py-1 rounded-full bg-[#303030] shadow-xs'>
+                        <p><span className="text-white font-bold">{displayUser.followers?.length || 0}</span> Followers</p>
                         <p>•</p>
-                        <p>{user.following.length} Following</p>
+                        <p><span className="text-white font-bold">{displayUser.following?.length || 0}</span> Following</p>
                     </div>
                 </div>
-                <div className='grid sm:grid-cols-4 max-w-3xl gap-2 rounded-lg text-sm'>
-                    <div className='p-4 bg-[#303030] rounded-lg flex gap-2 items-center justify-center shadow-md'>
-                        <div className='flex gap-2 items-center'>
-                            <Check size={18} strokeWidth={3} />
-                            <p className='text-white/50'>Watched</p>
+
+                <div className='grid sm:grid-cols-3 max-w-3xl gap-5 rounded-lg text-sm mb-5'>
+                    {[
+                        { label: "Watched", icon: Check, count: displayUser.watched?.length || 0 },
+                        { label: "Reviews", icon: MessageSquareMore, count: displayUser.stats?.reviews || 0 },
+                        { label: "Watchlist", icon: Bookmark, count: displayUser.watchlist?.length || 0 },
+                    ].map((stat) => (
+                        <div key={stat.label} className='p-4 bg-[#303030] rounded-lg flex gap-2 items-center justify-center shadow-md'>
+                            <div className='flex gap-2 items-center'>
+                                <stat.icon size={16} className="" />
+                                <p className='text-sm text-white/50'>{stat.label}</p>
+                                <p className='font-bold text-md text-white'>{stat.count}</p>
+                            </div>
                         </div>
-                        <p className='font-bold'>{user.watched.length}</p>
-                    </div>
-                    <div className='p-4 bg-[#303030] rounded-lg flex gap-4 items-center justify-center shadow-md'>
-                        <div className='flex gap-2 items-center'>
-                            <MessageSquareMore size={18} strokeWidth={3} />
-                            <p className='text-white/50'>Reviews</p>
-                        </div>
-                        <p className='font-bold'>{user.stats.reviews}</p>
-                    </div>
-                    <div className='p-4 bg-[#303030] rounded-lg flex gap-2 items-center justify-center shadow-md'>
-                        <div className='flex gap-2 items-center'>
-                            <Star size={18} strokeWidth={3} />
-                            <p className='text-white/50'>Ratings</p>
-                        </div>
-                        <p className='font-bold'>{user.stats.ratings}</p>
-                    </div>
-                    <div className='p-4 flex gap-2 bg-[#303030] rounded-lg items-center justify-center shadow-md'>
-                        <div className='flex gap-2 items-center'>
-                            <Bookmark size={18} strokeWidth={3} />
-                            <p className='text-white/50'>Watchlist</p>
-                        </div>
-                        <p className='font-bold'>{user.watchlist.length}</p>
-                    </div>
+                    ))}
                 </div>
             </div>
-            <div className='w-full items-center justify-between pt-3'>
-                <div className='w-full grid sm:grid-cols-4 grid-cols-2 text-center text-sm sm:text-md'>
-                    <p className={`cursor-pointer  border-white/50 p-2  font-bold  border-r ${active.label == "Watched" ? `underline underline-offset-4` : `hover:underline hover:decoration-white/50 hover:underline-offset-4`}  transition-all ease-in-out duration-500`} onClick={() => setActive(tabs[0])}>Watched</p>
-                    <p className={`cursor-pointer sm:border-r border-white/50 p-2  font-bold ${active.label == "Reviews" ? `underline underline-offset-4` : ` hover:underline hover:decoration-white/50 hover:underline-offset-4`}   transition-all ease-in-out duration-500`} onClick={() => setActive(tabs[1])}>Reviews</p>
-                    <p className={`cursor-pointer border-r border-white/50 p-2  font-bold ${active.label == "Ratings" ? `underline underline-offset-4` : ` hover:underline hover:decoration-white/50 hover:underline-offset-4`}  transition-all ease-in-out duration-500`} onClick={() => setActive(tabs[2])}>Ratings</p>
-                    <p className={`cursor-pointer p-2  font-bold ${active.label == "Watchlist" ? `underline underline-offset-4` : ` hover:underline hover:decoration-white/50 hover:underline-offset-4`}  transition-all ease-in-out duration-500`} onClick={() => setActive(tabs[3])}>Watchlist</p>
+
+            <div className='w-full max-w-4xl border-b border-white/10'>
+                <div className='flex justify-around gap-2'>
+                    {tabs.map((tab) => (
+                        <button
+                            key={tab.label}
+                            onClick={() => setActive(tab)}
+                            className={`pb-4 px-1 md:px-2 text-sm font-bold transition-all relative ${active.label === tab.label
+                                ? 'text-white'
+                                : 'text-gray-500 hover:text-gray-300'
+                                }`}
+                        >
+                            {tab.label}
+                            {active.label === tab.label && (
+                                <div className="absolute bottom-0 left-0 w-full h-1 bg-white rounded-t-full" />
+                            )}
+                        </button>
+                    ))}
                 </div>
             </div>
-            <ProfileCards tab={active}/>
+
+            <ProfileCards tab={active} displayUser={displayUser} />
+
             {openProfileModal && <ProfileModal setOpenProfileModal={setOpenProfileModal} />}
         </div>
-    )
+    );
 }
 
-export default Profile
+export default Profile;
