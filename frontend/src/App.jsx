@@ -42,22 +42,19 @@ function App() {
       <ScrollToTop />
 
       <Routes>
-        {/* standard browsing routes */}
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
           <Route path='/movie/:movieId' element={<Info />} />
-          <Route path='/browse' element={<Browse />} />
         </Route>
 
-        {/* profile routes - fixed the path syntax to use :username */}
         <Route element={<ProfileLayout />}>
           <Route path='/profile/:username' element={<Profile />} />
         </Route>
 
-        {/* auth routes */}
         <Route element={<AuthLayout />}>
           <Route path="/signup" element={<Logup />} />
           <Route path='/login' element={<Login />} />
+          <Route path='/browse' element={<Browse />} />
         </Route>
       </Routes>
     </>

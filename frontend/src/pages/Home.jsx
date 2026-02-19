@@ -4,6 +4,7 @@ import { fetchPopularMovies } from "../lib/api/popular";
 import { fetchTrendingMovies } from "../lib/api/trending";
 import { fetchAllTimeMovies } from "../lib/api/alltime";
 import { useNavigate } from "react-router-dom";
+import api from "../lib/api/api";
 
 const Tiles = lazy(() => import("../components/Tiles"));
 const GenreCards = lazy(() => import("../components/GenreCards"));
@@ -18,6 +19,7 @@ function Home() {
   const [trending, setTrending] = useState([]);
   const [alltime, setAllTime] = useState([]);
   const [rowsLoading, setRowsLoading] = useState(true);
+  const [topReviews, setTopReviews] = useState([]);
 
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
@@ -61,6 +63,14 @@ function Home() {
       setPopular(data);
       setHeroLoading(false);
     });
+
+    const fetchTopReviews = async () => {
+      const res = await api.get('/user/fetchTopReviews');
+      setTopReviews(res.data.topReviews);
+      console.log(res);
+    }
+
+    fetchTopReviews();
 
     Promise.all([fetchTrendingMovies(), fetchAllTimeMovies()]).then(
       ([t, a]) => {
@@ -171,7 +181,7 @@ function Home() {
 
           <section>
             <p className="text-2xl md:text-3xl font-bold mb-4">From the community…</p>
-            <CommunityCard loading={rowsLoading} />
+            <CommunityCard loading={rowsLoading} topReviews={topReviews}  />
           </section>
         </div>
       </Suspense>

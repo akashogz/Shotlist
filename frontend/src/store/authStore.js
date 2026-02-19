@@ -7,6 +7,10 @@ export const useAuthStore = create((set) => ({
     profile: null,
     loading: true,
     isLoggedIn: false,
+    setUser: (user) => set({
+        user, 
+        isLoggedIn: !!user
+    }),
 
     fetchMe: async () => {
         try {
@@ -52,6 +56,7 @@ export const useAuthStore = create((set) => ({
     handleLogin: async (data) => {
         try {
             set({ loading: true });
+            console.log(data)
             const res = await api.post("/auth/login", data);
             set({ user: res.data.user, isLoggedIn: true });
             toast.success("Welcome back!");

@@ -39,7 +39,7 @@ export const addReview = async (req, res) => {
         }
 
         const exists = await reviewModel.findOne({ tmdbId, user: new mongoose.Types.ObjectId(userId) });
-        if (exists) return res.status(400).json({message:"Already reviewed!"})
+        if (exists) return res.status(400).json({ message: "Already reviewed!" })
 
         const review = await reviewModel.create({
             user: userId,
@@ -66,7 +66,6 @@ export const addToWatched = async (req, res) => {
 
         const user = await User.findById(userId);
         const exists = user.watched.some(movie => movie.movieId === movieId);
-        console.log(movieId)
 
         if (exists) {
             return res.status(400).json({ message: "Movie already in watched list" });
@@ -99,10 +98,10 @@ export const removeFromWatched = async (req, res) => {
 
         const updatedUser = await User.findByIdAndUpdate(
             userId,
-            { 
-                $pull: { 
+            {
+                $pull: {
                     watched: { movieId: numericId }
-                } 
+                }
             },
             { new: true }
         ).select("watched");
@@ -146,10 +145,10 @@ export const fetchReviews = async (req, res) => {
 
         const pipeline = [
             { $match: { user: new Types.ObjectId(userId) } },
-            
+
             {
                 $lookup: {
-                    from: "users", 
+                    from: "users",
                     localField: "user",
                     foreignField: "_id",
                     as: "userDetails"
@@ -205,5 +204,109 @@ export const fetchReviews = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
+export const fetchTopReviews = async (req, res) => {
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+    try {
+        const topReviews = await reviewModel.find({
+            createdAt: { $gte: oneWeekAgo }
+        })
+            .sort({ likesCount: -1 })
+            .limit(2)
+            .populate('user', 'username avatarSeed')
+            .lean();
+
+        return res.status(200).json({ message: "Top Reviews fetched", topReviews });
+    } catch (error) {
+        console.error("Error fetching top reviews:", error);
+        throw error;
+    }
+}
+
+export const fetchMovieReviews = async (req, res) => {
+    try {
+        const { tmdbId, viewerId } = req.query;
+
+        if (!tmdbId) {
+            return res.status(400).json({ message: "tmdbId is required" });
+        }
+
+        // 1. Convert tmdbId to Number because it's a Number in your Schema
+        // 2. Convert viewerId to ObjectId for the $eq comparison in the pipeline
+        const movieNumberId = Number(tmdbId);
+        const viewerObjectId = viewerId && mongoose.Types.ObjectId.isValid(viewerId) 
+            ? new mongoose.Types.ObjectId(viewerId) 
+            : null;
+
+        const pipeline = [
+            // Match reviews for this specific movie
+            { $match: { tmdbId: movieNumberId } },
+
+            // Pull user details (username, avatar) from the Users collection
+            {
+                $lookup: {
+                    from: "users", // Must match your MongoDB collection name
+                    localField: "user",
+                    foreignField: "_id",
+                    as: "userDetails"
+                }
+            },
+            { $unwind: "$userDetails" },
+
+            // Add fields to the top level for easier frontend access
+            {
+                $addFields: {
+                    username: "$userDetails.username",
+                    avatarSeed: "$userDetails.avatarSeed"
+                }
+            },
+
+            // Check if the current viewer has liked this review
+            {
+                $lookup: {
+                    from: "reviewlikes", // Ensure this matches your likes collection name
+                    let: { reviewId: "$_id" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ["$review", "$$reviewId"] },
+                                        { $eq: ["$user", viewerObjectId] }
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    as: "userLike"
+                }
+            },
+            {
+                $addFields: {
+                    isLiked: { $gt: [{ $size: "$userLike" }, 0] }
+                }
+            },
+
+            // Clean up: Remove the temporary objects we joined
+            { $project: { userDetails: 0, userLike: 0 } },
+
+            // Sort by newest first
+            { $sort: { createdAt: -1 } }
+        ];
+
+        const reviews = await reviewModel   .aggregate(pipeline);
+
+        return res.status(200).json({
+            reviews: reviews || [],
+            count: reviews.length
+        });
+
+    } catch (error) {
+        console.error("Error in fetchMovieReviews:", error);
+        return res.status(500).json({ message: "Internal server error" });
     }
 };

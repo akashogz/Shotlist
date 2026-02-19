@@ -12,6 +12,46 @@ import {
 } from "../lib/googleOAuthConfig.js";
 import Review from "../models/review.model.js";
 import Rating from "../models/rating.model.js";
+import userModel from "../models/user.model.js";
+
+export const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    console.log(email, password)
+
+    if (!email || !password) return res.status(400).json({ message: "All fields are required" });
+
+    const user = await userModel.findOne({ email }).select("+password");
+
+    if (!user) return res.status(404).json({ message: "User doesn't exist!" });
+
+    const verify = await bcrypt.compare(password, user.password);
+
+    if (!verify) return res.status(401).json({ message: "Invalid credentials" });
+
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN }
+    );
+
+    res
+      .cookie("token", token, cookieOptions)
+      .status(201)
+      .json({
+        user: {
+          id: user._id,
+          name: user.name,
+          username: user.username,
+          email: user.email,
+          avatarSeed: user.avatarSeed,
+        },
+      });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+}
 
 export const register = async (req, res) => {
   try {

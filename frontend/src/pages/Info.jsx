@@ -12,392 +12,321 @@ import ReviewField from "../components/ReviewField.jsx";
 import api from "../lib/api/api.js";
 import toast from "react-hot-toast";
 
+const GENRE_ICONS = {
+    Action: <HandFistIcon size={16} />,
+    Adventure: <MountainIcon size={16} />,
+    Animation: <FilmIcon size={16} />,
+    Comedy: <LaughIcon size={16} />,
+    Crime: <Columns4Icon size={16} />,
+    Documentary: <BookOpen size={16} />,
+    Drama: <Theater size={16} />,
+    Family: <UsersIcon size={16} />,
+    Fantasy: <Sparkles size={16} />,
+    History: <Clock size={16} />,
+    Horror: <GhostIcon size={16} />,
+    Music: <Music size={16} />,
+    Mystery: <KeyIcon size={16} />,
+    Romance: <HeartIcon size={16} />,
+    "Science Fiction": <Brain size={16} />,
+    "TV Movie": <Tv size={16} />,
+    Thriller: <EyeIcon size={16} />,
+    War: <ShieldAlert size={16} />,
+    Western: <TrainTrack size={16} />
+};
+
 function Info() {
     const [movie, setMovie] = useState(null);
-    const [review, setReview] = useState(null);
+    const [reviews, setReviews] = useState([]);
+    const [country, setCountry] = useState("US");
     const { movieId } = useParams();
     const navigate = useNavigate();
 
-    const g = {
-        Action: <HandFistIcon size={16} />,
-        Adventure: <MountainIcon size={16} />,
-        Animation: <FilmIcon size={16} />,
-        Comedy: <LaughIcon size={16} />,
-        Crime: <Columns4Icon size={16} />,
-        Documentary: <BookOpen size={16} />,
-        Drama: <Theater size={16} />,
-        Family: <UsersIcon size={16} />,
-        Fantasy: <Sparkles size={16} />,
-        History: <Clock size={16} />,
-        Horror: <GhostIcon size={16} />,
-        Music: <Music size={16} />,
-        Mystery: <KeyIcon size={16} />,
-        Romance: <HeartIcon size={16} />,
-        "Science Fiction": <Brain size={16} />,
-        "TV Movie": <Tv size={16} />,
-        Thriller: <EyeIcon size={16} />,
-        War: <ShieldAlert size={16} />,
-        Western: <TrainTrack size={16} />
-    };
-
-    const [country, setCountry] = useState("US");
     const user = useAuthStore((s) => s.user);
     const setUser = useAuthStore((s) => s.setUser);
     const loggedIn = !!user;
 
     useEffect(() => {
         const fetchAll = async () => {
-            const movieData = await getMovieDetails(movieId);
-            setMovie(movieData);
+            try {
+                const movieData = await getMovieDetails(movieId);
+                setMovie(movieData);
 
-            const reviewData = await api.post('/user/findUserReview', { tmdbId: movieData.id });
-            setReview(reviewData);
+                const response = await api.get(`/user/fetchMovieReviews?tmdbId=${Number(movieData.id)}&viewerId=${user?._id || ''}`);
+                setReviews(response.data.reviews || []);
+            } catch (error) {
+                console.error("Failed to fetch movie details:", error);
+            }
         };
         fetchAll();
-    }, [movieId, user]);
+        window.scrollTo(0, 0); // Reset scroll on movie change
+    }, [movieId, user?._id]);
 
-    if (!movie) return null;
+    if (!movie) return <div className="h-screen bg-[#242424]" />; // Prevent layout shift
 
-    const recc =
-        movie.recommendations.results.length !== 0
-            ? movie.recommendations.results
-            : movie.similar.results;
+    const recommendations = movie.recommendations?.results?.length
+        ? movie.recommendations.results
+        : movie.similar?.results || [];
+
+    const isWatched = user?.watched?.some(m => m.movieId === movie.id);
 
     const handleAddToWatched = async () => {
-        let updatedWatched;
-
         if (!loggedIn) {
-            toast.error("Log in to interact")
-            navigate('/login');
+            toast.error("Log in to interact");
+            return navigate('/login');
         }
 
-        if (user.watched.some(m => m.movieId === movie.id)) {
-            const res = await api.post('/user/removeFromWatched', { tmdbId: movie.id });
-            toast.success(res.data.message);
-            updatedWatched = user.watched.filter(m => m.movieId !== movie.id);
-        } else {
-            const res = await api.post('/user/addToWatched', { movieId: movie.id, title: movie.title, posterPath: movie.poster_path });
-            toast.success(res.data.message);
-            updatedWatched = [...user.watched, { movieId: movie.id, title: movie.title, posterPath: movie.poster_path }];
+        try {
+            let updatedWatched;
+            if (isWatched) {
+                const res = await api.post('/user/removeFromWatched', { tmdbId: movie.id });
+                toast.success(res.data.message);
+                updatedWatched = user.watched.filter(m => m.movieId !== movie.id);
+            } else {
+                const res = await api.post('/user/addToWatched', {
+                    movieId: movie.id,
+                    title: movie.title,
+                    posterPath: movie.poster_path
+                });
+                toast.success(res.data.message);
+                updatedWatched = [...user.watched, {
+                    movieId: movie.id,
+                    title: movie.title,
+                    posterPath: movie.poster_path
+                }];
+            }
+            setUser({ ...user, watched: updatedWatched });
+        } catch (err) {
+            toast.error("Action failed");
         }
-
-        setUser({
-            ...user,
-            watched: updatedWatched
-        });
     };
 
     return (
-        <div>
+        <div className="w-screen bg-[#242424] text-white overflow-x-hidden">
             {/* BACKDROP */}
-            <div className="relative h-48 sm:h-64 md:h-70 w-full -z-10">
+            <div className="relative h-100 sm:h-96 md:h-125">
                 <img
-                    src={`https://image.tmdb.org/t/p/original/${movie.backdrop_path}`}
-                    className="absolute h-96 sm:h-112 md:h-160 w-full object-cover object-top"
-                    alt={movie.title}
+                    src={`https://image.tmdb.org/t/p/w1280/${movie.backdrop_path}`}
+                    className="absolute h-full w-full object-cover object-top"
+                    alt=""
                 />
-                <div className="absolute w-full bg-linear-to-b h-96 sm:h-112 md:h-160 from-[#464e8263] to-[#242424]" />
+                <div className="absolute inset-0 bg-linear-to-b from-transparent to-[#242424] h-full" />
             </div>
 
-            {/* CONTENT */}
-            <div className="flex flex-col p-4 sm:p-8 md:p-12 lg:p-20 gap-6 md:gap-10 -mt-30 md:-mt-50">
+            {/* CONTENT WRAPPER */}
+            <div className=" mx-auto px-4 sm:px-8 lg:px-20 md:-mt-70 -mt-70 relative z-10 pb-20">
 
-                {/* POSTER + INFO */}
-                <div className="flex flex-col md:flex-row gap-6 md:gap-10">
-                    <div className="flex flex-col gap-3 items-center md:items-start justify-center">
+                {/* HERO SECTION */}
+                <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
+                    <div className="shrink-0 flex flex-col gap-4 items-center">
                         <img
-                            src={`https://image.tmdb.org/t/p/w1280/${movie.poster_path}`}
-                            className="w-40 sm:w-48 md:w-55 rounded-lg shadow-2xl"
+                            src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
+                            className="w-40 sm:w-45 md:w-50 rounded-xl shadow-2xl border border-white/10"
                             alt={movie.title}
                         />
-                        <div className="w-full flex justify-center">
-                            <button className={`flex gap-1 text-sm font-semibold items-center justify-center ${user?.watched?.some(m => m.movieId === movie.id) ? `bg-white text-black outline-2 outline-offset-2 outline-white` : `bg-[#464E82]`} cursor-pointer hover:brightness-85 rounded-full p-3 shadow-2xl md:w-full sm:w-48 w-40 transition-color ease-in-out duration-1000`} onClick={() => handleAddToWatched()}>
-                                {user?.watched?.some(m => m.movieId === movie.id) ? <Check size={16} color="black" /> : <Plus size={16} />} {user?.watched?.some(m => m.movieId === movie.id) ? `Added` : `Add to Watched`}
-                            </button>
-                        </div>
+                        <button
+                            onClick={handleAddToWatched}
+                            className={`flex gap-2 items-center justify-center p-3 rounded-full w-full font-bold transition-all duration-300 ${isWatched ? 'bg-white text-black' : 'bg-[#464E82] text-white hover:bg-[#5a65a3]'
+                                }`}
+                        >
+                            {isWatched ? <Check size={18} /> : <Plus size={18} />}
+                            {isWatched ? "Watched" : "Add to Watched"}
+                        </button>
                     </div>
 
-                    <div className="flex flex-col gap-4 w-full">
-                        <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-shadow-2xl">
-                            {movie.title}
-                        </h1>
-                        <h2 className="italic text-sm sm:text-md text-shadow-2xl">
-                            ~ {movie.tagline}
-                        </h2>
+                    <div className="flex flex-col gap-4 text-center md:text-left">
+                        <h1 className="text-4xl md:text-6xl font-black">{movie.title}</h1>
+                        {movie.tagline && <p className="italic text-white/70">"{movie.tagline}"</p>}
 
-                        <div className="flex flex-wrap gap-2">
-                            <span className="bg-[#4C4C4C] text-sm p-1 px-2 rounded-full">
-                                {movie.release_date.slice(0, 4)}
-                            </span>
-                            {movie.genres.map((genre, index) => (
-                                <span
-                                    key={index}
-                                    className="bg-[#4C4C4C] text-sm p-1 px-2 rounded-full flex gap-1 items-center"
-                                >
-                                    {g[genre.name]} {genre.name}
+                        <div className="flex flex-wrap justify-center md:justify-start gap-2">
+                            <span className="bg-[#4C4C4C] px-3 py-1 rounded-full text-sm shadow-sm">{movie.release_date?.slice(0, 4)}</span>
+                            {movie.genres?.map(genre => (
+                                <span key={genre.id} className="bg-[#4C4C4C] px-3 py-1 rounded-full text-sm flex items-center gap-2 shadow-sm">
+                                    {GENRE_ICONS[genre.name]} {genre.name}
                                 </span>
                             ))}
-                            <span className="bg-[#4C4C4C] text-sm p-1 px-2 rounded-full flex gap-1 items-center">
-                                <Star size={16} /> {(Math.floor(movie.vote_average * 10)) / 10}
+                            <span className="bg-[#4C4C4C] px-3 py-1 rounded-full text-sm flex items-center gap-1 shadow-sm">
+                                <Star size={14} fill="currentColor" /> {movie.vote_average?.toFixed(1)}/10
                             </span>
-                            <span className="bg-[#4C4C4C] text-sm p-1 px-2 rounded-full flex gap-1 items-center">
-                                <Clock size={16} />
-                                {Math.floor(movie.runtime / 60)}h {movie.runtime % 60}m
+                            <span className="bg-[#4C4C4C] px-3 py-1 rounded-full text-sm flex items-center gap-1 shadow-sm">
+                                <Clock size={14} />{Math.floor(movie.runtime / 60)}h {movie.runtime % 60}m
                             </span>
                         </div>
 
-                        <p className="text-sm sm:text-base leading-relaxed text-shadow-2xl">
-                            {movie.overview}
-                        </p>
+                        <p className="text-md text-white/80 leading-relaxed">{movie.overview}</p>
                     </div>
                 </div>
 
-                {/* WHERE TO WATCH */}
-                <div className="flex flex-col gap-4">
-                    <div className="flex gap-4 items-center">
-                        <h1 className="font-bold text-2xl sm:text-3xl">Where to Watch</h1>
+
+                <div>
+                    <div className="flex justify-between items-center mb-6 mt-16">
+                        <h3 className="text-2xl font-bold">Where to Watch</h3>
                         <select
                             value={country}
                             onChange={(e) => setCountry(e.target.value)}
-                            className="p-1 rounded-lg text-sm bg-[#434343] active:outline-0"
+                            className="bg-white/5 border border-white/10 rounded px-2 py-1 text-sm focus:bg-black/80"
                         >
-                            <option value="US">US</option>
-                            <option value="IN">IN</option>
-                            <option value="EN">EN</option>
-                            <option value="AU">AU</option>
-                            <option value="CN">CN</option>
+                            {["US", "IN", "GB", "AU", "CA"].map(c => <option key={c} value={c}>{c}</option>)}
                         </select>
                     </div>
-
-                    <div className="flex sm:flex-row flex-col sm:flex-wrap gap-4">
-                        {movie["watch/providers"]?.results?.[country]?.buy?.length ? (
-                            movie["watch/providers"].results[country].buy.map((p, i) => (
-                                <div key={i} className="flex gap-2 items-center">
-                                    <img
-                                        src={`https://image.tmdb.org/t/p/original${p.logo_path}`}
-                                        className="size-10 rounded-lg"
-                                    />
-                                    <div>
-                                        <p className="text-sm">{p.provider_name}</p>
-                                        <p className="text-xs text-white/50">Buy</p>
-                                    </div>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                        {movie["watch/providers"]?.results?.[country]?.buy?.map((p, i) => (
+                            <div key={i} className="flex items-center gap-3 p-2 bg-white/5 rounded-lg">
+                                <img src={`https://image.tmdb.org/t/p/original${p.logo_path}`} className="size-10 rounded-md" />
+                                <div>
+                                    <p className="text-sm font-medium">{p.provider_name}</p>
+                                    <p className="text-xs text-white/40">Buy</p>
                                 </div>
-                            ))
-                        ) : (
-                            <p>No options available in your country</p>
-                        )}
+                            </div>
+                        )) || <p className="text-white/40 text-sm">No streaming options found for this region.</p>}
                     </div>
                 </div>
 
-                {/* CAST */}
-                <div className="flex flex-col gap-5">
-                    <div className="flex justify-between">
-                        <h1 className="font-bold text-2xl sm:text-3xl">Cast</h1>
-                        <button className="bg-[#464E82] rounded-full h-10 p-3 px-5 text-sm md:flex gap-2 items-center hidden">
-                            <MoveRight size={16} /> View All
-                        </button>
+                <section className="mt-10 gap-12">
+                    <div className="lg:col-span-2">
+                        <h3 className="text-2xl font-bold mb-6">Cast</h3>
+                        <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
+                            {movie.credits?.cast?.slice(0, 10).map(actor => (
+                                <div key={actor.id} className="shrink-0 w-28 md:w-32">
+                                    {
+                                        actor.profile_path ?
+                                            <img
+                                                src={`https://image.tmdb.org/t/p/w185${actor.profile_path}`}
+                                                className="h-40 w-full object-cover rounded-lg mb-2 bg-white/5"
+                                            /> :
+                                            <img src="/logo.png"
+                                                className="h-40 w-full object-cover rounded-lg mb-2 bg-white/5 p-10" />
+                                    }
+                                    <p className="text-sm font-bold truncate">{actor.name}</p>
+                                    <p className="text-xs text-white/50 truncate">{actor.character}</p>
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                    <div className="flex gap-3 overflow-x-scroll no-scrollbar">
-                        {movie.credits.cast.slice(0, 9).map((actor, index) => (
-                            <div key={index} className="flex w-full flex-col gap-2">
-                                {actor.profile_path ? (
-                                    <img
-                                        src={`https://image.tmdb.org/t/p/w185${actor.profile_path}`}
-                                        className="md:h-40 w-full h-20 object-cover rounded-lg"
-                                    />
-                                ) : (
-                                    <div className="h-40 bg-white/20 rounded-lg flex items-center justify-center">
-                                        <img src="/logo.png" className="h-12 w-12" />
+                </section>
+
+                {/* REVIEWS */}
+                <section className="mt-10">
+                    <div className="flex justify-between items-end mb-6">
+                        <h3 className="text-3xl font-bold">Community Reviews</h3>
+                        {reviews.length > 3 && (
+                            <button className="text-[#464E82] font-semibold flex items-center gap-2 hover:underline">
+                                View all {reviews.length} <MoveRight size={16} />
+                            </button>
+                        )}
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        {reviews.slice(0, 3).map(i => (
+                            <div key={i._id} className="flex flex-col gap-3 bg-[#303030] rounded-lg p-3 justify-between w-full max-w-md">
+                                <div className="flex flex-col gap-2">
+                                    <div className='flex justify-between items-start'>
+                                        <div className="flex flex-col gap-2">
+                                            <div className='flex gap-2 items-center'>
+                                                <img
+                                                    src={`https://api.dicebear.com/9.x/glass/svg?seed=${i.avatarSeed}`}
+                                                    className="size-9 rounded-full object-cover"
+                                                    alt={i.username}
+                                                />
+                                                <div>
+                                                    <p className="font-medium text-white/50 text-sm">{i.username}</p>
+                                                    <p className="text-xs text-white/50">
+                                                        {new Date(i.createdAt).toLocaleDateString('en-GB', {
+                                                            weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+                                                        })}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <span className='flex gap-1 text-sm'><p className='font-semibold text-white text-[14px]'>{i.movieName}</p></span>
+                                            <div className='flex items-center gap-1 h-full'>
+                                                <div className='flex'>
+                                                    {[1, 2, 3, 4, 5].map((idx) => (
+                                                        <div key={idx} className='flex'>
+                                                            {idx - 0.5 <= i.rating && <img src='/star-half-left.png' className='h-4' />}
+                                                            {idx <= i.rating && <img src='/star-half-right.png' className='h-4' />}
+                                                            {idx - 0.5 > i.rating && <img src='/star-half.png' className='h-4' />}
+                                                            {idx > i.rating && <img src='/star-half-r.png' className='h-4' />}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                                <p className='text-sm text-white/50'>({i.rating})</p>
+                                            </div>
+                                        </div>
                                     </div>
-                                )}
-                                <div className="flex flex-col w-20 md:w-35">
-                                    <p className="text-sm font-semibold">{actor.name}</p>
-                                    <p className="text-xs text-white/50">as {actor.character}</p>
+                                    <p className="text-sm leading-relaxed text-white/90 ">{i.text}</p>
+                                </div>
+
+                                <div className="flex justify-end items-center gap-1.5 text-xs text-white/60">
+                                    <div className='flex gap-1 items-center'>
+                                        <div className="flex items-center justify-center">
+                                            <Heart
+                                                size={14}
+                                                className={`cursor-pointer transition-all ${i.isLiked ? "fill-red-500 text-red-500 scale-110" : "hover:text-white"}`}
+                                                onClick={() => handleLike(i._id)}
+                                            />
+                                        </div>
+                                        <p className="leading-none select-none">
+                                            {i.likesCount || 0} Likes
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         ))}
-                    </div>
-                </div>
-                {/* COMMUNITY REVIEWS */}
-                <div className="flex flex-col gap-5">
-                    <div className="grid grid-cols-[1fr_auto] items-center">
-                        <h1 className="font-bold text-2xl sm:text-3xl">
-                            Reviews from the community...
-                        </h1>
-                        <button className="bg-[#464E82] rounded-full h-10 p-3 px-5 text-sm md:flex gap-2 items-center hidden">
-                            <MoveRight size={16} /> View All Reviews
-                        </button>
+                        {reviews.length === 0 && (
+                            <div className="col-span-full text-center py-12 bg-white/5 rounded-xl border border-dashed border-white/20">
+                                <GhostIcon className="mx-auto mb-2 opacity-20" size={48} />
+                                <p className="text-white/40 text-sm">Be the first to review {movie.title}!</p>
+                            </div>
+                        )}
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {/* REVIEW 1 */}
-                        <div className="flex flex-col gap-3 bg-[#303030] rounded-lg p-4 justify-between">
-                            <div className="flex flex-col gap-3">
-                                <div className="flex gap-2 items-center">
-                                    <img
-                                        src="../public/user1.png"
-                                        className="size-9 rounded-full object-cover"
-                                        alt="User"
-                                    />
-                                    <div>
-                                        <p className="font-bold">DailyDoseOfMarvel</p>
-                                        <p className="text-xs text-white/50">
-                                            Tuesday, 14 May 2024
-                                        </p>
-                                    </div>
-                                </div>
-                                <p className="text-sm leading-relaxed">
-                                    My favorite Spidey version! The skateboarding, the humor, the
-                                    suit — everything just clicks. Also, the Gwen & Peter
-                                    storyline is SO much better than usual superhero love
-                                    interests. Deserves more appreciation!
-                                </p>
-                            </div>
-                            <div className="flex gap-1 justify-end items-center text-xs">
-                                <Heart size={14} /> 198 Likes
-                            </div>
-                        </div>
-
-                        {/* REVIEW 2 */}
-                        <div className="flex flex-col gap-3 bg-[#303030] rounded-lg p-4 justify-between">
-                            <div className="flex flex-col gap-3">
-                                <div className="flex gap-2 items-center">
-                                    <img
-                                        src="../public/user.png"
-                                        className="size-9 rounded-full object-cover"
-                                        alt="User"
-                                    />
-                                    <div>
-                                        <p className="font-bold">WebSlinger</p>
-                                        <p className="text-xs text-white/50">
-                                            Monday, 18 June 2024
-                                        </p>
-                                    </div>
-                                </div>
-                                <p className="text-sm leading-relaxed">
-                                    Andrew Garfield brought a fresh, witty energy to Spider-Man
-                                    that I loved. The chemistry with Emma Stone was top-tier
-                                    superhero romance. Some story beats felt rushed, but overall
-                                    it’s an awesome reboot with great web-swinging shots!
-                                </p>
-                            </div>
-                            <div className="flex gap-1 justify-end items-center text-xs">
-                                <Heart size={14} /> 154 Likes
-                            </div>
-                        </div>
-
-                        {/* REVIEW 3 */}
-                        <div className="flex flex-col gap-3 bg-[#303030] rounded-lg p-4 justify-between">
-                            <div className="flex flex-col gap-3">
-                                <div className="flex gap-2 items-center">
-                                    <img
-                                        src="../public/user2.png"
-                                        className="size-9 rounded-full object-cover"
-                                        alt="User"
-                                    />
-                                    <div>
-                                        <p className="font-bold">NerdyNarrator</p>
-                                        <p className="text-xs text-white/50">
-                                            Thursday, 23 September 2024
-                                        </p>
-                                    </div>
-                                </div>
-                                <p className="text-sm leading-relaxed">
-                                    Visually impressive and stylish, but the plot tries to juggle
-                                    too much at once. Still, the action scenes are a blast and
-                                    Garfield nails the awkward-but-cool vibe of Peter Parker.
-                                </p>
-                            </div>
-                            <div className="flex gap-1 justify-end items-center text-xs">
-                                <Heart size={14} /> 128 Likes
-                            </div>
-                        </div>
-                        <button className="bg-[#464E82] rounded-full h-10 p-3 px-5 text-sm gap-2 items-center flex md:hidden justify-center">
-                            <MoveRight size={16} /> View All Reviews
-                        </button>
-                    </div>
-
-                    {/* LOGIN PROMPT */}
-                    {!loggedIn && (
-                        <div className="font-semibold flex gap-2">
-                            Please log in to leave a review.
-                            <Link to="/signup" className="underline font-medium">
-                                Login / Signup
-                            </Link>
+                    {loggedIn ? (
+                        <ReviewField tmdbId={movie.id} movieName={movie.title} posterPath={movie.poster_path} />
+                    ) : (
+                        <div className="bg-white/5 p-6 rounded-xl text-center text-sm">
+                            <p>Please <Link to="/login" className="text-[#464E82] underline font-bold">Login</Link> to share your thoughts.</p>
                         </div>
                     )}
-                    {
-                        loggedIn && (
-                            <ReviewField tmdbId={movie.id} movieName={movie.title} posterPath={movie.poster_path} />
-                        )
-                    }
-                </div>
+                </section>
 
-
-                {/* MORE LIKE THIS */}
-                <div className="flex flex-col gap-4">
-                    <h1 className="font-bold text-2xl sm:text-3xl">More like this</h1>
-                    <div className="flex justify-between gap-5 overflow-x-scroll no-scrollbar">
-                        {recc.slice(0, 5).map((m, i) => (
+                {/* RECOMMENDATIONS */}
+                <section className="mt-16">
+                    <h3 className="text-3xl font-bold mb-6">More Like This</h3>
+                    <div className="flex gap-4 overflow-x-auto pb-6 no-scrollbar">
+                        {recommendations.slice(0, 10).map(m => (
                             <img
-                                key={i}
+                                key={m.id}
                                 onClick={() => navigate(`/movie/${m.id}`)}
                                 src={`https://image.tmdb.org/t/p/w500${m.poster_path}`}
-                                className="h-50 sm:h-70 rounded-lg hover:brightness-50 shrink-0 cursor-pointer"
+                                className="h-50 rounded-lg cursor-pointer hover:scale-105 transition-transform duration-300"
+                                alt={m.title}
                             />
                         ))}
                     </div>
-                </div>
+                </section>
 
-            </div>
-            {/* FULL DETAILS */}
-            <div className="flex flex-col gap-2 px-3 md:px-20">
-                <div className="bg-[#303030] p-3 px-6 sm:px-8 rounded-lg flex gap-2 items-center">
-                    <p className="font-semibold">Full Details</p>
-                    <ReceiptText size={16} />
-                </div>
-
-                <div className="grid grid-cols-1 bg-[#3D3D3D] rounded-lg text-xs sm:text-sm overflow-hidden">
-
-                    {[
-                        ["Release Date", movie.release_date],
-                        ["Language", movie.spoken_languages.map(l => l.english_name).join(", ")],
-                        ["Production", movie.production_companies.map(p => p.name).join(", ")],
-                        ["Budget", `$${movie.budget.toLocaleString()}`],
-                        ["Revenue", `$${movie.revenue.toLocaleString()}`],
-                        ["Popularity", movie.popularity],
-                        ["Status", movie.status],
-                    ].map(([label, value], index) => (
-                        <div className="flex w-full" key={index}>
-                            <div className="w-1/2 p-3 sm:p-4 border-b border-r border-[#303030] text-white/50 text-center">
-                                {label}
-                            </div>
-                            <div className="w-1/2 p-3 sm:p-4 border-b border-[#303030] text-center font-semibold">
-                                {value}
-                            </div>
-                        </div>
-                    ))}
-
-                    {/* IMDb */}
-                    <div className="flex w-full">
-                        <div className="w-1/2 p-3 sm:p-4 border-r border-[#303030] text-white/50 text-center">
-                            IMDb Page
-                        </div>
-                        <div className="w-1/2 p-3 sm:p-4 text-center font-semibold">
-                            <a
-                                href={`https://www.imdb.com/title/${movie.imdb_id}`}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="inline-flex items-center gap-1 hover:underline"
-                            >
-                                <ExternalLink size={14} />
-                                Open Page
-                            </a>
-                        </div>
+                {/* FULL DATA TABLE */}
+                <section className="mt-16">
+                    <div className="bg-[#303030] p-4 rounded-t-xl flex items-center gap-2 border-b border-white/10">
+                        <ReceiptText size={20} />
+                        <h3 className="font-bold">Production Details</h3>
                     </div>
-                </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 bg-[#3D3D3D] rounded-b-xl overflow-hidden text-sm">
+                        {[
+                            ["Release Date", movie.release_date],
+                            ["Language", movie.spoken_languages?.map(l => l.english_name).join(", ")],
+                            ["Budget", movie.budget ? `$${movie.budget.toLocaleString()}` : "N/A"],
+                            ["Revenue", movie.revenue ? `$${movie.revenue.toLocaleString()}` : "N/A"],
+                            ["Status", movie.status],
+                            ["IMDb", <a href={`https://www.imdb.com/title/${movie.imdb_id}`} target="_blank" className="text-blue-400 hover:underline">View Page</a>]
+                        ].map(([label, value], i) => (
+                            <div key={i} className="flex border-white/5 border">
+                                <div className="w-1/3 p-4 text-white/40 bg-[#3D3D3D] border-r border-white/5">{label}</div>
+                                <div className="w-2/3 p-4 font-medium">{value}</div>
+                            </div>
+                        ))}
+                    </div>
+                </section>
             </div>
-
         </div>
     );
 }

@@ -1,5 +1,5 @@
 import express from "express";
-import { addReview, addToWatched, changePFP, fetchReviews, getUserInteraction, removeFromWatched } from "../controllers/user.controller.js";
+import { addReview, addToWatched, changePFP, fetchMovieReviews, fetchReviews, fetchTopReviews, getUserInteraction, removeFromWatched } from "../controllers/user.controller.js";
 import { protect } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
@@ -10,5 +10,7 @@ router.post('/findUserReview', getUserInteraction);
 router.post('/addToWatched', protect, addToWatched);
 router.post('/removeFromWatched', protect, removeFromWatched);
 router.get('/fetchReviews/:userId', fetchReviews);
+router.get('/fetchTopReviews', fetchTopReviews);
+router.get('/fetchMovieReviews', fetchMovieReviews);
 
 export default router;

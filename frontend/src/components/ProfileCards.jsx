@@ -3,10 +3,12 @@ import { useAuthStore } from '../store/authStore'
 import api from '../lib/api/api';
 import { Heart } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 function ProfileCards({ tab, displayUser }) {
   const [items, setItems] = useState([])
   const user = useAuthStore((s) => s.user);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchReview = async () => {
@@ -64,6 +66,16 @@ function ProfileCards({ tab, displayUser }) {
         </div>
       )}
 
+      {items.length > 0 && tab.label != "Reviews" && (
+        <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-5 place-items-center'>
+          {
+            items.map((i) => (
+              <img src={`https://image.tmdb.org/t/p/w500/${i.posterPath}`} className='w-35 rounded-lg hover:scale-105 ease-in-out duration-200' onClick={() => navigate(`/movie/${i.movieId}`)}  />
+            ))
+          }
+        </div>
+      )}
+
       {items?.length > 0 && tab.label === "Reviews" && (
         <div className='w-full items-start'>
           <div className='grid sm:grid-cols-3 grid-cols-1 gap-5'>
@@ -87,7 +99,7 @@ function ProfileCards({ tab, displayUser }) {
                           </p>
                         </div>
                       </div>
-                      <span className='flex gap-1 text-sm'><p className='font-semibold text-white'>{i.movieName}</p></span>
+                      <span className='flex gap-1 text-sm'><p className='font-semibold text-white text-[14px]'>{i.movieName}</p></span>
                       <div className='flex items-center gap-1 h-full'>
                         <div className='flex'>
                           {[1, 2, 3, 4, 5].map((idx) => (
