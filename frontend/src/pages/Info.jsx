@@ -1,8 +1,8 @@
 import {
-    BookOpen, Brain, Check, Clock, Columns4Icon, ExternalLink, EyeIcon,
+    BookOpen, Brain, Check, Clock, Columns4Icon, EllipsisVertical, ExternalLink, EyeIcon,
     FilmIcon, GhostIcon, HandFistIcon, Heart, HeartIcon, KeyIcon,
-    LaughIcon, MountainIcon, MoveRight, Music, Plus, ReceiptText,
-    ShieldAlert, Sparkles, Star, Theater, TrainTrack, Tv, UsersIcon
+    LaughIcon, Menu, MountainIcon, MoveRight, Music, Pencil, Plus, ReceiptText,
+    ShieldAlert, Sparkles, Star, Theater, TrainTrack, Trash, Tv, UsersIcon
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { getMovieDetails } from "../lib/api/movie.js";
@@ -40,6 +40,7 @@ function Info() {
     const [country, setCountry] = useState("US");
     const { movieId } = useParams();
     const navigate = useNavigate();
+    const [editReview, setEditReview] = useState(false);
 
     const user = useAuthStore((s) => s.user);
     const setUser = useAuthStore((s) => s.setUser);
@@ -58,10 +59,10 @@ function Info() {
             }
         };
         fetchAll();
-        window.scrollTo(0, 0); // Reset scroll on movie change
+        window.scrollTo(0, 0);
     }, [movieId, user?._id]);
 
-    if (!movie) return <div className="h-screen bg-[#242424]" />; // Prevent layout shift
+    if (!movie) return <div className="h-screen bg-[#242424]" />;
 
     const recommendations = movie.recommendations?.results?.length
         ? movie.recommendations.results
@@ -101,7 +102,7 @@ function Info() {
     };
 
     return (
-        <div className="w-screen bg-[#242424] text-white overflow-x-hidden">
+        <div className="w-screen bg-[#242424] text-white overflow-x-hidden -z-10">
             {/* BACKDROP */}
             <div className="relative h-100 sm:h-96 md:h-125">
                 <img
@@ -220,20 +221,26 @@ function Info() {
                             <div key={i._id} className="flex flex-col gap-3 bg-[#303030] rounded-lg p-3 justify-between w-full max-w-md">
                                 <div className="flex flex-col gap-2">
                                     <div className='flex justify-between items-start'>
-                                        <div className="flex flex-col gap-2">
-                                            <div className='flex gap-2 items-center'>
-                                                <img
-                                                    src={`https://api.dicebear.com/9.x/glass/svg?seed=${i.avatarSeed}`}
-                                                    className="size-9 rounded-full object-cover"
-                                                    alt={i.username}
-                                                />
-                                                <div>
-                                                    <p className="font-medium text-white/50 text-sm">{i.username}</p>
-                                                    <p className="text-xs text-white/50">
-                                                        {new Date(i.createdAt).toLocaleDateString('en-GB', {
-                                                            weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-                                                        })}
-                                                    </p>
+                                        <div className="flex flex-col gap-2 w-full">
+                                            <div className='flex gap-2 items-center justify-between w-full'>
+                                                <div className="flex gap-2">
+                                                    <img
+                                                        src={`https://api.dicebear.com/9.x/glass/svg?seed=${i.avatarSeed}`}
+                                                        className="size-9 rounded-full object-cover"
+                                                        alt={i.username}
+                                                    />
+                                                    <div>
+                                                        <p className="font-medium text-white/50 text-sm">{i.username}</p>
+                                                        <p className="text-xs text-white/50">
+                                                            {new Date(i.createdAt).toLocaleDateString('en-GB', {
+                                                                weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+                                                            })}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex gap-2">
+                                                    <div className="bg-[#3a3a3a] p-2 rounded-lg hover:rounded-[50px] duration-300 transition-all ease-in-out" onClick={() => setEditReview(true)}><Pencil size={16} className=""/></div>
+                                                    <div className="bg-[#3a3a3a] p-2 rounded-lg hover:rounded-[50px] duration-300 transition-all ease-in-out"><Trash size={16}/></div>
                                                 </div>
                                             </div>
                                             <span className='flex gap-1 text-sm'><p className='font-semibold text-white text-[14px]'>{i.movieName}</p></span>
@@ -252,7 +259,9 @@ function Info() {
                                             </div>
                                         </div>
                                     </div>
-                                    <p className="text-sm leading-relaxed text-white/90 ">{i.text}</p>
+                                    <p className={`text-sm leading-relaxed text-white/90 ${editReview ? `hidden` : ``} duration-150 transition-opacity`} >{i.text}</p>
+                                    <textarea className={`bg-[#525252] focus:outline-0 border border-white/50 rounded-lg p-1 text-sm no-scrollbar ${editReview ? `` : `hidden`}`} />
+                                    <button className="w-full bg-[#464E82] p-2 rounded-lg text-sm font-bold">Edit</button>
                                 </div>
 
                                 <div className="flex justify-end items-center gap-1.5 text-xs text-white/60">
