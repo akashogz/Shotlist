@@ -2,7 +2,6 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import axios from "axios";
 import crypto from "crypto";
-
 import User from "../models/user.model.js";
 import { cookieOptions } from "../lib/cookieOptions.js";
 import {
@@ -10,23 +9,24 @@ import {
   googleTokenURL,
   googleUserInfoURL,
 } from "../lib/googleOAuthConfig.js";
-import Review from "../models/review.model.js";
-import Rating from "../models/rating.model.js";
-import userModel from "../models/user.model.js";
+
+const BACKEND_URL = process.env.NODE_ENV === "production" 
+  ? "https://shotlist.onrender.com" 
+  : "http://localhost:3000";
+
+const FRONTEND_URL = process.env.NODE_ENV === "production" 
+  ? "https://shotlist-frontend.onrender.com" 
+  : "http://localhost:5173";
 
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log(email, password)
-
     if (!email || !password) return res.status(400).json({ message: "All fields are required" });
 
-    const user = await userModel.findOne({ email }).select("+password");
-
+    const user = await User.findOne({ email }).select("+password");
     if (!user) return res.status(404).json({ message: "User doesn't exist!" });
 
     const verify = await bcrypt.compare(password, user.password);
-
     if (!verify) return res.status(401).json({ message: "Invalid credentials" });
 
     const token = jwt.sign(
@@ -56,7 +56,6 @@ export const login = async (req, res) => {
 export const register = async (req, res) => {
   try {
     const { name, username, email, password } = req.body;
-
     if (!name || !username || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
@@ -67,15 +66,11 @@ export const register = async (req, res) => {
 
     if (exists) {
       return res.status(409).json({
-        message:
-          exists.email === email
-            ? "Email already exists"
-            : "Username already exists",
+        message: exists.email === email ? "Email already exists" : "Username already exists",
       });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
     const user = await User.create({
       name,
       username,
@@ -104,7 +99,6 @@ export const register = async (req, res) => {
           avatarSeed: user.avatarSeed,
         },
       });
-
   } catch (error) {
     console.error("Register error:", error);
     res.status(500).json({ message: "Server error" });
@@ -116,7 +110,7 @@ export const googleRedirect = (req, res) => {
     `${googleOAuthURL}?` +
     new URLSearchParams({
       client_id: process.env.GOOGLE_CLIENT_ID,
-      redirect_uri: "http://localhost:3000/api/auth/google/callback",
+      redirect_uri: `${BACKEND_URL}/api/auth/google/callback`,
       response_type: "code",
       scope: "email profile",
       prompt: "consent",
@@ -128,10 +122,7 @@ export const googleRedirect = (req, res) => {
 export const googleCallback = async (req, res) => {
   try {
     const { code } = req.query;
-
-    if (!code) {
-      return res.status(400).json({ message: "Missing code" });
-    }
+    if (!code) return res.status(400).json({ message: "Missing code" });
 
     const tokenRes = await axios.post(
       googleTokenURL,
@@ -140,26 +131,18 @@ export const googleCallback = async (req, res) => {
         client_secret: process.env.GOOGLE_CLIENT_SECRET,
         code,
         grant_type: "authorization_code",
-        redirect_uri: "http://localhost:3000/api/auth/google/callback",
+        redirect_uri: `${BACKEND_URL}/api/auth/google/callback`,
       },
-      {
-        headers: { "Content-Type": "application/json" },
-      }
+      { headers: { "Content-Type": "application/json" } }
     );
 
     const { access_token } = tokenRes.data;
-
     const userRes = await axios.get(googleUserInfoURL, {
-      headers: {
-        Authorization: `Bearer ${access_token}`,
-      },
+      headers: { Authorization: `Bearer ${access_token}` },
     });
 
     const { id: googleId, email, name } = userRes.data;
-
-    let user = await User.findOne({
-      $or: [{ googleId }, { email }],
-    });
+    let user = await User.findOne({ $or: [{ googleId }, { email }] });
 
     if (!user) {
       user = await User.create({
@@ -182,11 +165,10 @@ export const googleCallback = async (req, res) => {
 
     res
       .cookie("token", token, cookieOptions)
-      .redirect("http://localhost:5173");
-
+      .redirect(FRONTEND_URL);
   } catch (err) {
     console.error("Google OAuth error:", err);
-    res.redirect("http://localhost:5173/login?error=oauth");
+    res.redirect(`${FRONTEND_URL}/login?error=oauth`);
   }
 };
 
