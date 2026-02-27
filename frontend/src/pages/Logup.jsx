@@ -15,7 +15,7 @@ function Logup() {
     const handleSignUp = useAuthStore((s) => s.handleSignUp);
     const user = useAuthStore((s) => s.user);
     const navigate = useNavigate()
-;
+        ;
     const isPasswordValid = password.length >= 8 && /[a-zA-Z]/.test(password) && /\d/.test(password);
 
     useEffect(() => {
@@ -24,7 +24,7 @@ function Logup() {
         setValid(Boolean(allFilled));
     }, [name, username, email, password]);
 
-    if (!(!user)){
+    if (!(!user)) {
         navigate('/');
     }
 
@@ -66,9 +66,11 @@ function Logup() {
                             email,
                             password,
                         })}>Signup</button>
-                    <button onClick={() => {window.location.href = "https://shotlist.onrender.com/api/auth/google";}}
-                            className='flex gap-2 bg-white rounded-lg p-3 text-black font-bold items-center justify-center'>
-                        <img src='google.svg.png' className='size-6'/>
+                    <button onClick={() => {
+                        window.location.href = `${import.meta.env.VITE_API_URL || "http://localhost:3000/api"}/auth/google`;
+                    }}
+                        className='flex gap-2 bg-white rounded-lg p-3 text-black font-bold items-center justify-center'>
+                        <img src='google.svg.png' className='size-6' />
                         Continue with Google
                     </button>
 

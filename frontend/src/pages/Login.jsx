@@ -29,7 +29,7 @@ function Logup() {
                     </div>
                     <a className='w-full text-center'>Forgot your password?</a>
                     <button className='bg-[#464E82] p-3 rounded-lg font-bold text-md hover:brightness-110 ease-in-out duration-300' onClick={() => handleLogin({ email: email, password: password })}>Login</button>
-                    <button onClick={() => { window.location.href = "http://localhost:3000/api/auth/google"; }}
+                    <button onClick={() => { window.location.href = window.location.href = `${import.meta.env.VITE_API_URL || "http://localhost:3000/api"}/auth/google`; }}
                         className='flex gap-2 bg-white rounded-lg p-3 text-black font-bold items-center justify-center'>
                         <img src='google.svg.png' className='size-6' />
                         Continue with Google

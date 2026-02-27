@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://shotlist.onrender.com/api",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000/api",
   withCredentials: true,
 });
 
