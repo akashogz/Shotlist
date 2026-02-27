@@ -13,8 +13,20 @@ configDotenv()
 const app = express();
 app.use(cookieParser());
 const PORT = process.env.PORT || 3000;
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://shotlist-og.vercel.app"
+];
+
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
 }));
 connectDB()
