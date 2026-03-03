@@ -49,8 +49,16 @@ const userSchema = new Schema(
       ref: "User",
     }],
     
-    watched: [movieSnippetSchema],
-    watchlist: [movieSnippetSchema],
+    watched: { 
+      type: Schema.Types.ObjectId,
+      ref: "Watched"
+     },
+
+    watchlist: {
+      type: Schema.Types.ObjectId,
+      ref: "Watchlist"
+    },
+    
     role: {
       type: String,
       enum: ["user", "admin"],

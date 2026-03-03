@@ -71,10 +71,6 @@ function Logup() {
                     }}
                         className='flex gap-2 bg-white rounded-lg p-3 text-black font-bold items-center justify-center'>
                         <img src='google.svg.png' className='size-6' />
-                    </button>
-                    <button onClick={() => {window.location.href = "https://shotlist.onrender.com/api/auth/google";}}
-                            className='flex gap-2 bg-white rounded-lg p-3 text-black font-bold items-center justify-center'>
-                        <img src='google.svg.png' className='size-6'/>
                         Continue with Google
                     </button>
 

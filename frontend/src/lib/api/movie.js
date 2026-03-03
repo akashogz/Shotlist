@@ -15,9 +15,10 @@ export const getMovieDetails = async (movieId) => {
     try {
         const response = await api.get(`/movie/${movieId}`, {
             params: {
-                append_to_response: "credits,watch/providers,recommendations,similar"
+                append_to_response: "credits,watch/providers,recommendations,similar,videos"
             }
         });
+        console.log(response.data)
         return response.data;
     } catch (error) {
         console.error("Failed to fetch movie details:", error);

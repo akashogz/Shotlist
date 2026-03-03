@@ -101,7 +101,7 @@ const MoviePoster = ({ movie }) => {
             className="group relative cursor-pointer"
             onClick={() => navigate(`/movie/${movie?.id}`)}
         >
-            <div className="aspect-2/3 w-35 md:45 overflow-hidden rounded-xl bg-[#1A1A1A]">
+            <div className="aspect-2/3 w-35 md:45 rounded-xl bg-[#1A1A1A] group">
                 {!loaded && (
                     <div className="absolute inset-0 animate-pulse bg-[#262626]" />
                 )}
@@ -110,7 +110,7 @@ const MoviePoster = ({ movie }) => {
                     src={`https://image.tmdb.org/t/p/w342/${movie.poster_path}`}
                     alt={movie.title}
                     onLoad={() => setLoaded(true)}
-                    className={`h-full w-full object-cover transition-transform duration-500 group-hover:scale-110 ${
+                    className={`h-full w-full object-cover rounded-lg transition-transform duration-500 group-hover:scale-105 ${
                         loaded ? "opacity-100" : "opacity-0"
                     }`}
                 />

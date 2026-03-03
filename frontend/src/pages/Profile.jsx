@@ -76,9 +76,9 @@ function Profile() {
 
                 <div className='grid sm:grid-cols-3 max-w-3xl gap-5 rounded-lg text-sm mb-5'>
                     {[
-                        { label: "Watched", icon: Check, count: displayUser.watched?.length || 0 },
+                        { label: "Watched", icon: Check, count: displayUser.stats?.watched || 0 },
                         { label: "Reviews", icon: MessageSquareMore, count: displayUser.stats?.reviews || 0 },
-                        { label: "Watchlist", icon: Bookmark, count: displayUser.watchlist?.length || 0 },
+                        { label: "Watchlist", icon: Bookmark, count: displayUser.stats?.watchlist || 0 },
                     ].map((stat) => (
                         <div key={stat.label} className='p-4 bg-[#303030] rounded-lg flex gap-2 items-center justify-center shadow-md'>
                             <div className='flex gap-2 items-center'>

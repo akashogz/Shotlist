@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { useAuthStore } from '../store/authStore'
 import api from '../lib/api/api';
-import { Heart } from 'lucide-react';
+import { Heart, Pencil, Trash } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import { FlipCard } from './FlipCard';
 
 function ProfileCards({ tab, displayUser }) {
   const [items, setItems] = useState([])
@@ -17,16 +18,31 @@ function ProfileCards({ tab, displayUser }) {
         const query = user?._id ? `?viewerId=${user._id}` : "";
         const res = await api.get(`/user/fetchReviews/${displayUser._id}${query}`);
         setItems(res.data.reviews || []);
-        
-      console.log(res.data)
+
+        console.log(res.data)
       } catch (error) {
         console.error(error);
       }
     }
 
+    const fetchWatched = async () => {
+      if (!displayUser?._id) return;
+      try {
+        const res = await api.get(`/user/fetchWatched/${displayUser._id}`);
+        setItems(res.data.watched || []);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
     if (tab.label === "Reviews") {
       fetchReview();
-    } else {
+    }
+    else if (tab.label == "Watched") {
+      console.log("watched")
+      fetchWatched();
+    } 
+    else {
       setItems(displayUser?.[tab.label.toLowerCase()] || []);
     }
   }, [tab, displayUser?._id, user?._id])
@@ -70,7 +86,7 @@ function ProfileCards({ tab, displayUser }) {
         <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-5 place-items-center'>
           {
             items.map((i) => (
-              <img src={`https://image.tmdb.org/t/p/w500/${i.posterPath}`} className='w-35 rounded-lg hover:scale-105 ease-in-out duration-200' onClick={() => navigate(`/movie/${i.movieId}`)}  />
+              <FlipCard item={i} />
             ))
           }
         </div>

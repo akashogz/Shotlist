@@ -67,7 +67,7 @@ function Tiles({ movies = [], title, loading }) {
 
       <MoreModal
         open={openMore}
-        movies={movies}
+        items={movies}
         title={title}
         setOpenMore={setOpenMore}
       />

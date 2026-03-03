@@ -3,6 +3,7 @@ import userModel from "../models/user.model.js";
 import User from "../models/user.model.js";
 import mongoose from "mongoose";
 import { Types } from "mongoose";
+import watchedModel from "../models/watched.model.js";
 
 export const changePFP = async (req, res) => {
     try {
@@ -64,22 +65,23 @@ export const addToWatched = async (req, res) => {
         const { movieId, title, posterPath } = req.body;
         const userId = req.user._id;
 
-        const user = await User.findById(userId);
-        const exists = user.watched.some(movie => movie.movieId === movieId);
+        const exists = await watchedModel.findOne( { userId, movieId });
+        console.log(exists)
 
         if (exists) {
             return res.status(400).json({ message: "Movie already in watched list" });
         }
 
-        const updatedUser = await User.findByIdAndUpdate(
+        const watched = await watchedModel.create({
             userId,
-            { $push: { watched: { movieId, title, posterPath } } },
-            { new: true }
-        );
+            movieId,
+            title,
+            posterPath
+        })
 
         res.status(201).json({
             message: "Added to watched",
-            watched: updatedUser.watched
+            watched: watched
         });
     } catch (error) {
         console.error("Error adding to watched:", error);
@@ -94,25 +96,11 @@ export const removeFromWatched = async (req, res) => {
 
         if (!tmdbId) return res.status(400).json({ message: "No movie id provided" });
 
-        const numericId = Number(tmdbId);
-
-        const updatedUser = await User.findByIdAndUpdate(
-            userId,
-            {
-                $pull: {
-                    watched: { movieId: numericId }
-                }
-            },
-            { new: true }
-        ).select("watched");
-
-        if (!updatedUser) {
-            return res.status(404).json({ message: "User not found" });
-        }
+        const deleted = await watchedModel.findOneAndDelete({ movieId: tmdbId, userId });
 
         res.status(200).json({
             message: "Removed from watched",
-            watched: updatedUser.watched
+            watched: deleted
         });
     } catch (error) {
         console.error("Error removing from watched:", error);
@@ -208,13 +196,8 @@ export const fetchReviews = async (req, res) => {
 };
 
 export const fetchTopReviews = async (req, res) => {
-    const oneWeekAgo = new Date();
-    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-
     try {
-        const topReviews = await reviewModel.find({
-            createdAt: { $gte: oneWeekAgo }
-        })
+        const topReviews = await reviewModel.find()
             .sort({ likesCount: -1 })
             .limit(2)
             .populate('user', 'username avatarSeed')
@@ -325,6 +308,37 @@ export const editReview = async (req, res) => {
         res.status(200).json({ message: "Review Updated", updatedReview });
     } catch (error) {
         console.error("Error in updateReviews:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+export const checkWatched = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user._id;
+        
+        console.log(req.params);
+        const tmdbId = Number(id);
+
+        const isWatched = await watchedModel.findOne({ movieId: tmdbId, userId });
+        console.log(isWatched, tmdbId)
+
+        return res.status(200).json({ message: "Fetched", isWatched: !!(isWatched) });
+
+    } catch (error) {
+        console.error("Error in checkWatched:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+} 
+
+export const fetchWatched = async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const watched = await watchedModel.find({ userId }).sort({ addedAt: -1 });
+
+        return res.status(200).json({ message: "Fetched watched", watched });
+    } catch (error) {
+        console.error("Error in fetchWatched:", error);
         return res.status(500).json({ message: "Internal server error" });
     }
 }

@@ -11,6 +11,7 @@ import { useAuthStore } from "../store/authStore.js";
 import ReviewField from "../components/ReviewField.jsx";
 import api from "../lib/api/api.js";
 import toast from "react-hot-toast";
+import MoreModal from "../components/MoreModal.jsx";
 
 const GENRE_ICONS = {
     Action: <HandFistIcon size={16} />,
@@ -41,6 +42,8 @@ function Info() {
     const { movieId } = useParams();
     const navigate = useNavigate();
     const [editReview, setEditReview] = useState(false);
+    const [openMore, setOpenMore] = useState(false);
+    const [isWatched, setIsWatched] = useState(false);
 
     const user = useAuthStore((s) => s.user);
     const setUser = useAuthStore((s) => s.setUser);
@@ -54,6 +57,10 @@ function Info() {
 
                 const response = await api.get(`/user/fetchMovieReviews?tmdbId=${Number(movieData.id)}&viewerId=${user?._id || ''}`);
                 setReviews(response.data.reviews || []);
+
+                const watched = await api.get(`/user/checkWatched/${movieId}`);
+                console.log(watched)
+                setIsWatched(watched.data.isWatched);
             } catch (error) {
                 console.error("Failed to fetch movie details:", error);
             }
@@ -68,8 +75,6 @@ function Info() {
         ? movie.recommendations.results
         : movie.similar?.results || [];
 
-    const isWatched = user?.watched?.some(m => m.movieId === movie.id);
-
     const handleAddToWatched = async () => {
         if (!loggedIn) {
             toast.error("Log in to interact");
@@ -77,11 +82,10 @@ function Info() {
         }
 
         try {
-            let updatedWatched;
             if (isWatched) {
                 const res = await api.post('/user/removeFromWatched', { tmdbId: movie.id });
                 toast.success(res.data.message);
-                updatedWatched = user.watched.filter(m => m.movieId !== movie.id);
+                setIsWatched(false);
             } else {
                 const res = await api.post('/user/addToWatched', {
                     movieId: movie.id,
@@ -89,32 +93,60 @@ function Info() {
                     posterPath: movie.poster_path
                 });
                 toast.success(res.data.message);
-                updatedWatched = [...user.watched, {
-                    movieId: movie.id,
-                    title: movie.title,
-                    posterPath: movie.poster_path
-                }];
+                setIsWatched(true);
             }
-            setUser({ ...user, watched: updatedWatched });
         } catch (err) {
+            console.log(err)
             toast.error("Action failed");
         }
     };
 
+    const handleLike = async (reviewId) => {
+        try {
+            if (!loggedIn) {
+                toast.error("Log in to interact");
+                return navigate('/login');
+            }
+            console.log(reviewId)
+            const res = await api.post(`/like/likeToggle`, { reviewId });
+            const { isLiked: serverIsLiked, message } = res.data;
+            console.log(res)
+            setReviews((prevItems) =>
+                prevItems.map((item) => {
+                    if (item._id === reviewId) {
+                        const newIsLiked = serverIsLiked !== undefined ? serverIsLiked : !item.isLiked;
+                        return {
+                            ...item,
+                            isLiked: newIsLiked,
+                            likesCount: newIsLiked
+                                ? (item.likesCount || 0) + 1
+                                : Math.max(0, (item.likesCount || 0) - 1)
+                        };
+                    }
+                    return item;
+                })
+            );
+            toast.success(message);
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Something went wrong");
+        }
+    }
+    console.log(movie)
+
     return (
         <div className="w-screen bg-[#242424] text-white overflow-x-hidden -z-10">
             {/* BACKDROP */}
-            <div className="relative h-100 sm:h-96 md:h-125">
+            <div className="relative h-100 sm:h-96 md:h-150">
                 <img
                     src={`https://image.tmdb.org/t/p/w1280/${movie.backdrop_path}`}
                     className="absolute h-full w-full object-cover object-top"
                     alt=""
                 />
-                <div className="absolute inset-0 bg-linear-to-b from-transparent to-[#242424] h-full" />
+                <div className="absolute inset-0 bg-linear-to-b from-[#464e8253] to-[#242424] h-full" />
             </div>
 
             {/* CONTENT WRAPPER */}
-            <div className=" mx-auto px-4 sm:px-8 lg:px-20 md:-mt-70 -mt-70 relative z-10 pb-20">
+            <div className=" mx-auto px-4 sm:px-8 lg:px-20 md:-mt-100 -mt-70 relative z-10 pb-20">
 
                 {/* HERO SECTION */}
                 <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
@@ -184,7 +216,10 @@ function Info() {
 
                 <section className="mt-10 gap-12">
                     <div className="lg:col-span-2">
-                        <h3 className="text-2xl font-bold mb-6">Cast</h3>
+                        <div className="flex justify-between mb-6 items-center">
+                            <h3 className="text-2xl font-bold ">Cast</h3>
+                            <button className="flex gap-2 rounded-full bg-[#464E82] p-2 px-5 text-sm font-bold items-center" onClick={() => setOpenMore(true)}>View All <MoveRight/></button>
+                        </div>
                         <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
                             {movie.credits?.cast?.slice(0, 10).map(actor => (
                                 <div key={actor.id} className="shrink-0 w-28 md:w-32">
@@ -238,10 +273,6 @@ function Info() {
                                                         </p>
                                                     </div>
                                                 </div>
-                                                <div className="flex gap-2">
-                                                    <div className="bg-[#3a3a3a] p-2 rounded-lg hover:rounded-[50px] duration-300 transition-all ease-in-out" onClick={() => setEditReview(true)}><Pencil size={16} className=""/></div>
-                                                    <div className="bg-[#3a3a3a] p-2 rounded-lg hover:rounded-[50px] duration-300 transition-all ease-in-out"><Trash size={16}/></div>
-                                                </div>
                                             </div>
                                             <span className='flex gap-1 text-sm'><p className='font-semibold text-white text-[14px]'>{i.movieName}</p></span>
                                             <div className='flex items-center gap-1 h-full'>
@@ -257,11 +288,9 @@ function Info() {
                                                 </div>
                                                 <p className='text-sm text-white/50'>({i.rating})</p>
                                             </div>
+                                            <p className={`text-sm leading-relaxed text-white/90 duration-150 transition-opacity`} >{i.text}</p>
                                         </div>
                                     </div>
-                                    <p className={`text-sm leading-relaxed text-white/90 ${editReview ? `hidden` : ``} duration-150 transition-opacity`} >{i.text}</p>
-                                    <textarea className={`bg-[#525252] focus:outline-0 border border-white/50 rounded-lg p-1 text-sm no-scrollbar ${editReview ? `` : `hidden`}`} />
-                                    <button className="w-full bg-[#464E82] p-2 rounded-lg text-sm font-bold">Edit</button>
                                 </div>
 
                                 <div className="flex justify-end items-center gap-1.5 text-xs text-white/60">
@@ -306,7 +335,7 @@ function Info() {
                                 key={m.id}
                                 onClick={() => navigate(`/movie/${m.id}`)}
                                 src={`https://image.tmdb.org/t/p/w500${m.poster_path}`}
-                                className="h-50 rounded-lg cursor-pointer hover:scale-105 transition-transform duration-300"
+                                className="h-50 rounded-lg cursor-pointer hover:scale-105 ease-in-out duration-300"
                                 alt={m.title}
                             />
                         ))}
@@ -319,23 +348,26 @@ function Info() {
                         <ReceiptText size={20} />
                         <h3 className="font-bold">Production Details</h3>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 bg-[#3D3D3D] rounded-b-xl overflow-hidden text-sm">
+                    <div className="grid grid-cols-1 md:grid-cols-1 bg-[#3D3D3D] rounded-b-xl overflow-hidden text-sm">
                         {[
                             ["Release Date", movie.release_date],
                             ["Language", movie.spoken_languages?.map(l => l.english_name).join(", ")],
+                            ["Directed By", movie.credits.crew.find(i => i.known_for_department === "Directing")?.name],
+                            ["Produced By", movie.production_companies?.map(p => p.name).join(", ")],
                             ["Budget", movie.budget ? `$${movie.budget.toLocaleString()}` : "N/A"],
                             ["Revenue", movie.revenue ? `$${movie.revenue.toLocaleString()}` : "N/A"],
                             ["Status", movie.status],
-                            ["IMDb", <a href={`https://www.imdb.com/title/${movie.imdb_id}`} target="_blank" className="text-blue-400 hover:underline">View Page</a>]
+                            ["IMDb", <span className="flex gap-2 items-center"><ExternalLink size={14}/><a href={`https://www.imdb.com/title/${movie.imdb_id}`} target="_blank" className="text-blue-300 hover:underline">View Page</a></span>]
                         ].map(([label, value], i) => (
                             <div key={i} className="flex border-white/5 border">
-                                <div className="w-1/3 p-4 text-white/40 bg-[#3D3D3D] border-r border-white/5">{label}</div>
-                                <div className="w-2/3 p-4 font-medium">{value}</div>
+                                <div className="p-4 text-white/40 bg-[#3D3D3D] border-r border-white/5 items-center w-1/2 flex justify-center">{label}</div>
+                                <div className="w-1/2 flex items-center justify-center p-4 font-medium">{value}</div>
                             </div>
                         ))}
                     </div>
                 </section>
             </div>
+            <MoreModal items={movie.credits?.cast} open={openMore} title={"Cast"} setOpenMore={setOpenMore}/>
         </div>
     );
 }

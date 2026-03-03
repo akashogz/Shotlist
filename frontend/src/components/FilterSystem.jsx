@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { Plus, X, ChevronDown, RotateCcw } from "lucide-react";
+import React, { useEffect, useState, useCallback } from "react";
+import { X, ChevronDown, RotateCcw } from "lucide-react";
+import { useUserStore } from "../store/userStore";
 
 const GENRE_MAP = { Action: 28, Comedy: 35, Drama: 18, "Sci-Fi": 878 };
 const SORT_MAP = { Popularity: "popularity.desc", Rating: "vote_average.desc", Voting: "vote_count.desc", Released: "primary_release_date.desc" };
@@ -21,8 +22,8 @@ const INITIAL_STATE = {
 };
 
 export default function FilterSystem({ setFilters }) {
-  const [localFilters, setLocalFilters] = useState(INITIAL_STATE);
-  const [activeFilters, setActiveFilters] = useState([]);
+  const { localFilters, setLocalFilters, activeFilters, setActiveFilters } = useUserStore();
+  const clearAll = useUserStore((s) => s.clearAll);
   const [openDropdown, setOpenDropdown] = useState(null);
 
   useEffect(() => {
@@ -31,6 +32,10 @@ export default function FilterSystem({ setFilters }) {
       with_genres: localFilters.genres.join(","),
     });
   }, [localFilters, setFilters]);
+
+  const removeFilter = useCallback(({ id, label }) => {
+    clearAll();
+  }, [setActiveFilters, setLocalFilters]);
 
   const handleSelect = (id, label) => {
     const isGenre = id === "genre";
@@ -66,31 +71,12 @@ export default function FilterSystem({ setFilters }) {
     setOpenDropdown(null);
   };
 
-  const removeFilter = ({ id, label }) => {
-    setActiveFilters((prev) => prev.filter((f) => !(f.id === id && f.label === label)));
-    setLocalFilters((prev) => {
-      const updated = { ...prev };
-      if (id === "genre") updated.genres = updated.genres.filter((g) => g !== GENRE_MAP[label]);
-      if (id === "sort") updated.sortBy = "";
-      if (id === "language") updated.language = null;
-      if (id === "year") { updated.releaseStart = null; updated.releaseEnd = null; }
-      return updated;
-    });
-  };
-
-  const clearAll = () => {
-    setLocalFilters(INITIAL_STATE);
-    setActiveFilters([]);
-  };
-
   return (
     <div className="w-full text-white">
-      <div className="lg:hidden bg-[#303030] px-2 py-3 mt-20 rounded-lg overflow-visible mx-5">
-        <div className="flex items-center gap-2 overflow-x-scroll no-scrollbar rounded-sm">
-          <button 
-            onClick={clearAll} 
-            className="p-2 bg-[#505050] rounded-full border border-[#606060] shrink-0"
-          >
+      {/* Mobile View */}
+      <div className="lg:hidden bg-[#303030] px-4 py-3 mt-20 rounded-lg mx-5">
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2">
+          <button onClick={clearAll} className="p-2 bg-[#505050] rounded-full border border-[#606060] shrink-0">
             <RotateCcw size={18} />
           </button>
 
@@ -98,15 +84,15 @@ export default function FilterSystem({ setFilters }) {
             <div key={f.id} className="relative shrink-0">
               <button
                 onClick={() => setOpenDropdown(openDropdown === f.id ? null : f.id)}
-                className={`flex items-center gap-2 px-4 py-2 bg-[#505050] rounded-full text-sm border transition-colors ${
+                className={`flex items-center gap-2 px-4 py-2 bg-[#505050] rounded-full text-xs border transition-colors ${
                   activeFilters.some((af) => af.id === f.id) ? "border-white" : "border-[#606060]"
                 }`}
               >
-                {f.title} <ChevronDown size={14} className={openDropdown === f.id ? "rotate-180" : ""} />
+                {f.title} <ChevronDown size={14} />
               </button>
 
               {openDropdown === f.id && (
-                <div className="fixed top-35 left-20 bg-[#1A1A1A] border border-[#333] rounded-xl shadow-2xl z-50 p-1 min-w-40">
+                <div className="absolute top-12 left-0 bg-[#1A1A1A] border border-[#333] rounded-xl shadow-2xl z-50 p-1 min-w-40">
                   {f.options.map((opt) => (
                     <div
                       key={opt}
@@ -123,11 +109,12 @@ export default function FilterSystem({ setFilters }) {
             </div>
           ))}
         </div>
-
+        
+        {/* Active Filter Badges */}
         {activeFilters.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-2">
+          <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-[#444]">
             {activeFilters.map((f, i) => (
-              <span key={i} className="flex items-center gap-2 bg-[#262626] px-3 py-1 rounded-full text-[12px] border border-[#444]">
+              <span key={i} className="flex items-center gap-2 bg-[#444] px-3 py-1 rounded-full text-[11px]">
                 {f.label} <X size={12} className="cursor-pointer" onClick={() => removeFilter(f)} />
               </span>
             ))}
@@ -135,20 +122,21 @@ export default function FilterSystem({ setFilters }) {
         )}
       </div>
 
+      {/* Desktop Sidebar */}
       <aside className="hidden lg:flex flex-col w-72 bg-[#303030] border-r border-[#262626] h-screen fixed left-0 top-0 pt-24 p-6 overflow-y-auto no-scrollbar">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl font-bold">Filters</h2>
           {activeFilters.length > 0 && (
-            <button onClick={clearAll} className="text-xs text-gray-500 hover:text-white uppercase tracking-widest">
-              Reset
+            <button onClick={clearAll} className="text-xs text-gray-400 hover:text-white uppercase tracking-tighter">
+              Reset All
             </button>
           )}
         </div>
 
         {FILTERS.map((section) => (
-          <div key={section.id} className="mb-8 border-b border-[#565656] pb-6">
-            <h3 className="text-xs font-bold text-gray-500 uppercase mb-4 tracking-widest">
-              {section.id === "sort" ? "Sort By" : section.title}
+          <div key={section.id} className="mb-8 border-b border-[#444] pb-6">
+            <h3 className="text-[10px] font-bold text-gray-500 uppercase mb-4 tracking-widest">
+              {section.title}
             </h3>
             <div className="flex flex-wrap gap-2">
               {section.options.map((opt) => {
@@ -157,8 +145,8 @@ export default function FilterSystem({ setFilters }) {
                   <button
                     key={opt}
                     onClick={() => handleSelect(section.id, opt)}
-                    className={`text-xs px-3 py-2 rounded-full border transition-all ${
-                      isActive ? "bg-white text-black border-white font-bold" : "border-[#606060] text-gray-400 hover:border-gray-100"
+                    className={`text-[11px] px-3 py-1.5 rounded-full border transition-all ${
+                      isActive ? "bg-white text-black border-white font-bold" : "border-[#505050] text-gray-400 hover:border-white"
                     }`}
                   >
                     {opt}
