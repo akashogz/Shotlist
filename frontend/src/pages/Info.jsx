@@ -1,8 +1,11 @@
 import {
+    Bookmark,
     BookOpen, Brain, Check, Clock, Columns4Icon, EllipsisVertical, ExternalLink, EyeIcon,
     FilmIcon, GhostIcon, HandFistIcon, Heart, HeartIcon, KeyIcon,
-    LaughIcon, Menu, MountainIcon, MoveRight, Music, Pencil, Plus, ReceiptText,
-    ShieldAlert, Sparkles, Star, Theater, TrainTrack, Trash, Tv, UsersIcon
+    LaughIcon, Menu, MountainIcon, MoveRight, Music, Pause, Pencil, Play, Plus, ReceiptText,
+    Save,
+    ShieldAlert, Sparkles, Star, Theater, TrainTrack, Trash, Tv, UsersIcon,
+    X
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { getMovieDetails } from "../lib/api/movie.js";
@@ -12,6 +15,7 @@ import ReviewField from "../components/ReviewField.jsx";
 import api from "../lib/api/api.js";
 import toast from "react-hot-toast";
 import MoreModal from "../components/MoreModal.jsx";
+import VideoPlayer from "../components/VideoPlayer.jsx";
 
 const GENRE_ICONS = {
     Action: <HandFistIcon size={16} />,
@@ -44,6 +48,8 @@ function Info() {
     const [editReview, setEditReview] = useState(false);
     const [openMore, setOpenMore] = useState(false);
     const [isWatched, setIsWatched] = useState(false);
+    const [isWatchListed, setIsWatchlisted] = useState(false);
+    const [openTrailer, setOpenTrailer] = useState(false);
 
     const user = useAuthStore((s) => s.user);
     const setUser = useAuthStore((s) => s.setUser);
@@ -136,39 +142,83 @@ function Info() {
     return (
         <div className="w-screen bg-[#242424] text-white overflow-x-hidden -z-10">
             {/* BACKDROP */}
-            <div className="relative h-100 sm:h-96 md:h-150">
+            <div className={`relative h-100 sm:h-96 md:h-150 ${openTrailer ? `blur-lg` : ``} duration-300 ease-in-out`}>
                 <img
                     src={`https://image.tmdb.org/t/p/w1280/${movie.backdrop_path}`}
                     className="absolute h-full w-full object-cover object-top"
                     alt=""
+                    loading="eager"
+                    fetchPriority="high"
                 />
                 <div className="absolute inset-0 bg-linear-to-b from-[#464e8253] to-[#242424] h-full" />
             </div>
 
             {/* CONTENT WRAPPER */}
-            <div className=" mx-auto px-4 sm:px-8 lg:px-20 md:-mt-100 -mt-70 relative z-10 pb-20">
+            <div className={`mx-auto px-4 sm:px-8 lg:px-20 md:-mt-120 -mt-70 relative z-10 pb-20`}>
 
                 {/* HERO SECTION */}
-                <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
-                    <div className="shrink-0 flex flex-col gap-4 items-center">
-                        <img
-                            src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
-                            className="w-40 sm:w-45 md:w-50 rounded-xl shadow-2xl border border-white/10"
-                            alt={movie.title}
-                        />
-                        <button
-                            onClick={handleAddToWatched}
-                            className={`flex gap-2 items-center justify-center p-3 rounded-full w-full font-bold transition-all duration-300 ${isWatched ? 'bg-white text-black' : 'bg-[#464E82] text-white hover:bg-[#5a65a3]'
-                                }`}
-                        >
-                            {isWatched ? <Check size={18} /> : <Plus size={18} />}
-                            {isWatched ? "Watched" : "Add to Watched"}
-                        </button>
+                <div className={`flex flex-col gap-8 items-center md:items-start transition-all duration-1000 ease-in-out`}>
+                    <div className="shrink-0 flex flex-col gap-4 items-center w-full h-full">
+                        {
+                            !openTrailer &&
+                            <img
+                                src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
+                                className={`w-40 sm:w-45 md:w-50 rounded-xl shadow-sm border border-white/10 ${!openTrailer ? `opacity-100 scale-100` : `opacity-0 pointer-events-none scale-90`} transition-all duration-200`}
+                                alt={movie.title}
+                            />
+                        }
+
+                        {
+                            openTrailer &&
+                            <div className={`flex w-full h-full justify-center gap-3 items-center ${openTrailer ? `opacity-100 scale-100` : `opacity-0 pointer-events-none scale-90`} transition-all duration-200`}>
+                                <VideoPlayer video={movie.videos?.results?.find(m => m.name.includes("Trailer"))} isOpen={openTrailer} />
+                            </div>
+                        }
+                        <div className="gap-2 flex w-45 sm:w-45 md:w-50">
+                            <button
+                                onClick={() => setOpenTrailer(!openTrailer)}
+                                className={`bg-white hover:bg-white/70 ease-in-out w-2/4 duration-300 flex gap-2 items-center justify-center p-3 rounded-full font-bold transition-all duration-300'
+                                    }`}
+                            >
+                                <div className="relative flex items-center justify-center">
+                                    <div className={`absolute transition-all duration-300 ease-in-out ${openTrailer ? 'opacity-100 scale-100' : 'opacity-0 scale-50 '}`}>
+                                        <Pause size={18} color="black" />
+                                    </div>
+                                    <div className={`absolute transition-all duration-300 ease-in-out ${!openTrailer ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}>
+                                        <Play size={18} color="black" />
+                                    </div>
+                                </div>
+                            </button>
+                            <button
+                                onClick={handleAddToWatched}
+                                className={`flex gap-2 items-center justify-center p-3 w-1/4 aspect-square rounded-full font-bold transition-all duration-300 ${isWatched ? 'bg-white text-black' : 'bg-[#464E82] text-white hover:bg-[#5a65a3]'
+                                    }`}
+                            >
+                                <div className={`absolute transition-all duration-300 ease-in-out ${isWatched ? 'opacity-100 scale-100' : 'opacity-0 scale-50 rotate-90'}`}>
+                                    <Check size={18} color="black" />
+                                </div>
+                                <div className={`absolute transition-all duration-300 ease-in-out ${!isWatched ? 'opacity-100 scale-100' : 'opacity-0 scale-50 -rotate-90'}`}>
+                                    <Plus size={18} color="white" />
+                                </div>
+                            </button>
+                            <button
+                                onClick={() => setIsWatchlisted(!isWatchListed)}
+                                className={`flex gap-2 items-center justify-center p-3 w-1/4 aspect-square rounded-full font-bold transition-all duration-300 ${isWatchListed ? 'bg-white text-black' : 'bg-[#464E82] text-white hover:bg-[#5a65a3]'
+                                    }`}
+                            >
+                                <div className={`absolute transition-all duration-300 ease-in-out ${isWatchListed ? 'opacity-100 scale-100' : 'opacity-0 scale-50 rotate-90'}`}>
+                                    <Bookmark size={18} color="black" fill="black" />
+                                </div>
+                                <div className={`absolute transition-all duration-300 ease-in-out ${!isWatchListed ? 'opacity-100 scale-100' : 'opacity-0 scale-50 -rotate-90'}`}>
+                                    <Bookmark size={18} color="white" />
+                                </div>
+                            </button>
+                        </div>
                     </div>
 
-                    <div className="flex flex-col gap-4 text-center md:text-left">
-                        <h1 className="text-4xl md:text-6xl font-black">{movie.title}</h1>
-                        {movie.tagline && <p className="italic text-white/70">"{movie.tagline}"</p>}
+                    <div className="flex flex-col gap-4 text-center md:text-left items-center w-full">
+                        <h1 className="text-4xl md:text-6xl font-black w-full text-center">{movie.title}</h1>
+                        {movie.tagline && <p className="italic text-white/70 text-center w-full">"{movie.tagline}"</p>}
 
                         <div className="flex flex-wrap justify-center md:justify-start gap-2">
                             <span className="bg-[#4C4C4C] px-3 py-1 rounded-full text-sm shadow-sm">{movie.release_date?.slice(0, 4)}</span>
@@ -218,7 +268,7 @@ function Info() {
                     <div className="lg:col-span-2">
                         <div className="flex justify-between mb-6 items-center">
                             <h3 className="text-2xl font-bold ">Cast</h3>
-                            <button className="flex gap-2 rounded-full bg-[#464E82] p-2 px-5 text-sm font-bold items-center" onClick={() => setOpenMore(true)}>View All <MoveRight/></button>
+                            <button className="flex gap-2 rounded-full bg-[#464E82] p-2 px-5 text-sm font-bold items-center" onClick={() => setOpenMore(true)}>View All <MoveRight /></button>
                         </div>
                         <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
                             {movie.credits?.cast?.slice(0, 10).map(actor => (
@@ -334,7 +384,7 @@ function Info() {
                             <img
                                 key={m.id}
                                 onClick={() => navigate(`/movie/${m.id}`)}
-                                src={`https://image.tmdb.org/t/p/w500${m.poster_path}`}
+                                src={`https://image.tmdb.org/t/p/w154${m.poster_path}`}
                                 className="h-50 rounded-lg cursor-pointer hover:scale-105 ease-in-out duration-300"
                                 alt={m.title}
                             />
@@ -357,7 +407,7 @@ function Info() {
                             ["Budget", movie.budget ? `$${movie.budget.toLocaleString()}` : "N/A"],
                             ["Revenue", movie.revenue ? `$${movie.revenue.toLocaleString()}` : "N/A"],
                             ["Status", movie.status],
-                            ["IMDb", <span className="flex gap-2 items-center"><ExternalLink size={14}/><a href={`https://www.imdb.com/title/${movie.imdb_id}`} target="_blank" className="text-blue-300 hover:underline">View Page</a></span>]
+                            ["IMDb", <span className="flex gap-2 items-center"><ExternalLink size={14} /><a href={`https://www.imdb.com/title/${movie.imdb_id}`} target="_blank" className="text-blue-300 hover:underline">View Page</a></span>]
                         ].map(([label, value], i) => (
                             <div key={i} className="flex border-white/5 border">
                                 <div className="p-4 text-white/40 bg-[#3D3D3D] border-r border-white/5 items-center w-1/2 flex justify-center">{label}</div>
@@ -367,7 +417,7 @@ function Info() {
                     </div>
                 </section>
             </div>
-            <MoreModal items={movie.credits?.cast} open={openMore} title={"Cast"} setOpenMore={setOpenMore}/>
+            <MoreModal items={movie.credits?.cast} open={openMore} title={"Cast"} setOpenMore={setOpenMore} />
         </div>
     );
 }

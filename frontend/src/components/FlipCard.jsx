@@ -9,6 +9,7 @@ export const FlipCard = ({ item }) => {
   
   const handleRemove = async() => {
     const res = await api.post('/user/removeFromWatched', { tmdbId: item.movieId });
+    
     toast.success(res.data.message);
   }
 
@@ -21,7 +22,7 @@ export const FlipCard = ({ item }) => {
       <div className={`relative h-full w-full duration-500 transition-all transform-3d ${isFlipped ? 'transform-[rotateY(180deg)]' : ''}`}>
         
         <div className="absolute inset-0 w-full h-full bg-zinc-800 text-white flex items-center justify-center rounded-xl backface-hidden">
-          <img src={`https://image.tmdb.org/t/p/w500/${item.posterPath}`} className='w-35 rounded-lg hover:scale-105 ease-in-out duration-200'/>
+          <img src={`https://image.tmdb.org/t/p/w185/${item.posterPath}`} className='w-35 rounded-lg hover:scale-105 ease-in-out duration-200'/>
         </div>
 
         <div className="absolute inset-0 w-full h-full bg-[#202020] text-white flex flex-col items-center justify-between rounded-xl transform-[rotateY(180deg)] backface-hidden border border-[#505050] p-4">

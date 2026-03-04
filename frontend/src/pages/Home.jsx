@@ -1,10 +1,12 @@
-import { Suspense, useEffect, useLayoutEffect, useState, useRef, lazy } from "react";
+import { Suspense, useEffect, useLayoutEffect, useState, useRef, lazy, use } from "react";
 
 import { fetchPopularMovies } from "../lib/api/popular";
 import { fetchTrendingMovies } from "../lib/api/trending";
 import { fetchAllTimeMovies } from "../lib/api/alltime";
 import { useNavigate } from "react-router-dom";
 import api from "../lib/api/api";
+import VideoPlayer from "../components/VideoPlayer";
+import { Cross, X } from "lucide-react";
 
 const Tiles = lazy(() => import("../components/Tiles"));
 const GenreCards = lazy(() => import("../components/GenreCards"));

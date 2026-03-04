@@ -130,7 +130,7 @@ function ProfileCards({ tab, displayUser }) {
                         <p className='text-sm text-white/50'>({i.rating})</p>
                       </div>
                     </div>
-                    <img src={`https://image.tmdb.org/t/p/w500/${i.posterPath}`} className='w-15 rounded-lg' alt="movie" />
+                    <img src={`https://image.tmdb.org/t/p/w92/${i.posterPath}`} className='w-15 rounded-lg' alt="movie" />
                   </div>
                   <p className="text-sm leading-relaxed text-white/90 ">{i.text}</p>
                 </div>
