@@ -5,8 +5,6 @@ import { fetchTrendingMovies } from "../lib/api/trending";
 import { fetchAllTimeMovies } from "../lib/api/alltime";
 import { useNavigate } from "react-router-dom";
 import api from "../lib/api/api";
-import VideoPlayer from "../components/VideoPlayer";
-import { Cross, X } from "lucide-react";
 
 const Tiles = lazy(() => import("../components/Tiles"));
 const GenreCards = lazy(() => import("../components/GenreCards"));
@@ -69,7 +67,6 @@ function Home() {
     const fetchTopReviews = async () => {
       const res = await api.get('/user/fetchTopReviews');
       setTopReviews(res.data.topReviews);
-      console.log(res);
     }
 
     fetchTopReviews();

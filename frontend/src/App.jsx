@@ -21,8 +21,6 @@ function App() {
   const fetchMe = useAuthStore((s) => s.fetchMe);
   const user = useAuthStore((s) => s.user);
 
-  console.log(user);
-
   useEffect(() => {
     fetchMe();
   }, []);

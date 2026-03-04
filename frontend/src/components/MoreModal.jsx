@@ -11,7 +11,7 @@ function MoreModal({ open, items, title, setOpenMore }) {
             <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 md:gap-10 overflow-y-scroll no-scrollbar overflow-auto p-1 rounded-lg place-items-stretch place-content-stretch w-full h-full'>
                 {
                     items.map((item, index) => (
-                        <div className='flex flex-col items-center gap-2'>
+                        <div className='flex flex-col items-center gap-2' key={index}>
                             {item.poster_path || item.profile_path ?
                             <img key={index} src={`https://image.tmdb.org/t/p/w500${item.poster_path || item.profile_path}`} className='h-40 md:h-55 w-30 md:w-40 rounded-lg object-cover hover:scale-102 ease-in-out duration-200 bg-[#4d4d4d]' onClick={() => navigate(`movie/${item?.id}`)}></img>
                             : <div className='rounded-lg h-40 md:h-55 w-30 md:w-40  bg-[#4d4d4d] flex items-center justify-center'>

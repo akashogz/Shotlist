@@ -40,6 +40,7 @@ export default function FilterSystem({ setFilters }) {
   const handleSelect = (id, label) => {
     const isGenre = id === "genre";
     const exists = activeFilters.some((f) => f.id === id && f.label === label);
+    console.log(localFilters)
 
     if (exists) {
       removeFilter({ id, label });

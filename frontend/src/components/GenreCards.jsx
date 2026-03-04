@@ -1,4 +1,6 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
+import { useUserStore } from "../store/userStore";
 
 function GenreCards() {
   const genres = [
@@ -6,28 +8,49 @@ function GenreCards() {
       name: "Action",
       color: "#D7263D",
       img: "action.png",
+      code: 28
     },
     {
       name: "Adventure",
       color: "#2BB673",
       img: "adventure.png",
+
     },
     {
       name: "Comedy",
       color: "#FFCA28",
       img: "comedy.png",
+      code: 35
     },
     {
       name: "Drama",
       color: "#7E57C2",
       img: "drama.png",
+      code: 18
     },
     {
       name: "Sci-Fi",
       color: "#00B8F5",
       img: "sci-fi.png",
+      code: 878
     },
   ];
+
+  const navigate = useNavigate();
+  const { setLocalFilters, setActiveFilters } = useUserStore();
+  const INITIAL_FILTERS = {
+    sortBy: "Popularity",
+    genres: [],
+    releaseStart: null,
+    releaseEnd: null,
+    language: null,
+  };
+
+  const handleGenreCard = (genre) => {
+    setLocalFilters((prev) => ({genres: [genre.code]}))
+    setActiveFilters((prev) => [{ id: "genre", label: genre.name, value: genre.code }]);
+    navigate('/browse')
+  }
 
   return (
     <div className="flex gap-8 md:gap-25 overflow-x-auto rounded-lg no-scrollbar">
@@ -45,6 +68,7 @@ function GenreCards() {
             flex flex-col items-center justify-center gap-2
             text-lg
           "
+          onClick={() => handleGenreCard(genre)}
         >
           <div
             className="

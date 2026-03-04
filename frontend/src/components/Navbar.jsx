@@ -8,7 +8,6 @@ function Navbar() {
     const [searchIsOpen, setSearchIsOpen] = useState(false);
     const user = useAuthStore((s) => s.user);
     const logout = useAuthStore((s) => s.logout);
-    console.log(user)
     const isLoggedIn = !!user;
     const navigate = useNavigate()
 
