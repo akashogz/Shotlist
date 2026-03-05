@@ -44,7 +44,7 @@ function App() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
           <Route path='/movie/:movieId' element={<Info />} />
-          <Route path='/search/' element={<Search />} />
+          <Route path='/search/:searchQuery' element={<Search />} />
         </Route>
 
         <Route element={<ProfileLayout />}>

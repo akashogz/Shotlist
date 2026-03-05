@@ -9,7 +9,8 @@ function Navbar() {
     const user = useAuthStore((s) => s.user);
     const logout = useAuthStore((s) => s.logout);
     const isLoggedIn = !!user;
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+    const [searchQuery, setSearchQuery] = useState("");
 
     const dropdownRef = useRef(null);
     useEffect(() => {
@@ -24,6 +25,11 @@ function Navbar() {
         };
     }, [profileIsOpen]);
 
+    const handleSearch = () => {
+        navigate(`/search/${searchQuery}`);
+        setSearchQuery("")
+    }
+
     return (
         <div className="sticky top-0 w-full z-50 items-center h-16 -mb-18 pt-0.5">
             <div className="flex justify-between md:px-20 px-5 mt-2 mb-2 z-10">
@@ -36,7 +42,7 @@ function Navbar() {
                         <div className="border rounded-full p-2">
                             <Search size={16} />
                         </div>
-                        <input type="text" placeholder="Search for anything..." className="text-[14px] focus:outline-0 w-60 text-shadow-xs" />
+                        <input type="text" placeholder="Search for anything..." className="text-[14px] focus:outline-0 w-60 text-shadow-xs" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSearch()}/>
                     </div>
                 </div>
                 <div className="md:flex gap-5 font-light items-center text-[14px] hidden">
@@ -63,8 +69,8 @@ function Navbar() {
 
                 <div className={`mt-12 -ml-5 flex w-full justify-center ${searchIsOpen ? `absolute` : `hidden`} md:hidden`}>
                     <span className="flex justify-between gap-2 p-2 bg-linear-to-r from-[#6d6d6da4] to-[#585858a3] rounded-full shadow-md ">
-                        <input type="text" placeholder="Search for anything..." className="border text-white rounded-full pl-2 text-[14px] font-light focus:outline-none focus:ring-0"></input>
-                        <button className="border rounded-full p-2 text-[14px] font-light">Search</button>
+                        <input type="text" placeholder="Search for anything..." className="border text-white rounded-full pl-2 text-[14px] font-light focus:outline-none focus:ring-0"  onChange={(e) => {setSearchQuery(e.target.value); searchIsOpen(false); setSearchQuery("")}}></input>
+                        <button className="border rounded-full p-2 text-[14px] font-light" onClick={() => handleSearch()}>Search</button>
                     </span>
                 </div>
             </div>
