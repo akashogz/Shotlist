@@ -49,7 +49,7 @@ function Navbar() {
                 <div className="flex gap-5 items-center md:hidden z-10">
                     <img src="/search.png" className="size-7" onClick={() => setSearchIsOpen(!searchIsOpen)}></img>
                     {
-                        isLoggedIn ? <img src={`https://api.dicebear.com/9.x/glass/svg?seed=${user.avatarSeed}&backgroundColor=242424,3D3D3D,464E82,303030`} className="size-8 rounded-full" onClick={() => setProfileIsOpen(!profileIsOpen)}></img>
+                        isLoggedIn ? <img src={`https://api.dicebear.com/9.x/glass/svg?seed=${user.avatarSeed}`} className="size-8 rounded-full" onClick={() => setProfileIsOpen(!profileIsOpen)}></img>
                             : <NavLink to={"/signup"} className="shadow-2xl text-sm z-10">Login/Signup</NavLink>
                     }
                 </div>

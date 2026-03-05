@@ -21,7 +21,6 @@ function Profile() {
     useEffect(() => {
         if (username) {
             fetchProfile(username);
-            console.log(displayUser)
         }
     }, [username, fetchProfile]);
 

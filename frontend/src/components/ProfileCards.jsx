@@ -18,8 +18,6 @@ function ProfileCards({ tab, displayUser }) {
         const query = user?._id ? `?viewerId=${user._id}` : "";
         const res = await api.get(`/user/fetchReviews/${displayUser._id}${query}`);
         setItems(res.data.reviews || []);
-
-        console.log(res.data)
       } catch (error) {
         console.error(error);
       }
@@ -38,8 +36,7 @@ function ProfileCards({ tab, displayUser }) {
     if (tab.label === "Reviews") {
       fetchReview();
     }
-    else if (tab.label == "Watched") {
-      console.log("watched")
+    else if (tab.label == "Watched") { 
       fetchWatched();
     } 
     else {
