@@ -7,7 +7,7 @@ const api = axios.create({
   baseURL: BASE_URL,
 });
 
-export const searchMovie = async (query = "Fight Club") => {
+export const searchMovie = async (query) => {
   try {
     const response = await api.get('search/movie', {
       params: {
