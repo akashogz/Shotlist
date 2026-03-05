@@ -58,7 +58,7 @@ function Navbar() {
                     <div className="fixed bg-[#202020] w-4 h-4 right-1 md:right-1 -mt-2 rotate-45 border-l border-t border-[#505050]"></div>
                     <p onClick={() => navigate(`/profile/${user.username}`)} className="border-t border-l border-r border-[#505050] px-8 text-center p-2 rounded-tl-md hover:underline underline-offset-5">Profile</p>
                     <p className="border px-8 p-2 border-[#505050] text-center hover:underline underline-offset-5">Settings</p>
-                    <p className="border-b border-l border-r px-8 p-2 border-[#505050] rounded-b-md hover:underline underline-offset-5" onClick={() => logout()}>Sign Out</p>
+                    <p className="border-b border-l border-r px-8 p-2 border-[#505050] rounded-b-md hover:underline underline-offset-5" onClick={() => {logout(); setProfileIsOpen(false)}}>Sign Out</p>
                 </div>
 
                 <div className={`mt-12 -ml-5 flex w-full justify-center ${searchIsOpen ? `absolute` : `hidden`} md:hidden`}>
