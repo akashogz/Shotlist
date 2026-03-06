@@ -67,6 +67,7 @@ function Info() {
                 const watched = await api.get(`/user/checkWatched/${movieId}`);
                 console.log(watched)
                 setIsWatched(watched.data.isWatched);
+                setIsWatchlisted(watched.data.isWatchlisted);
             } catch (error) {
                 console.error("Failed to fetch movie details:", error);
             }
@@ -100,6 +101,32 @@ function Info() {
                 });
                 toast.success(res.data.message);
                 setIsWatched(true);
+            }
+        } catch (err) {
+            console.log(err)
+            toast.error("Action failed");
+        }
+    };
+
+    const handleAddToWatchlist = async () => {
+        if (!loggedIn) {
+            toast.error("Log in to interact");
+            return navigate('/login');
+        }
+
+        try {
+            if (isWatchListed) {
+                const res = await api.post('/user/removeFromWatchlist', { tmdbId: movie.id });
+                toast.success(res.data.message);
+                setIsWatchlisted(false);
+            } else {
+                const res = await api.post('/user/addToWatchlist', {
+                    movieId: movie.id,
+                    title: movie.title,
+                    posterPath: movie.poster_path
+                });
+                toast.success(res.data.message);
+                setIsWatchlisted(true);
             }
         } catch (err) {
             console.log(err)
@@ -150,7 +177,7 @@ function Info() {
                     loading="eager"
                     fetchPriority="high"
                 />
-                <div className="absolute inset-0 bg-linear-to-b from-[#464e8253] to-[#242424] h-full" />
+                <div className="absolute inset-0 bg-linear-to-b from-[#464e8253] to-[#242424] min-h-full" />
             </div>
 
             {/* CONTENT WRAPPER */}
@@ -202,7 +229,7 @@ function Info() {
                                 </div>
                             </button>
                             <button
-                                onClick={() => setIsWatchlisted(!isWatchListed)}
+                                onClick={() => handleAddToWatchlist()}
                                 className={`flex gap-2 items-center justify-center p-3 w-1/4 aspect-square rounded-full font-bold transition-all duration-300 ${isWatchListed ? 'bg-white text-black' : 'bg-[#464E82] text-white hover:bg-[#5a65a3]'
                                     }`}
                             >

@@ -4,6 +4,7 @@ import User from "../models/user.model.js";
 import mongoose from "mongoose";
 import { Types } from "mongoose";
 import watchedModel from "../models/watched.model.js";
+import watchlistModel from "../models/watchlist.model.js";
 
 export const changePFP = async (req, res) => {
     try {
@@ -317,13 +318,12 @@ export const checkWatched = async (req, res) => {
         const { id } = req.params;
         const userId = req.user._id;
         
-        console.log(req.params);
         const tmdbId = Number(id);
 
         const isWatched = await watchedModel.findOne({ movieId: tmdbId, userId });
-        console.log(isWatched, tmdbId)
+        const isWatchlisted = await watchlistModel.findOne({ movieId: tmdbId, userId });
 
-        return res.status(200).json({ message: "Fetched", isWatched: !!(isWatched) });
+        return res.status(200).json({ message: "Fetched", isWatched: !!(isWatched), isWatchlisted: !!(isWatchlisted) });
 
     } catch (error) {
         console.error("Error in checkWatched:", error);
@@ -342,3 +342,63 @@ export const fetchWatched = async (req, res) => {
         return res.status(500).json({ message: "Internal server error" });
     }
 }
+
+export const addToWatchlist = async (req, res) => {
+    try {
+        const { movieId, title, posterPath } = req.body;
+        const userId = req.user._id;
+
+        const exists = await watchlistModel.findOne( { userId, movieId });
+
+        if (exists) {
+            return res.status(400).json({ message: "Movie already in watchlist" });
+        }
+
+        const watchlist = await watchlistModel.create({
+            userId,
+            movieId,
+            title,
+            posterPath
+        })
+
+        res.status(201).json({
+            message: "Added to watchlist",
+            watched: watchlist
+        });
+    } catch (error) {
+        console.error("Error adding to watchlist:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+export const removeFromWatchlist = async (req, res) => {
+    try {
+        const { tmdbId } = req.body;
+        const userId = req.user._id;
+
+        if (!tmdbId) return res.status(400).json({ message: "No movie id provided" });
+
+        const deleted = await watchlistModel.findOneAndDelete({ movieId: tmdbId, userId });
+
+        res.status(200).json({
+            message: "Removed from watched",
+            watchlist: deleted
+        });
+    } catch (error) {
+        console.error("Error removing from watchlist:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
+export const fetchWatchlist = async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const watchlist = await watchlistModel.find({ userId }).sort({ addedAt: -1 });
+
+        return res.status(200).json({ message: "Fetched watchlist", watchlist });
+
+    } catch (error) {
+        console.error("Error fetching watchlist:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};

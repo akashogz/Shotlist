@@ -41,6 +41,18 @@ function ProfileCards({ tab, displayUser }) {
       }
     }
 
+    const fetchWatchlist = async () => {
+      if (!displayUser?._id) return;
+      try {
+        setLoading(true);
+        const res = await api.get(`/user/fetchWatchlist/${displayUser._id}`);
+        setItems(res.data.watchlist || []);
+        setLoading(false);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
     if (tab.label === "Reviews") {
       fetchReview();
     }
@@ -48,7 +60,7 @@ function ProfileCards({ tab, displayUser }) {
       fetchWatched();
     }
     else {
-      setItems(displayUser?.[tab.label.toLowerCase()] || []);
+      fetchWatchlist();
     }
   }, [tab, displayUser?._id, user?._id])
 
