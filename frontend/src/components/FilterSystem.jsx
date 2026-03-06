@@ -76,7 +76,7 @@ export default function FilterSystem({ setFilters }) {
     <div className="w-full text-white">
       {/* Mobile View */}
       <div className="lg:hidden bg-[#303030] px-4 py-3 mt-20 rounded-lg mx-5">
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2">
+        <div className="flex items-center gap-2 overflow-x-visible no-scrollbar pb-2">
           <button onClick={clearAll} className="p-2 bg-[#505050] rounded-full border border-[#606060] shrink-0">
             <RotateCcw size={18} />
           </button>
