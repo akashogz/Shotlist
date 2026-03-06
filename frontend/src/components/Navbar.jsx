@@ -46,7 +46,7 @@ function Navbar() {
                     </div>
                 </div>
                 <div className="md:flex gap-5 font-light items-center text-[14px] hidden">
-                    <NavLink to={"/browse"} className="text-shadow-xs">Browse</NavLink>
+                    <NavLink to={"/browse"} className="text-shadow-xs z-10">Browse</NavLink>
                     {
                         isLoggedIn ? <img src={`https://api.dicebear.com/9.x/glass/svg?seed=${user.avatarSeed}`} className="size-9 shadow-xs rounded-full" onClick={() => setProfileIsOpen(!profileIsOpen)}></img>
                             : <NavLink to={"/signup"} className="shadow-2xl">Login/Signup</NavLink>

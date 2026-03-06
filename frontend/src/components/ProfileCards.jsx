@@ -5,19 +5,25 @@ import { Heart, Pencil, Trash } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { FlipCard } from './FlipCard';
+import {tailspin} from 'ldrs'
 
 function ProfileCards({ tab, displayUser }) {
   const [items, setItems] = useState([])
   const user = useAuthStore((s) => s.user);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  
+  tailspin.register()
 
   useEffect(() => {
     const fetchReview = async () => {
       if (!displayUser?._id) return;
       try {
+        setLoading(true);
         const query = user?._id ? `?viewerId=${user._id}` : "";
         const res = await api.get(`/user/fetchReviews/${displayUser._id}${query}`);
         setItems(res.data.reviews || []);
+        setLoading(false);
       } catch (error) {
         console.error(error);
       }
@@ -26,8 +32,10 @@ function ProfileCards({ tab, displayUser }) {
     const fetchWatched = async () => {
       if (!displayUser?._id) return;
       try {
+        setLoading(true);
         const res = await api.get(`/user/fetchWatched/${displayUser._id}`);
         setItems(res.data.watched || []);
+        setLoading(false);
       } catch (error) {
         console.log(error);
       }
@@ -36,9 +44,9 @@ function ProfileCards({ tab, displayUser }) {
     if (tab.label === "Reviews") {
       fetchReview();
     }
-    else if (tab.label == "Watched") { 
+    else if (tab.label == "Watched") {
       fetchWatched();
-    } 
+    }
     else {
       setItems(displayUser?.[tab.label.toLowerCase()] || []);
     }
@@ -71,87 +79,103 @@ function ProfileCards({ tab, displayUser }) {
   }
 
   return (
-    <div className='w-full md:px-20 mt-5'>
-      {items?.length === 0 && (
-        <div className='w-full justify-center items-center flex flex-col md:p-20 p-5 gap-5'>
-          <tab.icon size={70} />
-          <p className='font-semibold text-white/50'>{tab.label} is Empty</p>
+    <>
+      {
+        loading &&
+        <div className='w-full h-lvh -mt-60 flex items-center justify-center'>
+          <l-tailspin
+            size="40"
+            stroke="5"
+            speed="0.9"
+            color="white"
+          ></l-tailspin>
         </div>
-      )}
+      }
+      {
+        !loading &&
+        <div className='w-full md:px-20 mt-5'>
+          {items?.length === 0 && (
+            <div className='w-full justify-center items-center flex flex-col md:p-20 p-5 gap-5'>
+              <tab.icon size={70} />
+              <p className='font-semibold text-white/50'>{tab.label} is Empty</p>
+            </div>
+          )}
 
-      {items.length > 0 && tab.label != "Reviews" && (
-        <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-5 place-items-center'>
-          {
-            items.map((i) => (
-              <FlipCard item={i} />
-            ))
-          }
-        </div>
-      )}
+          {items.length > 0 && tab.label != "Reviews" && (
+            <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-5 place-items-center'>
+              {
+                items.map((i) => (
+                  <FlipCard item={i} />
+                ))
+              }
+            </div>
+          )}
 
-      {items?.length > 0 && tab.label === "Reviews" && (
-        <div className='w-full items-start'>
-          <div className='grid sm:grid-cols-3 grid-cols-1 gap-5'>
-            {items.map((i) => (
-              <div key={i._id} className="flex flex-col gap-3 bg-[#303030] rounded-lg p-3 justify-between w-full max-w-md">
-                <div className="flex flex-col gap-2">
-                  <div className='flex justify-between items-start'>
+          {items?.length > 0 && tab.label === "Reviews" && (
+            <div className='w-full items-start'>
+              <div className='grid sm:grid-cols-3 grid-cols-1 gap-5'>
+                {items.map((i) => (
+                  <div key={i._id} className="flex flex-col gap-3 bg-[#303030] rounded-lg p-3 justify-between w-full max-w-md">
                     <div className="flex flex-col gap-2">
-                      <div className='flex gap-2 items-center'>
-                        <img
-                          src={`https://api.dicebear.com/9.x/glass/svg?seed=${i.avatarSeed}`}
-                          className="size-9 rounded-full object-cover"
-                          alt={i.username}
-                        />
-                        <div>
-                          <p className="font-medium text-white/50 text-sm">{i.username}</p>
-                          <p className="text-xs text-white/50">
-                            {new Date(i.createdAt).toLocaleDateString('en-GB', {
-                              weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-                            })}
-                          </p>
-                        </div>
-                      </div>
-                      <span className='flex gap-1 text-sm'><p className='font-semibold text-white text-[14px]'>{i.movieName}</p></span>
-                      <div className='flex items-center gap-1 h-full'>
-                        <div className='flex'>
-                          {[1, 2, 3, 4, 5].map((idx) => (
-                            <div key={idx} className='flex'>
-                              {idx - 0.5 <= i.rating && <img src='/star-half-left.png' className='h-4' />}
-                              {idx <= i.rating && <img src='/star-half-right.png' className='h-4' />}
-                              {idx - 0.5 > i.rating && <img src='/star-half.png' className='h-4' />}
-                              {idx > i.rating && <img src='/star-half-r.png' className='h-4' />}
+                      <div className='flex justify-between items-start'>
+                        <div className="flex flex-col gap-2">
+                          <div className='flex gap-2 items-center'>
+                            <img
+                              src={`https://api.dicebear.com/9.x/glass/svg?seed=${i.avatarSeed}`}
+                              className="size-9 rounded-full object-cover"
+                              alt={i.username}
+                            />
+                            <div>
+                              <p className="font-medium text-white/50 text-sm">{i.username}</p>
+                              <p className="text-xs text-white/50">
+                                {new Date(i.createdAt).toLocaleDateString('en-GB', {
+                                  weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+                                })}
+                              </p>
                             </div>
-                          ))}
+                          </div>
+                          <span className='flex gap-1 text-sm'><p className='font-semibold text-white text-[14px]'>{i.movieName}</p></span>
+                          <div className='flex items-center gap-1 h-full'>
+                            <div className='flex'>
+                              {[1, 2, 3, 4, 5].map((idx) => (
+                                <div key={idx} className='flex'>
+                                  {idx - 0.5 <= i.rating && <img src='/star-half-left.png' className='h-4' />}
+                                  {idx <= i.rating && <img src='/star-half-right.png' className='h-4' />}
+                                  {idx - 0.5 > i.rating && <img src='/star-half.png' className='h-4' />}
+                                  {idx > i.rating && <img src='/star-half-r.png' className='h-4' />}
+                                </div>
+                              ))}
+                            </div>
+                            <p className='text-sm text-white/50'>({i.rating})</p>
+                          </div>
                         </div>
-                        <p className='text-sm text-white/50'>({i.rating})</p>
+                        <img src={`https://image.tmdb.org/t/p/w92/${i.posterPath}`} className='w-15 rounded-lg' alt="movie" />
+                      </div>
+                      <p className="text-sm leading-relaxed text-white/90 ">{i.text}</p>
+                    </div>
+
+                    <div className="flex justify-end items-center gap-1.5 text-xs text-white/60">
+                      <div className='flex gap-1 items-center'>
+                        <div className="flex items-center justify-center">
+                          <Heart
+                            size={14}
+                            className={`cursor-pointer transition-all ${i.isLiked ? "fill-red-500 text-red-500 scale-110" : "hover:text-white"}`}
+                            onClick={() => handleLike(i._id)}
+                          />
+                        </div>
+                        <p className="leading-none select-none">
+                          {i.likesCount || 0} Likes
+                        </p>
                       </div>
                     </div>
-                    <img src={`https://image.tmdb.org/t/p/w92/${i.posterPath}`} className='w-15 rounded-lg' alt="movie" />
                   </div>
-                  <p className="text-sm leading-relaxed text-white/90 ">{i.text}</p>
-                </div>
-
-                <div className="flex justify-end items-center gap-1.5 text-xs text-white/60">
-                  <div className='flex gap-1 items-center'>
-                    <div className="flex items-center justify-center">
-                      <Heart
-                        size={14}
-                        className={`cursor-pointer transition-all ${i.isLiked ? "fill-red-500 text-red-500 scale-110" : "hover:text-white"}`}
-                        onClick={() => handleLike(i._id)}
-                      />
-                    </div>
-                    <p className="leading-none select-none">
-                      {i.likesCount || 0} Likes
-                    </p>
-                  </div>
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      }
+    </>
   )
 }
 
