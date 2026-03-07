@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import { Bookmark, Check, MessageSquareMore, Pencil, Star } from 'lucide-react';
+import { Bookmark, Check, MessageSquareMore, Pencil, Plus, Star } from 'lucide-react';
 import ProfileCards from '../components/ProfileCards';
 import ProfileModal from '../components/ProfileModal';
+import api from '../lib/api/api';
+import toast from 'react-hot-toast';
 
 function Profile() {
     const { username } = useParams();
@@ -17,6 +19,7 @@ function Profile() {
     const [openProfileModal, setOpenProfileModal] = useState(false);
     const isOwnProfile = currentUser?.username === username;
     const displayUser = profileData;
+    const [isFollowed, setIsFollowed] = useState(false);
 
     useEffect(() => {
         if (username) {
@@ -24,12 +27,32 @@ function Profile() {
         }
     }, [username, fetchProfile]);
 
+    useEffect(() => {
+        const checkFollowed = async () => {
+            const ifFollowed = await api.get(`user/checkIfFollowed/${profileData._id}`)
+            setIsFollowed(ifFollowed.data.isFollowed);
+            console.log(ifFollowed)
+        }
+        checkFollowed();
+    }, [profileData, isFollowed])
+
     const tabs = [
         { label: "Watched", icon: Check, path: "watched" },
         { label: "Reviews", icon: MessageSquareMore, path: "reviews" },
         { label: "Watchlist", icon: Bookmark, path: "watchlist" },
     ];
     const [active, setActive] = useState(tabs[0]);
+
+    const handleFollow = async () => {
+        try {
+            const res = await api.post('/user/followToggle', { followeeId: displayUser._id });
+            setIsFollowed(!isFollowed);
+            toast.success(res.data.message);
+        } catch (error) {
+            const errorMsg = error.response?.data?.message || "Something went wrong";
+            toast.error(errorMsg);
+        }
+    }
 
     if (loading) {
         return <div className='min-h-screen w-full flex justify-center items-center text-white'><p className="animate-pulse">Loading profile...</p></div>;
@@ -61,11 +84,15 @@ function Profile() {
             <div className='flex flex-col items-center gap-6 w-full justify-center tracking-tight'>
                 <div className='flex flex-col items-center gap-3'>
                     <div className='flex flex-col items-center'>
-                        <h1 className='font-bold text-2xl text-center text-white'>
-                        {(displayUser.name || displayUser.username)}
-                    </h1>
-                    <p className='text-gray-400'>@{displayUser.username}</p>
+                        <div className='flex gap-2 items-center'>
+                            <h1 className='font-bold text-2xl text-center text-white'>
+                                {(displayUser.name || displayUser.username)}
+                            </h1>
+                            <button className={`${isFollowed ? `bg-white hover:white/90 text-black` : `bg-[#464E82] hover:bg-[#464e82c2]`} duration-200 ease-in-out transition-all flex gap-1 items-center p-0 px-3 rounded-full text-sm justify-center`} onClick={() => handleFollow()}>{isFollowed? <Check size={14} /> : <Plus size={14} />} Follow</button>
+                        </div>
+                        <p className='text-gray-400'>@{displayUser.username}</p>
                     </div>
+
                     <div className='flex gap-4 text-sm text-white/50 px-4 py-1 rounded-full bg-[#303030] shadow-xs'>
                         <p><span className="text-white font-bold">{displayUser.followers?.length || 0}</span> Followers</p>
                         <p>•</p>

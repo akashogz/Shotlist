@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import { Types } from "mongoose";
 import watchedModel from "../models/watched.model.js";
 import watchlistModel from "../models/watchlist.model.js";
+import followModel from "../models/follow.model.js";
 
 export const changePFP = async (req, res) => {
     try {
@@ -54,6 +55,13 @@ export const addReview = async (req, res) => {
             posterPath
         });
 
+        const watched = await watchedModel.create({
+            userId,
+            movieId: tmdbId,
+            title: movieName,
+            posterPath,
+        })
+
         res.status(201).json({ message: "Review added successfully", review });
     } catch (error) {
         console.error("Error adding review:", error);
@@ -66,7 +74,7 @@ export const addToWatched = async (req, res) => {
         const { movieId, title, posterPath } = req.body;
         const userId = req.user._id;
 
-        const exists = await watchedModel.findOne( { userId, movieId });
+        const exists = await watchedModel.findOne({ userId, movieId });
         console.log(exists)
 
         if (exists) {
@@ -317,7 +325,7 @@ export const checkWatched = async (req, res) => {
     try {
         const { id } = req.params;
         const userId = req.user._id;
-        
+
         const tmdbId = Number(id);
 
         const isWatched = await watchedModel.findOne({ movieId: tmdbId, userId });
@@ -329,7 +337,7 @@ export const checkWatched = async (req, res) => {
         console.error("Error in checkWatched:", error);
         return res.status(500).json({ message: "Internal server error" });
     }
-} 
+}
 
 export const fetchWatched = async (req, res) => {
     try {
@@ -348,7 +356,7 @@ export const addToWatchlist = async (req, res) => {
         const { movieId, title, posterPath } = req.body;
         const userId = req.user._id;
 
-        const exists = await watchlistModel.findOne( { userId, movieId });
+        const exists = await watchlistModel.findOne({ userId, movieId });
 
         if (exists) {
             return res.status(400).json({ message: "Movie already in watchlist" });
@@ -410,15 +418,81 @@ export const deleteReview = async (req, res) => {
 
         const review = await reviewModel.findById(reviewId);
 
-        if (!review) return res.status(404).json({message: "Review doesn't exist"});
+        if (!review) return res.status(404).json({ message: "Review doesn't exist" });
 
-        if (review.user.toString() !== userId.toString()) return res.status(401).json({message: "Not authorized"});
+        if (review.user.toString() !== userId.toString()) return res.status(401).json({ message: "Not authorized" });
 
         await reviewModel.deleteOne({ _id: reviewId });
 
-        return res.status(200).json({message: "Review deleted successfully"});
+        return res.status(200).json({ message: "Review deleted successfully" });
     } catch (error) {
-        console.error("Error fetching watchlist:", error);
+        console.error("Error deleting review:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+export const followToggle = async (req, res) => {
+    try {
+        const followerId = req.user._id;
+        const { followeeId } = req.body;
+
+        if (followerId.toString() === followeeId.toString()) return res.status(400).json({ message: "Can't follow oneself" });
+
+        const followee = await userModel.findById(followeeId);
+        if (!followee) res.status(404).json({ message: "Followee not found" });
+
+        const exists = await followModel.findOne({ followeeId, followerId });
+
+        if (exists) {
+            const followId = exists._id;
+            await followModel.findByIdAndDelete(followId);
+
+            await Promise.all([
+                userModel.findByIdAndUpdate(followerId, {
+                    $pull: { following: followId }
+                }),
+                userModel.findByIdAndUpdate(followeeId, {
+                    $pull: { followers: followId }
+                })
+            ]);
+        
+            return res.status(200).json({ message: "Unfollowed successfully"});
+        }
+
+        const follow = await followModel.create({
+            followerId,
+            followeeId
+        });
+
+        await Promise.all([
+            userModel.findByIdAndUpdate(followerId, {
+                $push: { following: follow._id }
+            }),
+            userModel.findByIdAndUpdate(followeeId, {
+                $push: { followers: follow._id }
+            })
+        ]);
+
+        return res.status(201).json({ message: "Followed successfully", follow });
+    } catch (error) {
+        console.error("Error adding follower:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+export const checkIfFollowed = async (req, res) => {
+    try {
+        const followerId = req.user._id;
+        const { followeeId } = req.params;
+
+        const ifFollowed = await followModel.findOne({
+            followeeId,
+            followerId
+        })
+
+        return res.status(200).json({message: "Fetched if followed", isFollowed: !!(ifFollowed)})
+    } catch (error) {
+        console.error("Error checkIfFollwing:", error);
         res.status(500).json({ message: "Internal Server Error" });
     }
 }
