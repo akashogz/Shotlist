@@ -16,6 +16,7 @@ import api from "../lib/api/api.js";
 import toast from "react-hot-toast";
 import MoreModal from "../components/MoreModal.jsx";
 import VideoPlayer from "../components/VideoPlayer.jsx";
+import { tailspin } from 'ldrs'
 
 const GENRE_ICONS = {
     Action: <HandFistIcon size={16} />,
@@ -50,10 +51,14 @@ function Info() {
     const [isWatched, setIsWatched] = useState(false);
     const [isWatchListed, setIsWatchlisted] = useState(false);
     const [openTrailer, setOpenTrailer] = useState(false);
+    const [loadingWatched, setLoadingWatched] = useState(false);
+    const [loadingWatchlisted, setLoadingWatchlisted] = useState(false);
 
     const user = useAuthStore((s) => s.user);
     const setUser = useAuthStore((s) => s.setUser);
     const loggedIn = !!user;
+
+    tailspin.register()
 
     useEffect(() => {
         const fetchAll = async () => {
@@ -90,6 +95,7 @@ function Info() {
 
         try {
             if (isWatched) {
+                setLoadingWatched(true);
                 const res = await api.post('/user/removeFromWatched', { tmdbId: movie.id });
                 toast.success(res.data.message);
                 setIsWatched(false);
@@ -105,6 +111,8 @@ function Info() {
         } catch (err) {
             console.log(err)
             toast.error("Action failed");
+        } finally {
+            setLoadingWatched(true);
         }
     };
 
@@ -116,10 +124,12 @@ function Info() {
 
         try {
             if (isWatchListed) {
+                setLoadingWatchlisted(true);
                 const res = await api.post('/user/removeFromWatchlist', { tmdbId: movie.id });
                 toast.success(res.data.message);
                 setIsWatchlisted(false);
             } else {
+                setLoadingWatchlisted(true);
                 const res = await api.post('/user/addToWatchlist', {
                     movieId: movie.id,
                     title: movie.title,
@@ -131,6 +141,8 @@ function Info() {
         } catch (err) {
             console.log(err)
             toast.error("Action failed");
+        } finally {
+            setLoadingWatchlisted(false);
         }
     };
 
@@ -221,24 +233,52 @@ function Info() {
                                 className={`flex gap-2 items-center justify-center p-3 w-1/4 aspect-square rounded-full font-bold transition-all duration-300 ${isWatched ? 'bg-white text-black' : 'bg-[#464E82] text-white hover:bg-[#5a65a3]'
                                     }`}
                             >
-                                <div className={`absolute transition-all duration-300 ease-in-out ${isWatched ? 'opacity-100 scale-100' : 'opacity-0 scale-50 rotate-90'}`}>
-                                    <Check size={18} color="black" />
-                                </div>
-                                <div className={`absolute transition-all duration-300 ease-in-out ${!isWatched ? 'opacity-100 scale-100' : 'opacity-0 scale-50 -rotate-90'}`}>
-                                    <Plus size={18} color="white" />
-                                </div>
+                                {
+                                    !loadingWatched &&
+                                    <div className="flex items-center justify-center">
+                                        <div className={`absolute transition-all duration-300 ease-in-out ${isWatched ? 'opacity-100 scale-100' : 'opacity-0 scale-50 rotate-90'}`}>
+                                            <Check size={18} color="black" />
+                                        </div>
+                                        <div className={`absolute transition-all duration-300 ease-in-out ${!isWatched ? 'opacity-100 scale-100' : 'opacity-0 scale-50 -rotate-90'}`}>
+                                            <Plus size={18} color="white" />
+                                        </div>
+                                    </div>
+                                }
+                                {
+                                    loadingWatched &&
+                                    <l-tailspin
+                                        size="20"
+                                        stroke="2"
+                                        speed="0.9"
+                                        color="white"
+                                    ></l-tailspin>
+                                }
                             </button>
                             <button
                                 onClick={() => handleAddToWatchlist()}
                                 className={`flex gap-2 items-center justify-center p-3 w-1/4 aspect-square rounded-full font-bold transition-all duration-300 ${isWatchListed ? 'bg-white text-black' : 'bg-[#464E82] text-white hover:bg-[#5a65a3]'
                                     }`}
                             >
-                                <div className={`absolute transition-all duration-300 ease-in-out ${isWatchListed ? 'opacity-100 scale-100' : 'opacity-0 scale-50 rotate-90'}`}>
-                                    <Bookmark size={18} color="black" fill="black" />
-                                </div>
-                                <div className={`absolute transition-all duration-300 ease-in-out ${!isWatchListed ? 'opacity-100 scale-100' : 'opacity-0 scale-50 -rotate-90'}`}>
-                                    <Bookmark size={18} color="white" />
-                                </div>
+                                {
+                                    !loadingWatchlisted &&
+                                    <div className="flex items-center justify-center">
+                                        <div className={`absolute transition-all duration-300 ease-in-out ${isWatchListed ? 'opacity-100 scale-100' : 'opacity-0 scale-50 rotate-90'}`}>
+                                            <Bookmark size={18} color="black" fill="black" />
+                                        </div>
+                                        <div className={`absolute transition-all duration-300 ease-in-out ${!isWatchListed ? 'opacity-100 scale-100' : 'opacity-0 scale-50 -rotate-90'}`}>
+                                            <Bookmark size={18} color="white" />
+                                        </div>
+                                    </div>
+                                }
+                                {
+                                    loadingWatchlisted &&
+                                    <l-tailspin
+                                        size="20"
+                                        stroke="2"
+                                        speed="0.9"
+                                        color="white"
+                                    ></l-tailspin>
+                                }
                             </button>
                         </div>
                     </div>
