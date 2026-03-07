@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useAuthStore } from '../store/authStore'
 import api from '../lib/api/api';
-import { Heart, Pencil, Trash } from 'lucide-react';
+import { Heart, Pencil, Trash, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { FlipCard } from './FlipCard';
@@ -90,6 +90,15 @@ function ProfileCards({ tab, displayUser }) {
     }
   }
 
+  const deleteReview = async (reviewId) => {
+    try {
+      const res = await api.delete(`/user/deleteReview/${reviewId}`);
+      toast.success("Deleted review");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Something went wrong");
+    }
+  }
+
   return (
     <>
       {
@@ -125,6 +134,7 @@ function ProfileCards({ tab, displayUser }) {
 
           {items?.length > 0 && tab.label === "Reviews" && (
             <div className='w-full items-start'>
+
               <div className='grid sm:grid-cols-3 grid-cols-1 gap-5'>
                 {items.map((i) => (
                   <div key={i._id} className="flex flex-col gap-3 bg-[#303030] rounded-lg p-3 justify-between w-full max-w-md">
@@ -166,7 +176,7 @@ function ProfileCards({ tab, displayUser }) {
                       <p className="text-sm leading-relaxed text-white/90 ">{i.text}</p>
                     </div>
 
-                    <div className="flex justify-end items-center gap-1.5 text-xs text-white/60">
+                    <div className="flex justify-end items-center gap-1.5 text-xs text-[#808080]">
                       <div className='flex gap-1 items-center'>
                         <div className="flex items-center justify-center">
                           <Heart
@@ -176,8 +186,9 @@ function ProfileCards({ tab, displayUser }) {
                           />
                         </div>
                         <p className="leading-none select-none">
-                          {i.likesCount || 0} Likes
+                          {i.likesCount || 0} Likes |
                         </p>
+                        <Trash2 size={22} color='grey' className='bg-black/20 p-1 rounded-sm hover:rounded-[50%] duration-200 ease-in-out transition-all' onClick={() => deleteReview(i._id)}/>
                       </div>
                     </div>
                   </div>

@@ -402,3 +402,23 @@ export const fetchWatchlist = async (req, res) => {
         res.status(500).json({ message: "Internal Server Error" });
     }
 };
+
+export const deleteReview = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const reviewId = req.params.id;
+
+        const review = await reviewModel.findById(reviewId);
+
+        if (!review) return res.status(404).json({message: "Review doesn't exist"});
+
+        if (review.user.toString() !== userId.toString()) return res.status(401).json({message: "Not authorized"});
+
+        await reviewModel.deleteOne({ _id: reviewId });
+
+        return res.status(200).json({message: "Review deleted successfully"});
+    } catch (error) {
+        console.error("Error fetching watchlist:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
