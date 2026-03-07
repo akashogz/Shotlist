@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { getMovieDetails } from "../lib/api/movie.js";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useAuthStore } from "../store/authStore.js";
 import ReviewField from "../components/ReviewField.jsx";
 import api from "../lib/api/api.js";
@@ -53,6 +53,9 @@ function Info() {
     const [openTrailer, setOpenTrailer] = useState(false);
     const [loadingWatched, setLoadingWatched] = useState(false);
     const [loadingWatchlisted, setLoadingWatchlisted] = useState(false);
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const isTrailerOpen = queryParams.get("trailer");
 
     const user = useAuthStore((s) => s.user);
     const setUser = useAuthStore((s) => s.setUser);
@@ -77,6 +80,7 @@ function Info() {
                 console.error("Failed to fetch movie details:", error);
             }
         };
+        if (isTrailerOpen === "open") setOpenTrailer(true);
         fetchAll();
         window.scrollTo(0, 0);
     }, [movieId, user?._id]);

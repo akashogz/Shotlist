@@ -3,7 +3,7 @@ import { Suspense, useEffect, useLayoutEffect, useState, useRef, lazy, use } fro
 import { fetchPopularMovies } from "../lib/api/popular";
 import { fetchTrendingMovies } from "../lib/api/trending";
 import { fetchAllTimeMovies } from "../lib/api/alltime";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../lib/api/api";
 
 const Tiles = lazy(() => import("../components/Tiles"));
@@ -126,15 +126,15 @@ function Home() {
               </p>
 
               <div className="flex gap-2">
-                <button className="border rounded-full p-3 px-4 flex items-center gap-2 text-[14px] font-bold">
+                <Link to={`movie/${slides[currentBG]?.id}?trailer=open`} className="border rounded-full p-3 px-4 flex items-center gap-2 text-[14px] font-bold cursor-pointer">
                   Play Trailer
                   <img src="play.png" alt="" aria-hidden="true" className="size-3" />
-                </button>
+                </Link>
 
-                <button className="border rounded-full p-3 px-4 flex items-center gap-2 text-[14px] bg-[#464E82] border-[#464E82] font-bold" onClick={() => navigate(`movie/${slides[currentBG]?.id}`)}>
+                <Link to={`movie/${slides[currentBG]?.id}`} className="border rounded-full p-3 px-4 flex items-center gap-2 text-[14px] bg-[#464E82] border-[#464E82] font-bold cursor-pointer">
                   Visit Page
                   <img src="visit.png" alt="" aria-hidden="true" className="size-3" />
-                </button>
+                </Link>
               </div>
 
               <div className="w-full flex items-center justify-center gap-4 px-20">
