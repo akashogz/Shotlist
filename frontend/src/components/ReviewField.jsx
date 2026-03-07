@@ -136,14 +136,14 @@ function ReviewField({ tmdbId, movieName, posterPath }) {
                         return (
                             <div className='flex' key={s}>
                                 <img
-                                    src={isLeftActive ? '/public/star-half-left.png' : '/public/star-half.png'}
+                                    src={isLeftActive ? '/star-half-left.png' : '/star-half.png'}
                                     className='h-6 w-auto cursor-pointer transition-opacity'
                                     onClick={() => setSelectedStars(s - 0.5)}
                                     onMouseEnter={() => setHovering(s - 0.5)}
                                     onMouseLeave={() => setHovering(0)}
                                 />
                                 <img
-                                    src={isRightActive ? '/public/star-half-right.png' : '/public/star-half-r.png'}
+                                    src={isRightActive ? '/star-half-right.png' : '/star-half-r.png'}
                                     className={`h-6 w-auto cursor-pointer transition-opacity`}
                                     onClick={() => setSelectedStars(s)}
                                     onMouseEnter={() => setHovering(s)}
