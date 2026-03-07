@@ -94,8 +94,8 @@ function Info() {
         }
 
         try {
+            setLoadingWatched(true);
             if (isWatched) {
-                setLoadingWatched(true);
                 const res = await api.post('/user/removeFromWatched', { tmdbId: movie.id });
                 toast.success(res.data.message);
                 setIsWatched(false);
@@ -123,8 +123,8 @@ function Info() {
         }
 
         try {
+            setLoadingWatchlisted(true);
             if (isWatchListed) {
-                setLoadingWatchlisted(true);
                 const res = await api.post('/user/removeFromWatchlist', { tmdbId: movie.id });
                 toast.success(res.data.message);
                 setIsWatchlisted(false);
@@ -256,7 +256,7 @@ function Info() {
                             </button>
                             <button
                                 onClick={() => handleAddToWatchlist()}
-                                className={`flex gap-2 items-center justify-center p-3 w-1/4 aspect-square rounded-full font-bold transition-all duration-300 ${isWatchListed ? 'bg-white text-black' : 'bg-[#464E82] text-white hover:bg-[#5a65a3]'
+                                className={`flex gap-2 items-center justify-center p-3 w-1/4 aspect-square rounded-full font-bold transition-all duration-300 ${isWatchListed && !loadingWatchlisted ? 'bg-white text-black' : 'bg-[#464E82] text-white hover:bg-[#5a65a3]'
                                     }`}
                             >
                                 {
