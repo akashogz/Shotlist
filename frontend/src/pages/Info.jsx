@@ -112,7 +112,7 @@ function Info() {
             console.log(err)
             toast.error("Action failed");
         } finally {
-            setLoadingWatched(true);
+            setLoadingWatched(false);
         }
     };
 
@@ -230,7 +230,7 @@ function Info() {
                             </button>
                             <button
                                 onClick={handleAddToWatched}
-                                className={`flex gap-2 items-center justify-center p-3 w-1/4 aspect-square rounded-full font-bold transition-all duration-300 ${isWatched ? 'bg-white text-black' : 'bg-[#464E82] text-white hover:bg-[#5a65a3]'
+                                className={`flex gap-2 items-center justify-center p-3 w-1/4 aspect-square rounded-full font-bold transition-all duration-300 ${isWatched && !loadingWatched ? 'bg-white text-black' : 'bg-[#464E82] text-white hover:bg-[#5a65a3]'
                                     }`}
                             >
                                 {
