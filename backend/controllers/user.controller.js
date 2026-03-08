@@ -504,7 +504,8 @@ export const fetchFollowers = async (req, res) => {
 
         const followers = await followModel
             .find({ followeeId: userId })
-            .populate("followerId", "username avatarSeed");
+            .populate("followerId", "username avatarSeed")
+            .lean();
 
         let followingIds = [];
         if (viewerId) {
@@ -515,7 +516,7 @@ export const fetchFollowers = async (req, res) => {
         const results = followers.map(f => {
             if (!f.followerId) return null;
 
-            const followerData = f.followerId.toObject();
+            const followerData = f.followerId;
 
             return {
                 ...followerData,
@@ -525,6 +526,41 @@ export const fetchFollowers = async (req, res) => {
 
         res.status(200).json(results);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error("Error in fetchFollowers:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+export const fetchFollowing = async (req, res) => {
+    try {
+        const viewerId = req.query.viewerId;
+        const userId = req.params.userId;
+
+        const following = await followModel
+            .find({ followerId: userId })
+            .populate("followeeId", "username avatarSeed")
+            .lean();
+
+        let viewerFollowingIds = [];
+        if (viewerId) {
+            const viewerFollowing = await followModel.find({ followerId: viewerId }).lean();
+            viewerFollowingIds = viewerFollowing.map(f => f.followeeId.toString());
+        }
+
+        const results = following.map(f => {
+            if (!f.followeeId) return null;
+
+            const userData = f.followeeId; 
+
+            return {
+                ...userData,
+                isFollowing: viewerId ? viewerFollowingIds.includes(userData._id.toString()) : false
+            };
+        }).filter(Boolean);
+
+        res.status(200).json(results);
+    } catch (error) {
+        console.error("Error in fetchFollowing:", error);
+        res.status(500).json({ message: "Internal Server Error" });
     }
 }

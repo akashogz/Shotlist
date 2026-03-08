@@ -22,6 +22,7 @@ function Profile() {
     const displayUser = profileData;
     const [isFollowed, setIsFollowed] = useState(false);
     const [openFollowModal, setOpenFollowModal] = useState(false);
+    const [activeFollow, setActiveFollow] = useState("Followers");
 
     useEffect(() => {
         if (username) {
@@ -96,9 +97,9 @@ function Profile() {
                     </div>
 
                     <div className='flex gap-4 text-sm text-white/50 px-4 py-1 rounded-full bg-[#303030] shadow-xs'>
-                        <button className='hover:underline underline-offset-2 cursor-pointer ease-in-out duration-200' onClick={() => setOpenFollowModal(true)}><span className="text-white font-bold">{displayUser.followers?.length || 0}</span> Followers</button>
+                        <button className='hover:underline underline-offset-2 cursor-pointer ease-in-out duration-200' onClick={() => {setOpenFollowModal(true); setActiveFollow("Followers")}}><span className="text-white font-bold">{displayUser.followers?.length || 0}</span> Followers</button>
                         <p>•</p>
-                        <button className='hover:underline underline-offset-2 cursor-pointer ease-in-out duration-200'><span className="text-white font-bold">{displayUser.following?.length || 0}</span> Following</button>
+                        <button className='hover:underline underline-offset-2 cursor-pointer ease-in-out duration-200' onClick={() => {setOpenFollowModal(true); setActiveFollow("Following")}}><span className="text-white font-bold">{displayUser.following?.length || 0}</span> Following</button>
                     </div>
                 </div>
 
@@ -144,7 +145,7 @@ function Profile() {
             {openProfileModal && <ProfileModal setOpenProfileModal={setOpenProfileModal} />}
             {
                 displayUser?._id && currentUser?._id && openFollowModal &&
-                <FollowCard viewerId={currentUser?._id} userId={displayUser?._id} setOpenFollowModal={setOpenFollowModal} className={`${openFollowModal ? `opacity-100` : `opacity-0`} transition-all ease-in-out duration-300`}/>
+                <FollowCard viewerId={currentUser?._id} userId={displayUser?._id} setOpenFollowModal={setOpenFollowModal} activeFollow={activeFollow} setActiveFollow={setActiveFollow} className={`${openFollowModal ? `opacity-100` : `opacity-0`} transition-all ease-in-out duration-300`}/>
             }
         </div>
     );

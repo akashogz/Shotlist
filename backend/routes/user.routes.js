@@ -1,5 +1,5 @@
 import express from "express";
-import { addReview, addToWatched, addToWatchlist, changePFP, checkIfFollowed, checkWatched, deleteReview, editReview, fetchFollowers, fetchMovieReviews, fetchReviews, fetchTopReviews, fetchWatched, fetchWatchlist, followToggle, getUserInteraction, removeFromWatched, removeFromWatchlist } from "../controllers/user.controller.js";
+import { addReview, addToWatched, addToWatchlist, changePFP, checkIfFollowed, checkWatched, deleteReview, editReview, fetchFollowers, fetchFollowing, fetchMovieReviews, fetchReviews, fetchTopReviews, fetchWatched, fetchWatchlist, followToggle, getUserInteraction, removeFromWatched, removeFromWatchlist } from "../controllers/user.controller.js";
 import { protect } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
@@ -21,6 +21,7 @@ router.get('/fetchWatchlist/:id', fetchWatchlist);
 router.delete('/deleteReview/:id', protect, deleteReview);
 router.post('/followToggle', protect, followToggle)
 router.get('/checkIfFollowed/:followeeId', protect, checkIfFollowed);
-router.get('/fetchFollowers/:userId', fetchFollowers)
+router.get('/fetchFollowers/:userId', fetchFollowers);
+router.get('/fetchFollowing/:userId', fetchFollowing);
 
 export default router;
