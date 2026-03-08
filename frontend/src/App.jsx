@@ -17,6 +17,7 @@ import Browse from './pages/Browse';
 import { useAuthStore } from './store/authStore';
 import { useEffect } from 'react';
 import Search from './pages/Search';
+import FollowCard from './components/FollowCard';
 
 function App() {
   const fetchMe = useAuthStore((s) => s.fetchMe);
@@ -49,6 +50,7 @@ function App() {
 
         <Route element={<ProfileLayout />}>
           <Route path='/profile/:username' element={<Profile />} />
+          <Route path='/follow' element={<FollowCard/>}/>
         </Route>
 
         <Route element={<AuthLayout />}>

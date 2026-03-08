@@ -6,6 +6,7 @@ import ProfileCards from '../components/ProfileCards';
 import ProfileModal from '../components/ProfileModal';
 import api from '../lib/api/api';
 import toast from 'react-hot-toast';
+import FollowCard from '../components/FollowCard';
 
 function Profile() {
     const { username } = useParams();
@@ -20,6 +21,7 @@ function Profile() {
     const isOwnProfile = currentUser?.username === username;
     const displayUser = profileData;
     const [isFollowed, setIsFollowed] = useState(false);
+    const [openFollowModal, setOpenFollowModal] = useState(false);
 
     useEffect(() => {
         if (username) {
@@ -88,15 +90,15 @@ function Profile() {
                             <h1 className='font-bold text-2xl text-center text-white'>
                                 {(displayUser.name || displayUser.username)}
                             </h1>
-                            <button className={`${isFollowed ? `bg-white hover:white/90 text-black` : `bg-[#464E82] hover:bg-[#464e82c2]`} duration-200 ease-in-out transition-all flex gap-1 items-center p-0 px-3 rounded-full text-sm justify-center`} onClick={() => handleFollow()}>{isFollowed? <Check size={14} /> : <Plus size={14} />} Follow</button>
+                            <button className={`${isFollowed ? `bg-white hover:white/90 text-black` : `bg-[#464E82] hover:bg-[#464e82c2]`} duration-200 ease-in-out transition-all flex gap-1 items-center p-0 px-3 rounded-full text-sm justify-center`} onClick={() => handleFollow()}>{isFollowed? <Check size={14} /> : <Plus size={14} />} {isFollowed ? `Following` : `Follow`}</button>
                         </div>
                         <p className='text-gray-400'>@{displayUser.username}</p>
                     </div>
 
                     <div className='flex gap-4 text-sm text-white/50 px-4 py-1 rounded-full bg-[#303030] shadow-xs'>
-                        <p><span className="text-white font-bold">{displayUser.followers?.length || 0}</span> Followers</p>
+                        <button className='hover:underline underline-offset-2 cursor-pointer ease-in-out duration-200' onClick={() => setOpenFollowModal(true)}><span className="text-white font-bold">{displayUser.followers?.length || 0}</span> Followers</button>
                         <p>•</p>
-                        <p><span className="text-white font-bold">{displayUser.following?.length || 0}</span> Following</p>
+                        <button className='hover:underline underline-offset-2 cursor-pointer ease-in-out duration-200'><span className="text-white font-bold">{displayUser.following?.length || 0}</span> Following</button>
                     </div>
                 </div>
 
@@ -140,6 +142,10 @@ function Profile() {
             <ProfileCards tab={active} displayUser={displayUser} />
 
             {openProfileModal && <ProfileModal setOpenProfileModal={setOpenProfileModal} />}
+            {
+                displayUser?._id && currentUser?._id && openFollowModal &&
+                <FollowCard viewerId={currentUser?._id} userId={displayUser?._id} setOpenFollowModal={setOpenFollowModal} className={`${openFollowModal ? `opacity-100` : `opacity-0`} transition-all ease-in-out duration-300`}/>
+            }
         </div>
     );
 }

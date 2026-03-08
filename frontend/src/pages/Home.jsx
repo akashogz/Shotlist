@@ -83,7 +83,7 @@ function Home() {
   return (
     <>
       <div
-        className="relative w-full h-dvh z-1"
+        className="relative w-full h-dvh z-1 "
         aria-busy={heroLoading}
         onTouchStart={!heroLoading ? handleTouchStart : undefined}
         onTouchMove={!heroLoading ? handleTouchMove : undefined}

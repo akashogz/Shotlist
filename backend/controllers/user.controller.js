@@ -455,8 +455,8 @@ export const followToggle = async (req, res) => {
                     $pull: { followers: followId }
                 })
             ]);
-        
-            return res.status(200).json({ message: "Unfollowed successfully"});
+
+            return res.status(200).json({ message: "Unfollowed successfully" });
         }
 
         const follow = await followModel.create({
@@ -490,9 +490,41 @@ export const checkIfFollowed = async (req, res) => {
             followerId
         })
 
-        return res.status(200).json({message: "Fetched if followed", isFollowed: !!(ifFollowed)})
+        return res.status(200).json({ message: "Fetched if followed", isFollowed: !!(ifFollowed) })
     } catch (error) {
-        console.error("Error checkIfFollwing:", error);
+        console.error("Error in checkIfFollwing:", error);
         res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+export const fetchFollowers = async (req, res) => {
+    try {
+        const viewerId = req.query.viewerId;
+        const userId = req.params.userId;
+
+        const followers = await followModel
+            .find({ followeeId: userId })
+            .populate("followerId", "username avatarSeed");
+
+        let followingIds = [];
+        if (viewerId) {
+            const viewerFollowing = await followModel.find({ followerId: viewerId });
+            followingIds = viewerFollowing.map(f => f.followeeId.toString());
+        }
+
+        const results = followers.map(f => {
+            if (!f.followerId) return null;
+
+            const followerData = f.followerId.toObject();
+
+            return {
+                ...followerData,
+                isFollowing: viewerId ? followingIds.includes(followerData._id.toString()) : false
+            };
+        }).filter(Boolean);
+
+        res.status(200).json(results);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 }
