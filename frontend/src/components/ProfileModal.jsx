@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { Check, RotateCcw } from 'lucide-react';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import api from '../lib/api/api';
 import { useAuthStore } from '../store/authStore';
 import toast from 'react-hot-toast';
@@ -9,6 +9,17 @@ function ProfileModal({ setOpenProfileModal, openProfileModel }) {
     const [random, setRandom] = useState(Math.random());
     const [selected, setSelected] = useState(0);
     const fetchMe = useAuthStore((s) => s.fetchMe);
+
+    useEffect(() => {
+            if (openProfileModel) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = 'unset';
+            }
+            return () => {
+                document.body.style.overflow = 'unset';
+            };
+        }, [openProfileModel]);
 
     const handleProfileChange = async (avatarSeed) => {
         try {

@@ -1,9 +1,21 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import logo from "../../public/logo.png"
 
 function MoreModal({ open, items, title, setOpenMore }) {
     const navigate = useNavigate();
+
+    useEffect(() => {
+            if (open) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = 'unset';
+            }
+            return () => {
+                document.body.style.overflow = 'unset';
+            };
+        }, [open]);
+
     return (
         <div className={`z-50 inset-0 m-5 md:m-10 shadow-2xl p-5 rounded-2xl ${open ? `fixed` : `hidden`} items-center flex justify-center flex-col`}>
             <div className=' bg-linear-to-r from-[#6666662e] to-[#4b4b4b46] backdrop-blur-xl absolute -z-1 w-full h-full m-5 md:m-10 rounded-2xl'></div>

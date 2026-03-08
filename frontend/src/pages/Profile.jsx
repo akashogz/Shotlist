@@ -142,10 +142,10 @@ function Profile() {
 
             <ProfileCards tab={active} displayUser={displayUser} />
 
-            {openProfileModal && <ProfileModal setOpenProfileModal={setOpenProfileModal} />}
+            {openProfileModal && <ProfileModal setOpenProfileModal={setOpenProfileModal} openProfileModel={openProfileModal} />}
             {
                 displayUser?._id && currentUser?._id && openFollowModal &&
-                <FollowCard viewerId={currentUser?._id} userId={displayUser?._id} setOpenFollowModal={setOpenFollowModal} activeFollow={activeFollow} setActiveFollow={setActiveFollow} className={`${openFollowModal ? `opacity-100` : `opacity-0`} transition-all ease-in-out duration-300`}/>
+                <FollowCard viewerId={currentUser?._id} userId={displayUser?._id} openFollowModal={openFollowModal} setOpenFollowModal={setOpenFollowModal} activeFollow={activeFollow} setActiveFollow={setActiveFollow} className={`${openFollowModal ? `opacity-100` : `opacity-0`} transition-all ease-in-out duration-300`}/>
             }
         </div>
     );
