@@ -1,8 +1,5 @@
 import { Suspense, useEffect, useLayoutEffect, useState, useRef, lazy, use } from "react";
 
-import { fetchPopularMovies } from "../lib/api/popular";
-import { fetchTrendingMovies } from "../lib/api/trending";
-import { fetchAllTimeMovies } from "../lib/api/alltime";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../lib/api/api";
 
@@ -57,27 +54,51 @@ function Home() {
     if (touchEndX.current - touchStartX.current > 50) prevSlide();
   }
 
+  const fetchPopularMovies = async () => {
+    const res = await api.get(`/movie/popular`);
+    return res.data || [];
+  }
+
+  const fetchTrendingMovies = async () => {
+    const res = await api.get(`/movie/trending`);
+    return res.data || [];
+  }
+
+  const fetchAllTimeMovies = async () => {
+    const res = await api.get(`/movie/top_rated`);
+    return res.data || [];
+  }
+
+  const fetchTopReviews = async () => {
+    const res = await api.get('/user/fetchTopReviews');
+    setTopReviews(res.data.topReviews);
+  }
+
   useEffect(() => {
-    fetchPopularMovies().then((data) => {
-      setSlides(data.slice(0, 5));
-      setPopular(data);
-      setHeroLoading(false);
-    });
+    const loadData = async () => {
+      try {
+        const [popularData, trendingData, allTimeData, reviewData] = await Promise.all([
+          api.get('/movie/popular'),
+          api.get('/movie/trending'),
+          api.get('/movie/top_rated'),
+          api.get('/user/fetchTopReviews')
+        ]);
 
-    const fetchTopReviews = async () => {
-      const res = await api.get('/user/fetchTopReviews');
-      setTopReviews(res.data.topReviews);
-    }
+        setSlides(popularData.data.slice(0, 5));
+        setPopular(popularData.data);
+        setTrending(trendingData.data);
+        setAllTime(allTimeData.data);
+        setTopReviews(reviewData.data.topReviews);
 
-    fetchTopReviews();
-
-    Promise.all([fetchTrendingMovies(), fetchAllTimeMovies()]).then(
-      ([t, a]) => {
-        setTrending(t);
-        setAllTime(a);
+      } catch (error) {
+        console.error("Failed to sync data:", error);
+      } finally {
+        setHeroLoading(false);
         setRowsLoading(false);
       }
-    );
+    };
+
+    loadData();
   }, []);
 
   return (
@@ -106,11 +127,10 @@ function Home() {
                 alt={slide.title || "Movie backdrop"}
                 loading="eager"
                 fetchPriority="high"
-                className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-700 ease-in-out ${
-                  index === currentBG
+                className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-700 ease-in-out ${index === currentBG
                     ? "opacity-100"
                     : "opacity-0 pointer-events-none"
-                }`}
+                  }`}
               />
             ))}
 
@@ -143,11 +163,10 @@ function Home() {
                     key={index}
                     onClick={() => setCurrentBG(index)}
                     aria-label={`Go to slide ${index + 1}`}
-                    className={`w-2 h-2 rounded-full -mb-10 transition-opacity duration-700 ${
-                      index === currentBG
+                    className={`w-2 h-2 rounded-full -mb-10 transition-opacity duration-700 ${index === currentBG
                         ? "bg-white opacity-100"
                         : "bg-white/50 opacity-50"
-                    }`}
+                      }`}
                   />
                 ))}
               </div>
@@ -157,7 +176,7 @@ function Home() {
       </div>
 
       <Suspense fallback={null}>
-        <div className="px-5 md:px-20 flex flex-col gap-5 mt-5">
+        <div className="px-5 md:px-20 flex flex-col gap-8 mt-5">
           <section>
             <p className="text-2xl md:text-3xl font-bold mb-4">Trending This Week</p>
             <Tiles movies={trending} title="Trending This Week" loading={rowsLoading} />
@@ -180,7 +199,7 @@ function Home() {
 
           <section>
             <p className="text-2xl md:text-3xl font-bold mb-4">From the community…</p>
-            <CommunityCard loading={rowsLoading} topReviews={topReviews}  />
+            <CommunityCard loading={rowsLoading} topReviews={topReviews} />
           </section>
         </div>
       </Suspense>

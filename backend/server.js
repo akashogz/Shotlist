@@ -6,9 +6,11 @@ import { register } from "./controllers/auth.controller.js";
 import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import likeRoutes from "./routes/like.routes.js";
+import movieRoutes from "./routes/movie.routes.js";
 import cors from "cors";
+import dotenv from "dotenv";
 
-configDotenv()
+dotenv.config();
 
 const app = express();
 app.use(cookieParser());
@@ -41,6 +43,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/like", likeRoutes);
+app.use("/api/movie", movieRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

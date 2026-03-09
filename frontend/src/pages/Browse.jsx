@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import FilterSystem from "../components/FilterSystem";
-import { fetchDiscoverMovies } from "../lib/api/discover";
 import { useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
+import api from "../lib/api/api";
 
 function Browse() {
     const [movies, setMovies] = useState([]);
@@ -18,9 +18,19 @@ function Browse() {
 
     useEffect(() => {
         const fetchMovies = async () => {
-            const data = await fetchDiscoverMovies(currentPage, filters);
-            setMovies(data);
+            try {
+                const res = await api.get('/movie/discover', {
+                    params: {
+                        page: currentPage,
+                        ...filters
+                    }
+                });
+                setMovies(res.data);
+            } catch (err) {
+                console.error("Discovery error:", err);
+            }
         };
+
         fetchMovies();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }, [currentPage, filters]);
@@ -55,18 +65,17 @@ function Browse() {
                     <div className="flex flex-col w-full justify-center items-center mt-12 gap-4">
                         <p className="text-sm font-medium text-gray-400">Page {currentPage}</p>
                         <div className="flex items-center gap-2">
-                            <button className="bg-[#383838] hover:bg-[#262626] sm:block hidden p-2 px-5 rounded-lg text-sm transition-colors border border-[#434343]" 
+                            <button className="bg-[#383838] hover:bg-[#262626] sm:block hidden p-2 px-5 rounded-lg text-sm transition-colors border border-[#434343]"
                                 onClick={handlePrevIndices}>Prev</button>
-                            
+
                             <div className="flex gap-2">
                                 {currentIndices.map((i) => (
                                     <button
                                         key={i}
-                                        className={`w-10 h-10 rounded-lg text-sm transition-all duration-300 ${
-                                            i === currentPage 
-                                            ? "bg-[#464E82] text-white font-bold" 
-                                            : "bg-[#2e2e2e] text-gray-400 hover:bg-[#333]"
-                                        }`}
+                                        className={`w-10 h-10 rounded-lg text-sm transition-all duration-300 ${i === currentPage
+                                                ? "bg-[#464E82] text-white font-bold"
+                                                : "bg-[#2e2e2e] text-gray-400 hover:bg-[#333]"
+                                            }`}
                                         onClick={() => setCurrentPage(i)}
                                     >
                                         {i}
@@ -74,18 +83,18 @@ function Browse() {
                                 ))}
                             </div>
 
-                            <button className="bg-[#383838] hover:bg-[#262626] sm:block hidden p-2 px-5 rounded-lg text-sm transition-colors border border-[#434343]" 
+                            <button className="bg-[#383838] hover:bg-[#262626] sm:block hidden p-2 px-5 rounded-lg text-sm transition-colors border border-[#434343]"
                                 onClick={handleNextIndices}>Next</button>
                         </div>
                         <div className="flex gap-2">
-                            <button className="bg-[#383838] sm:hidden hover:bg-[#262626] p-2 px-5 rounded-lg text-sm transition-colors border border-[#434343]" 
+                            <button className="bg-[#383838] sm:hidden hover:bg-[#262626] p-2 px-5 rounded-lg text-sm transition-colors border border-[#434343]"
                                 onClick={handlePrevIndices}>Prev</button>
-                            <button className="bg-[#383838] hover:bg-[#262626]  sm:hidden p-2 px-5 rounded-lg text-sm transition-colors border border-[#434343]" 
+                            <button className="bg-[#383838] hover:bg-[#262626]  sm:hidden p-2 px-5 rounded-lg text-sm transition-colors border border-[#434343]"
                                 onClick={handleNextIndices}>Next</button>
                         </div>
                     </div>
                 </div>
-                
+
                 <Footer />
             </div>
         </div>
@@ -97,7 +106,7 @@ const MoviePoster = ({ movie }) => {
     const navigate = useNavigate();
 
     return (
-        <div 
+        <div
             className="group relative cursor-pointer"
             onClick={() => navigate(`/movie/${movie?.id}`)}
         >
@@ -110,9 +119,8 @@ const MoviePoster = ({ movie }) => {
                     src={`https://image.tmdb.org/t/p/w342/${movie.poster_path}`}
                     alt={movie.title}
                     onLoad={() => setLoaded(true)}
-                    className={`h-full w-full object-cover rounded-lg transition-transform duration-500 group-hover:scale-105 ${
-                        loaded ? "opacity-100" : "opacity-0"
-                    }`}
+                    className={`h-full w-full object-cover rounded-lg transition-transform duration-500 group-hover:scale-105 ${loaded ? "opacity-100" : "opacity-0"
+                        }`}
                 />
             </div>
             <h3 className="mt-2 text-sm font-medium text-gray-200 truncate w-35 md:w-45 group-hover:text-white transition-colors">

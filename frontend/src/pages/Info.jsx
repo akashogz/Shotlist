@@ -8,7 +8,6 @@ import {
     X
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import { getMovieDetails } from "../lib/api/movie.js";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useAuthStore } from "../store/authStore.js";
 import ReviewField from "../components/ReviewField.jsx";
@@ -66,14 +65,16 @@ function Info() {
     useEffect(() => {
         const fetchAll = async () => {
             try {
-                const movieData = await getMovieDetails(movieId);
-                setMovie(movieData);
+                const fetchMovieDetails = async () => {
+                    const res = await api.get(`movie/${movieId}`)
+                    setMovie(res.data);
+                }
+                fetchMovieDetails()
 
-                const response = await api.get(`/user/fetchMovieReviews?tmdbId=${Number(movieData.id)}&viewerId=${user?._id || ''}`);
+                const response = await api.get(`/user/fetchMovieReviews?tmdbId=${Number(movie?.id)}&viewerId=${user?._id || ''}`);
                 setReviews(response.data.reviews || []);
 
                 const watched = await api.get(`/user/checkWatched/${movieId}`);
-                console.log(watched)
                 setIsWatched(watched.data.isWatched);
                 setIsWatchlisted(watched.data.isWatchlisted);
             } catch (error) {
@@ -180,7 +181,6 @@ function Info() {
             toast.error(error.response?.data?.message || "Something went wrong");
         }
     }
-    console.log(movie)
 
     return (
         <div className="w-screen bg-[#242424] text-white overflow-x-hidden -z-10">

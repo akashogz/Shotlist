@@ -18,12 +18,15 @@ function Navbar() {
             if (profileIsOpen && dropdownRef.current && !dropdownRef.current.contains(event.target)) {
                 setProfileIsOpen(false);
             }
+            if (searchIsOpen && dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setSearchIsOpen(false);
+            }
         };
         document.addEventListener("mousedown", handleClickOutside);
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
-    }, [profileIsOpen]);
+    }, [profileIsOpen, searchIsOpen]);
 
     const handleSearch = () => {
         navigate(`/search/${searchQuery}`);
@@ -60,17 +63,17 @@ function Navbar() {
                     }
                 </div>
 
-                <div className={`fixed bg-[#202020] right-9 md:right-22 mt-13 text-[14px] rounded-b-md rounded-tl-md ${profileIsOpen ? `opacity-100 scale-100` : `opacity-0 pointer-events-none scale-95`} z-10 transition-all ease-in-out duration-400`} ref={dropdownRef}>
+                <div className={`fixed bg-[#202020] flex flex-col right-9 md:right-22 mt-13 text-[14px] rounded-b-md rounded-tl-md ${profileIsOpen ? `opacity-100 scale-100` : `opacity-0 pointer-events-none scale-95`} z-10 transition-all ease-in-out duration-400`} ref={dropdownRef}>
                     <div className="fixed bg-[#202020] w-4 h-4 right-1 md:right-1 -mt-2 rotate-45 border-l border-t border-[#505050]"></div>
-                    <p onClick={() => navigate(`/profile/${user.username}`)} className="border-t border-l border-r border-[#505050] px-8 text-center p-2 rounded-tl-md hover:underline underline-offset-5">Profile</p>
-                    <p className="border px-8 p-2 border-[#505050] text-center hover:underline underline-offset-5">Settings</p>
-                    <p className="border-b border-l border-r px-8 p-2 border-[#505050] rounded-b-md hover:underline underline-offset-5" onClick={() => {logout(); setProfileIsOpen(false)}}>Sign Out</p>
+                    <Link to={`/profile/${user?.username}`} className="border-t border-l border-r border-[#505050] px-8 text-center p-2 rounded-tl-md hover:underline underline-offset-5">Profile</Link>
+                    <Link to={``} className="border px-8 p-2 border-[#505050] text-center hover:underline underline-offset-5">Settings</Link>
+                    <Link className="border-b border-l border-r px-8 p-2 border-[#505050] rounded-b-md hover:underline underline-offset-5" onClick={() => {logout(); setProfileIsOpen(false)}}>Sign Out</Link>
                 </div>
 
                 <div className={`mt-12 -ml-5 flex w-full justify-center ${searchIsOpen ? `absolute` : `hidden`} md:hidden`}>
                     <span className="flex justify-between gap-2 p-2 bg-linear-to-r from-[#6d6d6da4] to-[#585858a3] rounded-full shadow-md ">
                         <input type="text" placeholder="Search for anything..." className="border text-white rounded-full pl-2 text-[14px] font-light focus:outline-none focus:ring-0"  onChange={(e) => {setSearchQuery(e.target.value); searchIsOpen(false); setSearchQuery("")}}></input>
-                        <button className="border rounded-full p-2 text-[14px] font-light" onClick={() => handleSearch()}>Search</button>
+                        <button className="border rounded-full p-2 text-[14px] font-light" onClick={() => {handleSearch(); setSearchIsOpen(false);}}>Search</button>
                     </span>
                 </div>
             </div>
