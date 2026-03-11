@@ -1,4 +1,5 @@
 import reviewModel from "../models/review.model.js";
+import reviewLikeModel from "../models/reviewLike.model.js";
 import userModel from "../models/user.model.js";
 import User from "../models/user.model.js";
 import mongoose from "mongoose";
@@ -6,6 +7,7 @@ import { Types } from "mongoose";
 import watchedModel from "../models/watched.model.js";
 import watchlistModel from "../models/watchlist.model.js";
 import followModel from "../models/follow.model.js";
+import redisClient from "../config/redis.js";
 
 export const changePFP = async (req, res) => {
     try {
@@ -205,19 +207,33 @@ export const fetchReviews = async (req, res) => {
 };
 
 export const fetchTopReviews = async (req, res) => {
+    const cacheKey = "reviews:top_global";
+
     try {
+        const cachedData = await redisClient.get(cacheKey);
+        if (cachedData) {
+            return res.status(200).json({
+                message: "Top Reviews fetched (from cache)",
+                topReviews: JSON.parse(cachedData)
+            });
+        }
+
         const topReviews = await reviewModel.find()
             .sort({ likesCount: -1 })
             .limit(2)
             .populate('user', 'username avatarSeed')
             .lean();
 
+        if (topReviews.length > 0) {
+            await redisClient.setEx(cacheKey, 86400, JSON.stringify(topReviews));
+        }
+
         return res.status(200).json({ message: "Top Reviews fetched", topReviews });
     } catch (error) {
         console.error("Error fetching top reviews:", error);
-        throw error;
+        return res.status(500).json({ error: "Internal server error" });
     }
-}
+};
 
 export const fetchMovieReviews = async (req, res) => {
     try {
@@ -550,7 +566,7 @@ export const fetchFollowing = async (req, res) => {
         const results = following.map(f => {
             if (!f.followeeId) return null;
 
-            const userData = f.followeeId; 
+            const userData = f.followeeId;
 
             return {
                 ...userData,

@@ -1,6 +1,7 @@
 import axios from "axios";
 import dotenv from "dotenv";
 import https from "https";
+import redisClient from "../config/redis.js";
 
 dotenv.config();
 
@@ -17,7 +18,7 @@ const httpsAgent = new https.Agent({
 const tmdbApi = axios.create({
   baseURL: TMDB_BASE_URL,
   httpsAgent,
-  timeout: 20000, 
+  timeout: 20000,
   headers: {
     'Accept': 'application/json',
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
@@ -46,18 +47,60 @@ tmdbApi.interceptors.request.use((config) => {
   return config;
 });
 
+const getCachedOrFetch = async (key, fetchCallback, expiry = 86400) => {
+
+  const cachedValue = await redisClient.get(key);
+  if (cachedValue) return JSON.parse(cachedValue);
+
+  const data = await fetchCallback();
+  await redisClient.setEx(key, expiry, JSON.stringify(data));
+  return data;
+};
+
 export const getPopularMovies = async (req, res) => {
+  const page = req.query.page || 1;
+  const key = `movies:popular:p${page}`;
   try {
-    const { data } = await tmdbApi.get("/movie/popular", { params: { page: req.query.page || 1 } });
-    res.json(data.results);
+    const movies = await getCachedOrFetch(key, async () => {
+      const { data } = await tmdbApi.get("/movie/popular", { params: { page } });
+      return data.results;
+    });
+    res.json(movies);
   } catch (err) { res.status(500).json({ error: "Popular movies unavailable" }); }
 };
 
 export const getTopRatedMovies = async (req, res) => {
   try {
-    const { data } = await tmdbApi.get("/movie/top_rated");
-    res.json(data.results);
-  } catch (err) { res.status(500).json({ error: "Top rated movies unavailable" }); }
+    const movies = await getCachedOrFetch("movies:top_rated", async () => {
+      const { data } = await tmdbApi.get("/movie/top_rated");
+      return data.results;
+    });
+    res.json(movies);
+  } catch (err) { res.status(500).json({ error: "Top rated unavailable" }); }
+};
+
+export const getTrendingMovies = async (req, res) => {
+  try {
+    const movies = await getCachedOrFetch("movies:trending", async () => {
+      const { data } = await tmdbApi.get("/trending/movie/week");
+      return data.results;
+    });
+    res.json(movies);
+  } catch (err) { res.status(500).json({ error: "Trending unavailable" }); }
+};
+
+export const getMovieDetails = async (req, res) => {
+  const { movieId } = req.params;
+  const key = `movie:details:${movieId}`;
+  try {
+    const movie = await getCachedOrFetch(key, async () => {
+      const { data } = await tmdbApi.get(`/movie/${movieId}`, {
+        params: { append_to_response: "credits,videos,recommendations,watch/providers" }
+      });
+      return data;
+    }, 604800);
+    res.json(movie);
+  } catch (err) { res.status(404).json({ error: "Movie details not found" }); }
 };
 
 export const searchMovies = async (req, res) => {
@@ -72,20 +115,4 @@ export const getDiscoverMovies = async (req, res) => {
     const { data } = await tmdbApi.get("/discover/movie", { params: { ...req.query } });
     res.json(data.results);
   } catch (err) { res.status(500).json({ error: "Discovery unavailable" }); }
-};
-
-export const getMovieDetails = async (req, res) => {
-  try {
-    const { data } = await tmdbApi.get(`/movie/${req.params.movieId}`, { params: { append_to_response: "credits,videos,recommendations" } });
-    res.json(data);
-  } catch (err) { res.status(404).json({ error: "Movie details not found" }); }
-};
-
-export const getTrendingMovies = async (req, res) => {
-  try {
-    const { data } = await tmdbApi.get("/trending/movie/week");
-    res.json(data.results);
-  } catch (err) {
-    res.status(500).json({ error: "Trending movies unavailable" });
-  }
 };

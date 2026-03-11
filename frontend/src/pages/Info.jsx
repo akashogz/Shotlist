@@ -71,7 +71,7 @@ function Info() {
                 }
                 fetchMovieDetails()
 
-                const response = await api.get(`/user/fetchMovieReviews?tmdbId=${Number(movie?.id)}&viewerId=${user?._id || ''}`);
+                const response = await api.get(`/user/fetchMovieReviews?tmdbId=${(movieId)}&viewerId=${user?._id || ''}`);
                 setReviews(response.data.reviews || []);
 
                 const watched = await api.get(`/user/checkWatched/${movieId}`);
@@ -323,7 +323,7 @@ function Info() {
                         </select>
                     </div>
                     <div className="flex flex-col sm:flex-row gap-3">
-                        {movie["watch/providers"]?.results?.[country]?.buy?.map((p, i) => (
+                        {movie["watch/providers"]?.results?.[country]?.flatrate?.map((p, i) => (
                             <div key={i} className="flex items-center gap-3 p-2 bg-white/5 rounded-lg">
                                 <img src={`https://image.tmdb.org/t/p/original${p.logo_path}`} className="size-10 rounded-md" />
                                 <div>
