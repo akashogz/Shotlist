@@ -107,7 +107,7 @@ const MoviePoster = ({ movie }) => {
 
     return (
         <div
-            className="group relative cursor-pointer"
+            className="group relative cursor-pointer items-center flex flex-col"
             onClick={() => navigate(`/movie/${movie?.id}`)}
         >
             <div className="aspect-2/3 w-35 md:45 rounded-xl bg-[#1A1A1A] group">
@@ -123,7 +123,7 @@ const MoviePoster = ({ movie }) => {
                         }`}
                 />
             </div>
-            <h3 className="mt-2 text-sm font-medium text-gray-200 truncate w-35 md:w-45 group-hover:text-white transition-colors">
+            <h3 className="mt-2 text-sm font-medium text-gray-200 truncate w-35 md:w-45 group-hover:text-white transition-colors text-center">
                 {movie.title}
             </h3>
         </div>

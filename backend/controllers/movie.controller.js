@@ -80,14 +80,11 @@ export const getTopRatedMovies = async (req, res) => {
 };
 
 export const getTrendingMovies = async (req, res) => {
-  const start = Date.now()
   try {
     const movies = await getCachedOrFetch("movies:trending", async () => {
       const { data } = await tmdbApi.get("/trending/movie/week");
       return data.results;
     });
-    const end = Date.now();
-    console.log(end - start)
     res.json(movies);
   } catch (err) { res.status(500).json({ error: "Trending unavailable" }); }
 };

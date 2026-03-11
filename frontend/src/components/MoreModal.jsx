@@ -30,7 +30,7 @@ function MoreModal({ open, items, title, setOpenMore }) {
                                 <img key={index} src={`/logo.png`} className='p-10 hover:scale-102 ease-in-out duration-200' onClick={() => navigate(`movie/${item?.id}`)}></img>
                             </div>}
                             <div className='flex flex-col items-center w-30 md:w-40'>
-                                <p className='text-md font-bold items-center'>{item.title || item.name}</p>
+                                <p className='text-md font-bold items-center text-center'>{item.title || item.name}</p>
                                 <p className='text-sm'>{item.character || ``}</p>
                             </div>
                         </div>
