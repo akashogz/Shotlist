@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 const INITIAL_FILTERS = {
-  sortBy: "Popularity",
+  sort_by: "Popularity",
   genres: [],
   releaseStart: null,
   releaseEnd: null,

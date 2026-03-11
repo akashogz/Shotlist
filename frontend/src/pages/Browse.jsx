@@ -9,7 +9,7 @@ function Browse() {
     const [currentPage, setCurrentPage] = useState(1);
     const [currentIndices, setCurrentIndices] = useState([1, 2, 3, 4, 5]);
     const [filters, setFilters] = useState({
-        sortBy: "",
+        sort_by: "",
         genres: [],
         releaseStart: null,
         releaseEnd: null,

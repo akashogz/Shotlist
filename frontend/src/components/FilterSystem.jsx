@@ -13,14 +13,6 @@ const FILTERS = [
   { id: "language", title: "Language", options: Object.keys(LANGUAGE_MAP) },
 ];
 
-const INITIAL_STATE = {
-  sortBy: "",
-  genres: [],
-  releaseStart: null,
-  releaseEnd: null,
-  language: null,
-};
-
 export default function FilterSystem({ setFilters }) {
   const { localFilters, setLocalFilters, activeFilters, setActiveFilters } = useUserStore();
   const clearAll = useUserStore((s) => s.clearAll);
@@ -51,7 +43,7 @@ export default function FilterSystem({ setFilters }) {
 
       setLocalFilters((prev) => {
         const updated = { ...prev };
-        if (id === "sort") updated.sortBy = SORT_MAP[label];
+        if (id === "sort") updated.sort_by = SORT_MAP[label];
         if (id === "language") updated.language = LANGUAGE_MAP[label];
         if (id === "genre") {
           const gid = GENRE_MAP[label];
