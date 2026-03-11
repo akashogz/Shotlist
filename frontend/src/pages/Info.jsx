@@ -475,13 +475,13 @@ function Info() {
                 {/* RECOMMENDATIONS */}
                 <section className="mt-16">
                     <h3 className="text-3xl font-bold mb-6">More Like This</h3>
-                    <div className="flex gap-4 overflow-x-auto pb-6 no-scrollbar">
+                    <div className="flex gap-4 overflow-x-scroll pb-6 no-scrollbar">
                         {recommendations.slice(0, 10).map(m => (
                             <img
                                 key={m.id}
                                 onClick={() => navigate(`/movie/${m.id}`)}
                                 src={`https://image.tmdb.org/t/p/w154${m.poster_path}`}
-                                className="h-50 rounded-lg cursor-pointer hover:scale-105 ease-in-out duration-300"
+                                className="h-50 rounded-lg cursor-pointer hover:brightness-70 ease-in-out duration-300"
                                 alt={m.title}
                             />
                         ))}
@@ -507,7 +507,7 @@ function Info() {
                         ].map(([label, value], i) => (
                             <div key={i} className="flex border-white/5 border">
                                 <div className="p-4 text-white/40 bg-[#3D3D3D] border-r border-white/5 items-center w-1/2 flex justify-center">{label}</div>
-                                <div className="w-1/2 flex items-center justify-center p-4 font-medium">{value}</div>
+                                <div className="w-1/2 flex items-center justify-center p-4 font-medium"><p className="text-center">{value}</p></div>
                             </div>
                         ))}
                     </div>
