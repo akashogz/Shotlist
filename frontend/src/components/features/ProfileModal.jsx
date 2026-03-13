@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { Check, RotateCcw } from 'lucide-react';
 import React, { useEffect, useState } from 'react'
-import api from '../lib/api/api';
-import { useAuthStore } from '../store/authStore';
+import api from '../../lib/api/api';
+import { useAuthStore } from '../../store/authStore';
 import toast from 'react-hot-toast';
 
 function ProfileModal({ setOpenProfileModal, openProfileModel }) {

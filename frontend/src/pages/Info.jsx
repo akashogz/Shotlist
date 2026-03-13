@@ -10,11 +10,11 @@ import {
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useAuthStore } from "../store/authStore.js";
-import ReviewField from "../components/ReviewField.jsx";
+import ReviewField from "../components/ui/ReviewField.jsx";
 import api from "../lib/api/api.js";
 import toast from "react-hot-toast";
-import MoreModal from "../components/MoreModal.jsx";
-import VideoPlayer from "../components/VideoPlayer.jsx";
+import MoreModal from "../components/features/MoreModal.jsx";
+import VideoPlayer from "../components/features/VideoPlayer.jsx";
 import { tailspin } from 'ldrs'
 
 const GENRE_ICONS = {

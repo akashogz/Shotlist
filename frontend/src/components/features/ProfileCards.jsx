@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { useAuthStore } from '../store/authStore'
-import api from '../lib/api/api';
+import { useAuthStore } from '../../store/authStore'
+import api from '../../lib/api/api';
 import { Heart, Pencil, Trash, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-import { FlipCard } from './FlipCard';
+import { FlipCard } from '../ui/FlipCard';
 import {tailspin} from 'ldrs'
 
 function ProfileCards({ tab, displayUser }) {

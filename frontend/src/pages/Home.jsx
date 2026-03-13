@@ -3,9 +3,9 @@ import { Suspense, useEffect, useLayoutEffect, useState, useRef, lazy, use } fro
 import { Link, useNavigate } from "react-router-dom";
 import api from "../lib/api/api";
 
-const Tiles = lazy(() => import("../components/Tiles"));
-const GenreCards = lazy(() => import("../components/GenreCards"));
-const CommunityCard = lazy(() => import("../components/CommunityCard"));
+const Tiles = lazy(() => import("../components/ui/Tiles"));
+const GenreCards = lazy(() => import("../components/features/GenreCards"));
+const CommunityCard = lazy(() => import("../components/features/CommunityCard"));
 
 function Home() {
   const [slides, setSlides] = useState([]);

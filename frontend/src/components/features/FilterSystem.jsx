@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { X, ChevronDown, RotateCcw } from "lucide-react";
-import { useUserStore } from "../store/userStore";
+import { useUserStore } from "../../store/userStore";
 
 const GENRE_MAP = { Action: 28, Comedy: 35, Drama: 18, "Sci-Fi": 878 };
 const SORT_MAP = { Popularity: "popularity.desc", Rating: "vote_average.desc", Voting: "vote_count.desc", Released: "primary_release_date.desc" };

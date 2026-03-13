@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { Bookmark, Check, MessageSquareMore, Pencil, Plus, Star } from 'lucide-react';
-import ProfileCards from '../components/ProfileCards';
-import ProfileModal from '../components/ProfileModal';
+import ProfileCards from '../components/features/ProfileCards';
+import ProfileModal from '../components/features/ProfileModal';
 import api from '../lib/api/api';
 import toast from 'react-hot-toast';
-import FollowCard from '../components/FollowCard';
+import FollowCard from '../components/features/FollowCard';
 
 function Profile() {
     const { username } = useParams();

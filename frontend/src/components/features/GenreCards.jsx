@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useUserStore } from "../store/userStore";
+import { useUserStore } from "../../store/userStore";
 import { MoveRight } from "lucide-react";
 
 function GenreCards() {

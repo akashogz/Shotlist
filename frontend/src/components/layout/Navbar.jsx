@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { useAuthStore } from "../store/authStore";
+import { useAuthStore } from "../../store/authStore";
 import { Search } from "lucide-react";
 
 function Navbar() {

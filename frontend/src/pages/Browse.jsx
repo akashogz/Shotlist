@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import FilterSystem from "../components/FilterSystem";
+import FilterSystem from "../components/features/FilterSystem";
 import { useNavigate } from "react-router-dom";
-import Footer from "../components/Footer";
+import Footer from "../components/layout/Footer";
 import api from "../lib/api/api";
 
 function Browse() {

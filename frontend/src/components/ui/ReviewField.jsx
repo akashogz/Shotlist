@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useAuthStore } from '../store/authStore';
-import api from '../lib/api/api';
+import { useAuthStore } from '../../store/authStore';
+import api from '../../lib/api/api';
 import toast from 'react-hot-toast';
 
 function ReviewField({ tmdbId, movieName, posterPath }) {

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import MoreModal from "./MoreModal";
+import MoreModal from "../features/MoreModal";
 import { useNavigate } from "react-router-dom";
 
 function Tiles({ movies = [], title, loading }) {

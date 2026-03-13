@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Ban, Check } from 'lucide-react';
-import api from '../lib/api/api';
+import api from '../lib/api/api.js';
 import toast from "react-hot-toast";
 import { useAuthStore } from '../store/authStore';
 import { useNavigate } from 'react-router-dom';

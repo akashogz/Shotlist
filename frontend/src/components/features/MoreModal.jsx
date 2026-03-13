@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import logo from "../../public/logo.png"
 
 function MoreModal({ open, items, title, setOpenMore }) {
     const navigate = useNavigate();
