@@ -1,7 +1,8 @@
 import { Suspense, useEffect, useLayoutEffect, useState, useRef, lazy, use } from "react";
 
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import api from "../lib/api/api";
+import { ExternalLink, Play } from "lucide-react";
 
 const Tiles = lazy(() => import("../components/ui/Tiles"));
 const GenreCards = lazy(() => import("../components/features/GenreCards"));
@@ -127,12 +128,12 @@ function Home() {
               <div className="flex gap-2">
                 <Link to={`movie/${slides[currentBG]?.id}?trailer=open`} className="border rounded-full p-3 px-4 flex items-center gap-2 text-[14px] font-bold cursor-pointer">
                   Play Trailer
-                  <img src="play.png" alt="" aria-hidden="true" className="size-3" />
+                  <Play size={14} fill="white" />
                 </Link>
 
                 <Link to={`movie/${slides[currentBG]?.id}`} className="border rounded-full p-3 px-4 flex items-center gap-2 text-[14px] bg-[#464E82] border-[#464E82] font-bold cursor-pointer">
                   Visit Page
-                  <img src="visit.png" alt="" aria-hidden="true" className="size-3" />
+                  <ExternalLink size={14}  />
                 </Link>
               </div>
 

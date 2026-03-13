@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import MoreModal from "../features/MoreModal";
 import { useNavigate } from "react-router-dom";
+import { MoveRight } from "lucide-react";
 
 function Tiles({ movies = [], title, loading }) {
   const [openMore, setOpenMore] = useState(false);
@@ -55,12 +56,7 @@ function Tiles({ movies = [], title, loading }) {
           className="h-50 md:h-55 w-35 md:w-20 flex items-center justify-center"
         >
           <span className="w-15 md:w-20 h-15 md:h-20 rounded-full bg-[#464E82] flex items-center justify-center">
-            <img
-              src="right-arrow.png"
-              alt=""
-              aria-hidden="true"
-              className="size-6 md:size-8"
-            />
+            <MoveRight size={32}/>
           </span>
         </button>
       )}
