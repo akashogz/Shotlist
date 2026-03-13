@@ -1,13 +1,12 @@
 import { Routes, Route } from 'react-router-dom';
 import { Toaster } from "react-hot-toast";
 
-// Components & Layouts
 import MainLayout from './components/MainLayout';
 import AuthLayout from './components/AuthLayout';
+import BrowseLayout from './components/BrowseLayout';
 import ProfileLayout from './components/ProfileLayout';
 import ScrollToTop from './components/ScrollToTop';
 
-// Pages
 import Home from './pages/Home';
 import Logup from './pages/Logup';
 import Login from './pages/Login';
@@ -53,10 +52,13 @@ function App() {
           <Route path='/follow' element={<FollowCard/>}/>
         </Route>
 
+        <Route element={<BrowseLayout />}>
+          <Route path='/browse' element={<Browse />} />
+        </Route>
+
         <Route element={<AuthLayout />}>
           <Route path="/signup" element={<Logup />} />
           <Route path='/login' element={<Login />} />
-          <Route path='/browse' element={<Browse />} />
         </Route>
       </Routes>
     </>
