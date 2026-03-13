@@ -1,84 +1,203 @@
-import { use, useEffect, useRef, useState } from "react"
-import { Link, Navigate, NavLink, useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react"
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import { Search } from "lucide-react";
 
 function Navbar() {
+
     const [profileIsOpen, setProfileIsOpen] = useState(false);
     const [searchIsOpen, setSearchIsOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+
     const user = useAuthStore((s) => s.user);
     const logout = useAuthStore((s) => s.logout);
     const isLoggedIn = !!user;
-    const navigate = useNavigate();
-    const [searchQuery, setSearchQuery] = useState("");
 
-    const dropdownRef = useRef(null);
+    const navigate = useNavigate();
+
+    const profileRef = useRef(null);
+    const searchRef = useRef(null);
+
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (profileIsOpen && dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+
+            if (profileIsOpen && profileRef.current && !profileRef.current.contains(event.target)) {
                 setProfileIsOpen(false);
             }
-            if (searchIsOpen && dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+
+            if (searchIsOpen && searchRef.current && !searchRef.current.contains(event.target)) {
                 setSearchIsOpen(false);
             }
         };
+
         document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
+
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+
     }, [profileIsOpen, searchIsOpen]);
 
+
     const handleSearch = () => {
+        if (!searchQuery.trim()) return;
         navigate(`/search/${searchQuery}`);
-        setSearchQuery("")
-    }
+        setSearchQuery("");
+    };
 
     return (
-        <div className="sticky top-0 w-full z-50 items-center h-16 -mb-18 pt-0.5">
-            <div className="flex justify-between md:px-20 px-5 mt-2 mb-2 z-10">
-                <div className="flex gap-2 items-center justify-center">
-                    <img src="/logo.png" className="size-10  rounded-full shadow-xs"></img>
-                    <NavLink to={"/"} className="font-bold text-2xl md:text-3xl text-shadow-xs">shotlist</NavLink>
+
+        <div className="fixed top-0 w-full h-16 z-40">
+
+            <div className="flex justify-between md:px-20 px-5 items-center h-full">
+
+                <div className="flex gap-2 items-center">
+                    <img src="/logo.png" className="size-10 rounded-full shadow-xs" />
+                    <NavLink to="/" className="font-bold text-2xl md:text-3xl">
+                        shotlist
+                    </NavLink>
                 </div>
-                <div className="-mr-35 items-center flex justify-center pr-38 z-10">
-                    <div className="border rounded-full md:flex p-1 gap-2 items-center pr-2 hidden shadow-sm w-80">
-                        <div className="border rounded-full p-2">
-                            <Search size={16} />
-                        </div>
-                        <input type="text" placeholder="Search for anything..." className="text-[14px] focus:outline-0 w-60 text-shadow-xs" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSearch()}/>
+
+                <div className="hidden md:flex border rounded-full p-1 gap-2 items-center pr-2 shadow-sm w-80">
+
+                    <div className="border rounded-full p-2">
+                        <Search size={16} />
                     </div>
-                </div>
-                <div className="md:flex gap-5 font-light items-center text-[14px] hidden">
-                    <NavLink to={"/browse"} className="text-shadow-xs z-10">Browse</NavLink>
-                    {
-                        isLoggedIn ? <img src={`https://api.dicebear.com/9.x/glass/svg?seed=${user.avatarSeed}`} className="size-9 shadow-xs rounded-full" onClick={() => setProfileIsOpen(!profileIsOpen)}></img>
-                            : <NavLink to={"/signup"} className="shadow-2xl">Login/Signup</NavLink>
-                    }
-                </div>
-                <div className="flex gap-5 items-center md:hidden z-10">
-                    <img src="/search.png" className="size-7" onClick={() => setSearchIsOpen(!searchIsOpen)}></img>
-                    {
-                        isLoggedIn ? <img src={`https://api.dicebear.com/9.x/glass/svg?seed=${user.avatarSeed}`} className="size-8 rounded-full" onClick={() => setProfileIsOpen(!profileIsOpen)}></img>
-                            : <NavLink to={"/signup"} className="shadow-2xl text-sm z-10">Login/Signup</NavLink>
-                    }
+
+                    <input
+                        type="text"
+                        placeholder="Search for anything..."
+                        className="text-sm focus:outline-none w-full"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    />
+
                 </div>
 
-                <div className={`fixed bg-[#202020] flex flex-col right-9 md:right-22 mt-13 text-[14px] rounded-b-md rounded-tl-md ${profileIsOpen ? `opacity-100 scale-100` : `opacity-0 pointer-events-none scale-95`} z-10 transition-all ease-in-out duration-400`} ref={dropdownRef}>
-                    <div className="fixed bg-[#202020] w-4 h-4 right-1 md:right-1 -mt-2 rotate-45 border-l border-t border-[#505050]"></div>
-                    <Link to={`/profile/${user?.username}`} className="border-t border-l border-r border-[#505050] px-8 text-center p-2 rounded-tl-md hover:underline underline-offset-5">Profile</Link>
-                    <Link to={``} className="border px-8 p-2 border-[#505050] text-center hover:underline underline-offset-5">Settings</Link>
-                    <Link className="border-b border-l border-r px-8 p-2 border-[#505050] rounded-b-md hover:underline underline-offset-5" onClick={() => {logout(); setProfileIsOpen(false)}}>Sign Out</Link>
+                <div className="hidden md:flex gap-5 items-center text-sm">
+
+                    <NavLink to="/browse">
+                        Browse
+                    </NavLink>
+
+                    {isLoggedIn ? (
+
+                        <img
+                            src={`https://api.dicebear.com/9.x/glass/svg?seed=${user.avatarSeed}`}
+                            className="size-9 rounded-full cursor-pointer"
+                            onClick={() => setProfileIsOpen(!profileIsOpen)}
+                        />
+
+                    ) : (
+
+                        <NavLink to="/signup">
+                            Login / Signup
+                        </NavLink>
+
+                    )}
+
                 </div>
 
-                <div className={`mt-12 -ml-5 flex w-full justify-center ${searchIsOpen ? `absolute` : `hidden`} md:hidden`}>
-                    <span className="flex justify-between gap-2 p-2 bg-linear-to-r from-[#6d6d6da4] to-[#585858a3] rounded-full shadow-md ">
-                        <input type="text" placeholder="Search for anything..." className="border text-white rounded-full pl-2 text-[14px] font-light focus:outline-none focus:ring-0"  onChange={(e) => {setSearchQuery(e.target.value); searchIsOpen(false); setSearchQuery("")}}></input>
-                        <button className="border rounded-full p-2 text-[14px] font-light" onClick={() => {handleSearch(); setSearchIsOpen(false);}}>Search</button>
-                    </span>
+
+                <div className="flex md:hidden gap-4 items-center">
+
+                    <img
+                        src="/search.png"
+                        className="size-7 cursor-pointer"
+                        onClick={() => setSearchIsOpen(!searchIsOpen)}
+                    />
+
+                    {isLoggedIn ? (
+
+                        <img
+                            src={`https://api.dicebear.com/9.x/glass/svg?seed=${user.avatarSeed}`}
+                            className="size-8 rounded-full"
+                            onClick={() => setProfileIsOpen(!profileIsOpen)}
+                        />
+
+                    ) : (
+
+                        <NavLink to="/signup" className="text-sm">
+                            Login
+                        </NavLink>
+
+                    )}
+
                 </div>
+
             </div>
+
+            <div
+                ref={profileRef}
+                className={`absolute right-5 md:right-20 top-16 bg-[#202020] rounded-md overflow-hidden transition-all duration-200 z-50 text-sm
+                ${profileIsOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"}`}
+            >
+
+                <Link
+                    to={`/profile/${user?.username}`}
+                    className="block px-6 py-2 hover:bg-[#2a2a2a]"
+                >
+                    Profile
+                </Link>
+
+                <Link
+                    to="/browse"
+                    className="block md:hidden px-6 py-2 hover:bg-[#2a2a2a]"
+                >
+                    Browse
+                </Link>
+
+                <Link
+                    to="/settings"
+                    className="block px-6 py-2 hover:bg-[#2a2a2a]"
+                >
+                    Settings
+                </Link>
+
+                <button
+                    className="block w-full text-left px-6 py-2 hover:bg-[#2a2a2a]"
+                    onClick={() => {
+                        logout();
+                        setProfileIsOpen(false);
+                    }}
+                >
+                    Sign Out
+                </button>
+
+            </div>
+
+            <div
+                ref={searchRef}
+                className={`md:hidden absolute left-0 right-0 top-16 flex justify-center z-50
+                ${searchIsOpen ? "flex" : "hidden"}`}
+            >
+
+                <div className="flex gap-2 p-1.5 border border-white rounded-full shadow-md">
+
+                    <input
+                        type="text"
+                        placeholder="Search..."
+                        className="bg-transparent px-2 outline-none text-sm"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+
+                    <button
+                        className="bg-white text-black px-3 p-2 rounded-full text-xs font-semibold"
+                        onClick={() => {
+                            handleSearch();
+                            setSearchIsOpen(false);
+                        }}
+                    >
+                        Search
+                    </button>
+
+                </div>
+
+            </div>
+
         </div>
-    )
+
+    );
 }
 
-export default Navbar
+export default Navbar;
