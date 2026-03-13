@@ -66,7 +66,6 @@ export default function FilterSystem({ setFilters }) {
 
   return (
     <div className="w-full text-white">
-      {/* Mobile View */}
       <div className="lg:hidden bg-[#303030] px-4 py-3 mt-20 rounded-lg mx-5">
         <div className="flex items-center gap-2 flex-wrap no-scrollbar pb-2">
           <button onClick={clearAll} className="p-2 bg-[#505050] rounded-full border border-[#606060] shrink-0">
@@ -103,7 +102,6 @@ export default function FilterSystem({ setFilters }) {
           ))}
         </div>
         
-        {/* Active Filter Badges */}
         {activeFilters.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-[#444]">
             {activeFilters.map((f, i) => (
@@ -115,7 +113,6 @@ export default function FilterSystem({ setFilters }) {
         )}
       </div>
 
-      {/* Desktop Sidebar */}
       <aside className="hidden lg:flex flex-col w-72 bg-[#303030] border-r border-[#262626] h-screen fixed left-0 top-0 pt-24 p-6 overflow-y-auto no-scrollbar">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl font-bold">Filters</h2>

@@ -2,11 +2,7 @@ import { use, useState } from "react"
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom"
 
 function AuthNavbar() {
-    const [profileIsOpen, setProfileIsOpen] = useState(false);
-    const [searchIsOpen, setSearchIsOpen] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const location = useLocation();
-    const navigate = useNavigate();
 
     return (
         <div className="sticky top-0 w-full z-10 items-center h-16 -mb-18 pt-0.5">

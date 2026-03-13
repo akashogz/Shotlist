@@ -1,10 +1,10 @@
 import {
     Bookmark,
-    BookOpen, Brain, Check, Clock, Columns4Icon, EllipsisVertical, ExternalLink, EyeIcon,
+    BookOpen, Brain, Check, Clock, Columns4Icon, ExternalLink, EyeIcon,
     FilmIcon, GhostIcon, HandFistIcon, Heart, HeartIcon, KeyIcon,
-    LaughIcon, Menu, MountainIcon, MoveRight, Music, Pause, Pencil, Play, Plus, ReceiptText,
+    LaughIcon, Menu, MountainIcon, MoveRight, Music, Pause, Play, Plus, ReceiptText,
     Save,
-    ShieldAlert, Sparkles, Star, Theater, TrainTrack, Trash, Tv, UsersIcon,
+    ShieldAlert, Sparkles, Star, Theater, TrainTrack, Tv, UsersIcon,
     X
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
@@ -45,7 +45,6 @@ function Info() {
     const [country, setCountry] = useState("US");
     const { movieId } = useParams();
     const navigate = useNavigate();
-    const [editReview, setEditReview] = useState(false);
     const [openMore, setOpenMore] = useState(false);
     const [isWatched, setIsWatched] = useState(false);
     const [isWatchListed, setIsWatchlisted] = useState(false);
@@ -59,7 +58,6 @@ function Info() {
     tailspin.register();
 
     const user = useAuthStore((s) => s.user);
-    const setUser = useAuthStore((s) => s.setUser);
     const loggedIn = !!user;
 
     tailspin.register()
@@ -209,7 +207,6 @@ function Info() {
 
     return (
         <div className="w-screen bg-[#242424] text-white overflow-x-hidden -z-10">
-            {/* BACKDROP */}
             <div className={`relative h-100 sm:h-96 md:h-150 ${openTrailer ? `blur-lg` : ``} duration-300 ease-in-out`}>
                 <img
                     src={`https://image.tmdb.org/t/p/w1280/${movie.backdrop_path}`}
@@ -221,10 +218,8 @@ function Info() {
                 <div className="absolute inset-0 bg-linear-to-b from-[#464e8253] to-[#242424] min-h-full" />
             </div>
 
-            {/* CONTENT WRAPPER */}
             <div className={`mx-auto px-4 sm:px-8 lg:px-20 md:-mt-120 -mt-70 relative z-10 pb-20`}>
 
-                {/* HERO SECTION */}
                 <div className={`flex flex-col gap-8 items-center md:items-start transition-all duration-1000 ease-in-out`}>
                     <div className="shrink-0 flex flex-col gap-4 items-center w-full h-full">
                         {
@@ -386,7 +381,6 @@ function Info() {
                     </div>
                 </section>
 
-                {/* REVIEWS */}
                 <section className="mt-10">
                     <div className="flex justify-between items-end mb-6">
                         <h3 className="text-3xl font-bold">Community Reviews</h3>
@@ -472,7 +466,6 @@ function Info() {
                     )}
                 </section>
 
-                {/* RECOMMENDATIONS */}
                 <section className="mt-16">
                     <h3 className="text-3xl font-bold mb-6">More Like This</h3>
                     <div className="flex gap-4 overflow-x-scroll pb-6 no-scrollbar">
@@ -488,7 +481,6 @@ function Info() {
                     </div>
                 </section>
 
-                {/* FULL DATA TABLE */}
                 <section className="mt-16">
                     <div className="bg-[#303030] p-4 rounded-t-xl flex items-center gap-2 border-b border-white/10">
                         <ReceiptText size={20} />

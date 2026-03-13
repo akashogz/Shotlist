@@ -11,7 +11,6 @@ function Home() {
   const [slides, setSlides] = useState([]);
   const [heroLoading, setHeroLoading] = useState(true);
   const [currentBG, setCurrentBG] = useState(0);
-  const navigate = useNavigate();
   const [popular, setPopular] = useState([]);
   const [trending, setTrending] = useState([]);
   const [alltime, setAllTime] = useState([]);
@@ -53,27 +52,7 @@ function Home() {
     if (touchStartX.current - touchEndX.current > 50) nextSlide();
     if (touchEndX.current - touchStartX.current > 50) prevSlide();
   }
-
-  const fetchPopularMovies = async () => {
-    const res = await api.get(`/movie/popular`);
-    return res.data || [];
-  }
-
-  const fetchTrendingMovies = async () => {
-    const res = await api.get(`/movie/trending`);
-    return res.data || [];
-  }
-
-  const fetchAllTimeMovies = async () => {
-    const res = await api.get(`/movie/top_rated`);
-    return res.data || [];
-  }
-
-  const fetchTopReviews = async () => {
-    const res = await api.get('/user/fetchTopReviews');
-    setTopReviews(res.data.topReviews);
-  }
-
+  
   useEffect(() => {
     const loadData = async () => {
       try {

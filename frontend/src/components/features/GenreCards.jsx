@@ -27,14 +27,7 @@ function GenreCards() {
 
   const navigate = useNavigate();
   const { setLocalFilters, setActiveFilters } = useUserStore();
-  const INITIAL_FILTERS = {
-    sortBy: "Popularity",
-    genres: [],
-    releaseStart: null,
-    releaseEnd: null,
-    language: null,
-  };
-
+  
   const handleGenreCard = (genre) => {
     setLocalFilters((prev) => ({genres: [genre.code]}))
     setActiveFilters((prev) => [{ id: "genre", label: genre.name, value: genre.code }]);

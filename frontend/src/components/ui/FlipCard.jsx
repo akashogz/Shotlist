@@ -28,8 +28,7 @@ export const FlipCard = ({ item }) => {
         <div className="absolute inset-0 w-full h-full bg-[#202020] text-white flex flex-col items-center justify-between rounded-xl transform-[rotateY(180deg)] backface-hidden border border-[#505050] p-4">
           <h1 className='text-sm text-center font-bold cursor-pointer hover:underline underline-offset-3' onClick={() => navigate(`/movie/${item.movieId}`)}>{item.title}</h1>
           <p className="text-xs text-center">Added at: {new Date(item.addedAt).toLocaleDateString('en-GB', {
-                              weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-                            })}</p>
+                              weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'})}</p>
           <button className='bg-white text-black p-2 rounded-full px-4 text-sm font-bold hover:bg-white/80 ease-in-out duration-300' onClick={() => handleRemove()}>Remove</button>
         </div>
 
