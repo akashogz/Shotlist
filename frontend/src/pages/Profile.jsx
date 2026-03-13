@@ -91,7 +91,7 @@ function Profile() {
                             <h1 className='font-bold text-2xl text-center text-white'>
                                 {(displayUser.name || displayUser.username)}
                             </h1>
-                            <button className={`${isFollowed ? `bg-white hover:white/90 text-black` : `bg-[#464E82] hover:bg-[#464e82c2]`} duration-200 ease-in-out transition-all flex gap-1 items-center p-0 px-3 rounded-full text-sm justify-center`} onClick={() => handleFollow()}>{isFollowed? <Check size={14} /> : <Plus size={14} />} {isFollowed ? `Following` : `Follow`}</button>
+                            <button className={`${isFollowed ? `bg-white hover:white/90 text-black` : `bg-[#464E82] hover:bg-[#464e82c2] ${isOwnProfile ? `hidden` : ``}`} duration-200 ease-in-out transition-all flex gap-1 items-center p-0 px-3 rounded-full text-sm justify-center`} onClick={() => handleFollow()}>{isFollowed? <Check size={14} /> : <Plus size={14} />} {isFollowed ? `Following` : `Follow`}</button>
                         </div>
                         <p className='text-gray-400'>@{displayUser.username}</p>
                     </div>
