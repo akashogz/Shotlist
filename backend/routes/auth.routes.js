@@ -1,5 +1,5 @@
 import express from "express";
-import { googleCallback, googleRedirect, login, logout, register } from "../controllers/auth.controller.js";
+import { googleCallback, googleRedirect, login, logout, register, verifyEmail } from "../controllers/auth.controller.js";
 import { protect } from "../middleware/auth.middleware.js";
 import reviewModel from "../models/review.model.js";
 import ratingModel from "../models/rating.model.js";
@@ -14,6 +14,7 @@ router.post("/login", login)
 router.get("/google", googleRedirect);
 router.get("/google/callback", googleCallback);
 router.get("/logout", logout);
+router.get("/verify/:token", verifyEmail);
 router.get("/me", protect, async (req, res) => {
   try {
     const [reviewCount, watchedCount, watchlistCount] = await Promise.all([

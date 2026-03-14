@@ -9,13 +9,14 @@ import {
   googleTokenURL,
   googleUserInfoURL,
 } from "../lib/googleOAuthConfig.js";
+import { sendVerificationEmail } from "../config/send-email.js";
 
-const BACKEND_URL = process.env.NODE_ENV === "production" 
-  ? "https://shotlist.onrender.com" 
+const BACKEND_URL = process.env.NODE_ENV === "production"
+  ? "https://shotlist.onrender.com"
   : "http://localhost:3000";
 
-const FRONTEND_URL = process.env.NODE_ENV === "production" 
-  ? "https://shotlist.uk" 
+const FRONTEND_URL = process.env.NODE_ENV === "production"
+  ? "https://shotlist.uk"
   : "http://localhost:5173";
 
 export const login = async (req, res) => {
@@ -28,6 +29,12 @@ export const login = async (req, res) => {
 
     const verify = await bcrypt.compare(password, user.password);
     if (!verify) return res.status(401).json({ message: "Invalid credentials" });
+
+    if (!user.isVerified) {
+      return res.status(403).json({
+        message: "Please verify your email before logging in."
+      });
+    }
 
     const token = jwt.sign(
       { id: user._id },
@@ -70,6 +77,13 @@ export const register = async (req, res) => {
       });
     }
 
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(verificationToken)
+      .digest("hex");
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await User.create({
       name,
@@ -78,17 +92,14 @@ export const register = async (req, res) => {
       password: hashedPassword,
       avatarSeed: username.toLowerCase(),
       authProvider: "local",
-      emailVerified: false,
+      isVerified: false,
+      verificationToken: hashedToken,
+      verificationTokenExpires: Date.now() + 1000 * 60 * 15,
     });
 
-    const token = jwt.sign(
-      { id: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN }
-    );
+    await sendVerificationEmail(email, verificationToken);
 
     res
-      .cookie("token", token, cookieOptions)
       .status(201)
       .json({
         user: {
@@ -152,7 +163,7 @@ export const googleCallback = async (req, res) => {
         avatarSeed: crypto.randomUUID(),
         authProvider: "google",
         googleId,
-        emailVerified: true,
+        isVerified: true,
         password: crypto.randomUUID(),
       });
     }
@@ -184,5 +195,36 @@ export const logout = async (req, res) => {
   } catch (error) {
     console.error("Logout error:", error);
     res.status(500).json({ message: "Server error during logout" });
+  }
+};
+
+export const verifyEmail = async (req, res) => {
+  try {
+    const { token } = req.params;
+
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+
+    const user = await User.findOne({
+      verificationToken: hashedToken,
+      verificationTokenExpires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+
+    user.isVerified = true;
+    user.verificationToken = undefined;
+    user.verificationTokenExpires = undefined;
+
+    await user.save();
+
+    res.redirect(`${FRONTEND_URL}/login?verified=true`);
+  } catch (error) {
+      console.error("Verify email error:", error);
+      res.status(500).json({ message: "Server error" });
   }
 };

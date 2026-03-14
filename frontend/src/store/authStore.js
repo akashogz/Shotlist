@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import api from "../lib/api/api.js";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 export const useAuthStore = create((set) => ({
     user: null,
@@ -40,11 +41,7 @@ export const useAuthStore = create((set) => ({
         try {
             set({ loading: true });
             const res = await api.post("/auth/signup", data);
-            set({ 
-                user: res.data.user, 
-                isLoggedIn: true 
-            });
-            toast.success("Account created!");
+            toast.success("Verification email sent");
         } catch (err) {
             const message = err.response?.data?.message || "Signup failed";
             toast.error(message);

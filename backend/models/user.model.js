@@ -48,17 +48,16 @@ const userSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Follow",
     }],
-    
-    watched: { 
+    watched: {
       type: Schema.Types.ObjectId,
       ref: "Watched"
-     },
+    },
 
     watchlist: {
       type: Schema.Types.ObjectId,
       ref: "Watchlist"
     },
-    
+
     role: {
       type: String,
       enum: ["user", "admin"],
@@ -74,6 +73,18 @@ const userSchema = new Schema(
       unique: true,
       sparse: true,
     },
+    isVerified: {
+      type: Boolean,
+      default: false
+    },
+    verificationToken: {
+      type: String,
+      select: false
+    },
+    verificationTokenExpires: {
+      type: Date,
+      select: false
+    }
   },
   { timestamps: true }
 );

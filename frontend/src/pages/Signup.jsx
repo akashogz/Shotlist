@@ -12,12 +12,17 @@ function Logup() {
     const [valid, setValid] = useState(false);
     const handleSignUp = useAuthStore((s) => s.handleSignUp);
     const user = useAuthStore((s) => s.user);
-    const navigate = useNavigate()
-        ;
+    const navigate = useNavigate();
     const isPasswordValid = password.length >= 8 && /[a-zA-Z]/.test(password) && /\d/.test(password);
+    const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
     useEffect(() => {
-        const allFilled = name.trim() && username.trim() && email.trim() && isPasswordValid;
+        const allFilled =
+            name.trim() &&
+            username.trim() &&
+            email.trim() &&
+            isEmailValid &&
+            isPasswordValid;
 
         setValid(Boolean(allFilled));
     }, [name, username, email, password]);
@@ -47,7 +52,7 @@ function Logup() {
                     </div>
                     <div className='flex flex-col gap-1'>
                         <p className='bold text-sm'>Password</p>
-                        <input placeholder='••••••••' type='password' className='border focus:outline-0 rounded-lg p-2 w-full border-[#6666669d] focus:border-white/70' onChange={(e) => setPassword(e.target.value)} />
+                        <input placeholder='••••••••' type='password' className='border focus:outline-0 rounded-lg p-2 w-full border-[#6666669d] focus:border-white/70' onChange={(e) => setPassword(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { handleSignUp({ name, username, email, password }); } }} />
                     </div>
                     <div
                         className={`overflow-hidden transition-all duration-500 ease-in-out flex flex-col gap-2 ${password ? "opacity-100 max-h-40" : "opacity-0 max-h-0 mt-0"}`}
@@ -58,12 +63,14 @@ function Logup() {
                     </div>
 
                     <button className={`p-3 rounded-lg font-bold text-md ${!valid ? `` : `hover:brightness-110 ease-in-out duration-300`} ${!valid ? `bg-[#828282]` : `bg-[#464E82]`}`} disabled={!valid}
-                        onClick={() => handleSignUp({
-                            name,
-                            username,
-                            email,
-                            password,
-                        })}>Signup</button>
+                        onClick={() => {
+                            handleSignUp({
+                                name,
+                                username,
+                                email,
+                                password,
+                            }); navigate('/login')
+                        }}>Signup</button>
                     <button onClick={() => {
                         window.location.href = `${import.meta.env.VITE_API_URL || "http://localhost:3000/api"}/auth/google`;
                     }}
