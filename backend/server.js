@@ -17,7 +17,9 @@ app.use(cookieParser());
 const PORT = process.env.PORT || 3000;
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://shotlist-og.vercel.app"
+  "https://shotlist-og.vercel.app",
+  "https://shotlist.uk",
+  "https://www.shotlist.uk"
 ];
 
 app.use(cors({

@@ -15,7 +15,7 @@ const BACKEND_URL = process.env.NODE_ENV === "production"
   : "http://localhost:3000";
 
 const FRONTEND_URL = process.env.NODE_ENV === "production" 
-  ? "https://shotlist-og.vercel.app" 
+  ? "https://shotlist.uk" 
   : "http://localhost:5173";
 
 export const login = async (req, res) => {
