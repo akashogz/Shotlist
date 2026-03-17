@@ -70,9 +70,9 @@ function Info() {
         const fetchAll = async () => {
             try {
                 const [movieRes, reviewsRes, watchedRes] = await Promise.all([
-                    api.get(`movie/${movieId}`),
-                    api.get(`/user/fetchMovieReviews?tmdbId=${movieId}&viewerId=${user?._id || ''}`),
-                    api.get(`/user/checkWatched/${movieId}`)
+                    api.get(`/movie/${movieId}`).catch(err => ({ data: null })),
+                    api.get(`/user/fetchMovieReviews?...`).catch(err => ({ data: [] })),
+                    api.get(`/user/checkWatched/${movieId}`).catch(err => ({ data: { watched: false } }))
                 ]);
 
                 setMovie(movieRes.data);
