@@ -348,7 +348,7 @@ function Info() {
                                 <img src={`https://image.tmdb.org/t/p/original${p.logo_path}`} className="size-10 rounded-md" />
                                 <div>
                                     <p className="text-sm font-medium">{p.provider_name}</p>
-                                    <p className="text-xs text-white/40">Buy</p>
+                                    <p className="text-xs text-white/40">Flatrate</p>
                                 </div>
                             </div>
                         )) || <p className="text-white/40 text-sm">No streaming options found for this region.</p>}
