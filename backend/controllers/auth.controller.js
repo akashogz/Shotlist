@@ -12,7 +12,7 @@ import {
 import { sendVerificationEmail } from "../config/send-email.js";
 
 const BACKEND_URL = process.env.NODE_ENV === "production"
-  ? "https://shotlist.onrender.com"
+  ? "https://api.shotlist.uk"
   : "http://localhost:3000";
 
 const FRONTEND_URL = process.env.NODE_ENV === "production"
