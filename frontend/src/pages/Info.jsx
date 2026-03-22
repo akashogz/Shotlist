@@ -71,7 +71,7 @@ function Info() {
             try {
                 const [movieRes, reviewsRes, watchedRes] = await Promise.all([
                     api.get(`/movie/${movieId}`).catch(err => ({ data: null })),
-                    api.get(`/user/fetchMovieReviews?...`).catch(err => ({ data: [] })),
+                    api.get(`/user/fetchMovieReviews?tmdbId=${movieId}&viewerId=${user?._id}`).catch(err => ({ data: [] })),
                     api.get(`/user/checkWatched/${movieId}`).catch(err => ({ data: { watched: false } }))
                 ]);
 
