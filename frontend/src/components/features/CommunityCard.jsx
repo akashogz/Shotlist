@@ -1,6 +1,9 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom';
 
 function CommunityCard({ topReviews = [] }) {
+    const navigate = useNavigate();
+
     if (!topReviews.length) return <p className="text-white/50 p-6">No trending reviews this week.</p>;
 
     return (
@@ -9,6 +12,7 @@ function CommunityCard({ topReviews = [] }) {
                 <div
                     className='bg-[#60606071] hover:bg-[#393939] ease-in-out duration-300 rounded-lg p-3 flex flex-col gap-3'
                     key={review._id || index}
+                    onClick={() => navigate(`/movie/${review.tmdbId}`)}
                 >
                     <div className='flex gap-3 w-full items-center'>
                         <img
@@ -17,7 +21,7 @@ function CommunityCard({ topReviews = [] }) {
                             alt="avatar"
                         />
                         <div className='flex flex-col justify-between w-full'>
-                            <p className='font-bold text-white'>{review.user?.username || 'Anonymous'}</p>
+                            <p className='font-bold text-white80'>{review.user?.username || 'Anonymous'}</p>
                             <p className='text-[10px] md:text-xs text-white/40 font-medium'>
                                 {new Date(review.createdAt).toLocaleDateString('en-GB', {
                                     weekday: 'long', day: 'numeric', month: 'short', year: 'numeric'
@@ -35,6 +39,9 @@ function CommunityCard({ topReviews = [] }) {
 
                         <div className='flex flex-col flex-1'>
                             <div className='flex flex-col gap-2'>
+                                <p className='font-bold'>
+                                    {review.movieName}
+                                </p>
                                 <div className='flex gap-0.5'>
                                     {[1, 2, 3, 4, 5].map((idx) => (
                                         <div key={idx} className='flex'>
