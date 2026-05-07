@@ -2,7 +2,6 @@ import express from "express";
 import { googleCallback, googleRedirect, login, logout, register, verifyEmail } from "../controllers/auth.controller.js";
 import { protect } from "../middleware/auth.middleware.js";
 import reviewModel from "../models/review.model.js";
-import ratingModel from "../models/rating.model.js";
 import userModel from "../models/user.model.js";
 import watchedModel from "../models/watched.model.js";
 import watchlistModel from "../models/watchlist.model.js";

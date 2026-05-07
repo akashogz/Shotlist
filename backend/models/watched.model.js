@@ -18,6 +18,10 @@ const watchedSchema = new Schema({
     posterPath: { 
         type: String 
     },
+    genres: [{
+        type: String,
+        required:true
+    }],
     addedAt: { 
         type: Date, 
         default: Date.now 
