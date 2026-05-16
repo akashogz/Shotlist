@@ -4,12 +4,11 @@ function Footer() {
     return (
         <div className='font-slim text-sm w-full flex flex-col justify-between items-center mt-30 gap-3 mb-10'>
             <p>©{(new Date).getFullYear()} Shotlist. All Rights Reserved.</p>
-            <p>Made By Akash Gautam</p>
-            <div className='flex gap-2 items-center'>
-                <a href='https://github.com/akashogz' target='_blank'><img src='/github.png' className='size-8'/></a>
-                <a href='https://www.linkedin.com/in/akashogz/' target='_blank'><img src='/linkedin.webp' className='size-6'/></a>
+            <div className='grid grid-cols-2 gap-1 items-center'>
+                <p className='text-xs font-semibold text-white/50'>Powered by</p>
+                <img src='TMDB.svg'/>
             </div>
-            <a href='mailto:akashogz@gmail.com' className='underline'>akashogz@gmail.com</a>
+            <p className='text-xs text-white/50'>This product uses the TMDB API but is not endorsed or certified by TMDB</p>
         </div>
     )
 }
