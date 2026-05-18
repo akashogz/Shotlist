@@ -37,7 +37,7 @@ const CareerTimeline = ({ movies }) => {
         <div className="overflow-x-scroll w-screen overflow-visible pt-10 no-scrollbar">
 
             <div
-                className="relative h-[300px]"
+                className="relative h-75"
                 style={{ width: `${svgWidth}px` }}
             >
 
@@ -87,7 +87,7 @@ const CareerTimeline = ({ movies }) => {
 
                                 <Link
                                     to={`/movie/${movie.id}`}
-                                    className="group flex gap-2 "
+                                    className="group flex gap-2 items-center"
                                 >
 
                                     <div className="border p-0.5 rounded-lg w-12 hover:border-0">
@@ -95,7 +95,7 @@ const CareerTimeline = ({ movies }) => {
                                             src={`https://image.tmdb.org/t/p/w185${movie.poster_path}`}
                                             alt={movie.title}
                                             className="
-                                        rounded-lg
+                                        rounded-md
                                         w-12
                                         aspect-2/3
                                         shadow-lg
@@ -107,7 +107,7 @@ const CareerTimeline = ({ movies }) => {
                                     </div>
 
                                     <div className="mt-3 text-center">
-                                        <p className="font-semibold text-white text-sm">
+                                        <p className="font-semibold text-white text-sm max-w-80 line-clamp-1">
                                             {movie.title}
                                         </p>
 
@@ -119,6 +119,12 @@ const CareerTimeline = ({ movies }) => {
                                             movie.character &&
                                             <p className="text-white/50 text-xs">
                                                 as {movie.character}
+                                            </p>
+                                        }
+                                        {
+                                            movie.job &&
+                                            <p className="text-white/50 text-xs">
+                                                {movie.jobs.join(", ")}
                                             </p>
                                         }
                                     </div>

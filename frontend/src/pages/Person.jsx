@@ -20,7 +20,7 @@ function Person() {
             const res = await api.get(`movie/person/${personId}`).catch(err => ({ data: null }))
             console.log(res.data)
             setPerson(res.data);
-            
+
             setTimeout(() => {
                 setLoading(false);
             }, 1000);
@@ -59,7 +59,7 @@ function Person() {
         <div className={`md:p-20 p-5 pt-20 md:pt-28 h-full w-full flex flex-col gap-2 ${loading ? `opacity-0` : `opacity-100`} transition-opacity duration-500 `}>
             <div className=''>
                 <div className='bg-linear-to-b blur-sm from-[#464e8234] to-[#24242400] absolute w-screen h-80 md:-mt-28 -ml-20 -z-10'>
-                    <img src={`https://image.tmdb.org/t/p/original${person?.profile_path}`} className='w-full h-80 blur-3xl object-fit brightness-50'></img>
+                    <img src={`https://image.tmdb.org/t/p/original${person?.profile_path}`} className='w-full h-80 blur-[120px] object-fit brightness-80'></img>
                 </div>
                 <div className='flex flex-col gap-5  items-center '>
                     <img
@@ -68,7 +68,7 @@ function Person() {
                     />
                     <div className='flex gap-2 items-center'>
                         <h1 className='font-bold text-2xl'>{person?.name}</h1>
-                        <p className='text-xs bg-linear-to-br from-[#464e82d7] to-[#24242474] border border-white/50 px-3 rounded-lg font-regular'>{person.known_for_department == "Acting" ? `Actor` : `Background`}</p>
+                        <p className={`text-xs bg-linear-to-br to-[#2424249a] ${person.known_for_department == "Acting" ? `from-[#464e82d7]` : `from-[#658246d7]`} border border-white/50 px-3 rounded-lg font-regular`}>{person.known_for_department == "Acting" ? `Actor` : person.known_for_department == "Directing" ? `Director` : person.known_for_department}</p>
                     </div>
                     <div className='flex gap-2 text-sm'>
                         <div className='flex gap-2 items-center border px-3 py-2 rounded-full'>
@@ -85,14 +85,15 @@ function Person() {
                             <p className='text-xs'>{person.place_of_birth}</p>
                         </div>
                         <div className='flex gap-2 items-center border px-3 py-2 rounded-full'>
-                            {person.gender == 1 ? <Venus size={14} color='gray' /> : person.gender == 0 ? <Mars size={14} color='gray' /> : <User size={14} color='gray' />}
+                            {person.gender == 1 ? <Venus size={14} color='gray' /> : person.gender == 2 ? <Mars size={14} color='gray' /> : <User size={14} color='gray' />}
                             <p className='text-white/50 font-semibold text-xs'>Gender</p>
-                            <p className='text-xs'>{person.gender == 1 ? `Female` : person.gender == 0 ? `Male` : `Other`}</p>
+                            <p className='text-xs'>{person.gender == 1 ? `Female` : person.gender == 2 ? `Male` : `Other`}</p>
                         </div>
                         <div className='flex gap-2 items-center border px-3 py-2 rounded-full'>
                             <Film size={14} color='gray' />
                             <p className='text-white/50 font-semibold text-xs'>Filmography</p>
-                            <p className='text-xs'>{person.combined_credits?.cast?.length}</p>
+                            <p className='text-xs'>{person?.known_for_department === "Acting" ? person?.combined_credits?.cast.length : person?.combined_credits?.crew.length
+                            }</p>
                         </div>
                         <div className='flex gap-2 items-center border px-3 py-2 rounded-full'>
                             <Signature size={14} color='gray' />
@@ -110,7 +111,7 @@ function Person() {
                             </p>
 
                             {!bioExpanded && (
-                                <div className="absolute bottom-0 left-0 h-12 w-full bg-linear-to-t from-[#242424] to-transparent" />
+                                <div className="absolute bottom-0 left-0 h-20 w-full bg-linear-to-t from-[#242424] to-transparent blur-[1px]" />
                             )}
                         </div>
 
@@ -134,23 +135,80 @@ function Person() {
                     <div className=' flex flex-col gap-5 mt-10 w-full items-start'>
                         <h1 className='font-bold text-2xl'>Essential Films</h1>
                         <div className='flex gap-3'>
-                            {person?.combined_credits?.cast
-                                .filter(
+
+                            {(person?.known_for_department === "Acting"
+                                ? person?.combined_credits?.cast
+                                : person?.combined_credits?.crew
+                            )
+                                ?.filter(
                                     (item) =>
                                         item.media_type === "movie" &&
                                         item.poster_path
                                 )
+                                ?.filter(
+                                    (item, index, self) =>
+                                        index ===
+                                        self.findIndex((m) => m.id === item.id)
+                                )
                                 .sort((a, b) => b.vote_count - a.vote_count)
                                 .slice(0, 9)
                                 .map((m, i) => (
-                                    <img src={`https://image.tmdb.org/t/p/w185${m.poster_path}`} className='w-35 aspect-2/3 rounded-lg hover:brightness-80 transition-all duration-200' onClick={() => navigate(`/movie/${m.id}`)} />
-                                ))
-                            }
+                                    <img
+                                        key={`${m.id}-${i}`}
+                                        src={`https://image.tmdb.org/t/p/w185${m.poster_path}`}
+                                        className='w-35 aspect-2/3 rounded-lg transition-all duration-200 hover:brightness-80 hover:scale-105 cursor-pointer'
+                                        onClick={() => navigate(`/movie/${m.id}`)}
+                                    />
+                                ))}
+
                         </div>
                     </div>
                     <div className=''>
                         <h1 className='px-20 text-2xl font-bold mt-10'>Career Timeline</h1>
-                        <CareerTimeline movies={person?.combined_credits?.cast} />
+                        <CareerTimeline
+                            movies={
+                                person?.known_for_department === "Acting"
+
+                                    ? person?.combined_credits?.cast
+                                        ?.filter(
+                                            (item) =>
+                                                item.media_type === "movie" &&
+                                                item.poster_path
+                                        )
+
+                                    : Object.values(
+
+                                        (person?.combined_credits?.crew || [])
+
+                                            .filter(
+                                                (item) =>
+                                                    item.media_type === "movie" &&
+                                                    item.poster_path
+                                            )
+
+                                            .reduce((acc, item) => {
+
+                                                if (!acc[item.id]) {
+
+                                                    acc[item.id] = {
+                                                        ...item,
+                                                        jobs: [item.job],
+                                                    };
+
+                                                } else if (
+                                                    item.job &&
+                                                    !acc[item.id].jobs.includes(item.job)
+                                                ) {
+
+                                                    acc[item.id].jobs.push(item.job);
+                                                }
+
+                                                return acc;
+
+                                            }, {})
+                                    )
+                            }
+                        />
                     </div>
 
                     <div className='flex flex-col gap-5 mt-10 w-full items-start justify-start'>
@@ -162,7 +220,7 @@ function Person() {
                                         href={`https://www.tiktok.com/@${person.external_ids.tiktok_id}`}
                                         target='_blank'
                                         rel='noopener noreferrer'
-                                        className='text-sm flex items-center gap-2 rounded-full border px-3 py-1 bg-linear-to-br hover:from-[#f5c5187b] hover:to-[#2727274e] transition-all duration-300 hover:scale-105'
+                                        className='text-sm flex items-center gap-2 rounded-full border px-3 py-1 bg-linear-to-br hover:from-[#2323237b] hover:to-[#4c4c4c4e] transition-all duration-300 hover:scale-105'
                                     >
                                         <img src='/tiktok.png' className='size-4' />
                                         <p>@{person.external_ids.tiktok_id}</p>
@@ -173,7 +231,7 @@ function Person() {
                                         href={`https://www.instagram.com/${person.external_ids.instagram_id}`}
                                         target='_blank'
                                         rel='noopener noreferrer'
-                                        className='text-sm flex items-center gap-2 rounded-full border px-3 py-1 bg-linear-to-br hover:from-[#f5c5187b] hover:to-[#2727274e] transition-all duration-300 hover:scale-105'
+                                        className='text-sm flex items-center gap-2 rounded-full border px-3 py-1 bg-linear-to-br hover:from-[#8234af7a] hover:to-[#f5852970] transition-all duration-300 hover:scale-105'
                                     >
                                         <img src='/instagram.png' className='size-4' />
                                         <p>@{person.external_ids.instagram_id}</p>
@@ -184,7 +242,7 @@ function Person() {
                                         href={`https://x.com/${person.external_ids.twitter_id}`}
                                         target='_blank'
                                         rel='noopener noreferrer'
-                                        className='text-sm flex items-center gap-2 rounded-full border px-3 py-1 bg-linear-to-br hover:from-[#f5c5187b] hover:to-[#2727274e] transition-all duration-300 hover:scale-105'
+                                        className='text-sm flex items-center gap-2 rounded-full border px-3 py-1 bg-linear-to-br hover:from-[#2323237b] hover:to-[#4c4c4c4e] transition-all duration-300 hover:scale-105'
                                     >
                                         <img src='/x.png' className='size-4' />
                                         <p>@{person.external_ids.twitter_id}</p>

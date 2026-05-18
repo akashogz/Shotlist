@@ -361,12 +361,12 @@ function Info() {
                         </div>
                         <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
                             {movie.credits?.cast?.slice(0, 10).map(actor => (
-                                <div key={actor.id} className="shrink-0 w-28 md:w-32">
+                                <div key={actor.id} className="shrink-0 w-28 md:w-32" onClick={() => navigate(`/person/${actor.id}`)}>
                                     {
                                         actor.profile_path ?
                                             <img
                                                 src={`https://image.tmdb.org/t/p/w185${actor.profile_path}`}
-                                                className="h-40 w-full object-cover rounded-lg mb-2 bg-white/5"
+                                                className="h-40 w-full object-cover rounded-lg mb-2 bg-white/5 hover:brightness-70 transition-all duration-200"
                                             /> :
                                             <img src="/logo.png"
                                                 className="h-40 w-full object-cover rounded-lg mb-2 bg-white/5 p-10" />
