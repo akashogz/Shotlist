@@ -18,6 +18,7 @@ import Profile from './pages/Profile';
 import Info from './pages/Info';
 import Browse from './pages/Browse';
 import Search from './pages/Search';
+import Person from './pages/Person';
 
 function App() {
   const fetchMe = useAuthStore((s) => s.fetchMe);
@@ -46,6 +47,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path='/movie/:movieId' element={<Info />} />
           <Route path='/search/:searchQuery' element={<Search />} />
+          <Route path='/person/:personId' element={<Person />} />
         </Route>
 
         <Route element={<ProfileLayout />}>

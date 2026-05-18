@@ -116,3 +116,23 @@ export const getDiscoverMovies = async (req, res) => {
     res.json(data.results);
   } catch (err) { res.status(500).json({ error: "Discovery unavailable" }); }
 };
+
+export const getPersonDetails = async (req, res) => {
+  try {
+    const { personId } = req.params;
+
+    const response = await tmdbApi.get(
+      `person/${personId}?append_to_response=combined_credits,images,external_ids`
+    );
+
+    res.status(200).json(response.data);
+
+  } catch (error) {
+    console.error("Error fetching person details:", error.message);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch person details",
+    });
+  }
+};

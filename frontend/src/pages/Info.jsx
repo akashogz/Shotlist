@@ -60,8 +60,6 @@ function Info() {
     const user = useAuthStore((s) => s.user);
     const loggedIn = !!user;
 
-    tailspin.register()
-
     useEffect(() => {
         setMovie(null);
         setReviews([]);
