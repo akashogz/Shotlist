@@ -223,7 +223,7 @@ function Info() {
                         {
                             !openTrailer &&
                             <img
-                                src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
+                                src={`https://image.tmdb.org/t/p/w342/${movie.poster_path}`}
                                 className={`w-40 sm:w-45 md:w-50 rounded-xl shadow-sm border border-white/10 ${!openTrailer ? `opacity-100 scale-100` : `opacity-0 pointer-events-none scale-90`} transition-all duration-200`}
                                 alt={movie.title}
                             />

@@ -15,7 +15,7 @@ function Person() {
 
     useEffect(() => {
         setPerson({});
-        setLoading(true);
+        setLoading(true)
         const fetchPerson = async () => {
             const res = await api.get(`movie/person/${personId}`).catch(err => ({ data: null }))
             console.log(res.data)
@@ -26,7 +26,7 @@ function Person() {
             }, 1000);
         }
 
-        fetchPerson();
+        fetchPerson()
     }, [personId])
 
     const convertDateToText = (dateStr) => {
@@ -56,9 +56,9 @@ function Person() {
     }
 
     return (
-        <div className={`md:p-20 p-5 pt-20 md:pt-28 h-full w-full flex flex-col gap-2 ${loading ? `opacity-0` : `opacity-100`} transition-opacity duration-500 `}>
+        <div className={`md:p-20 p-5 pt-20 md:pt-28 h-full w-full flex flex-col gap-2 max-w-screen overflow-hidden ${loading ? `opacity-0` : `opacity-100`} transition-opacity duration-500 `}>
             <div className=''>
-                <div className='bg-linear-to-b blur-sm from-[#464e8234] to-[#24242400] absolute w-screen h-80 md:-mt-28 -ml-20 -z-10'>
+                <div className='bg-linear-to-b blur-sm from-[#464e8234] to-[#24242400] absolute w-screen h-80 -mt-20 md:-mt-28 -ml-5 md:-ml-20 -z-10'>
                     <img src={`https://image.tmdb.org/t/p/original${person?.profile_path}`} className='w-full h-80 blur-[120px] object-fit brightness-80'></img>
                 </div>
                 <div className='flex flex-col gap-5  items-center '>
@@ -68,9 +68,9 @@ function Person() {
                     />
                     <div className='flex gap-2 items-center'>
                         <h1 className='font-bold text-2xl'>{person?.name}</h1>
-                        <p className={`text-xs bg-linear-to-br to-[#2424249a] ${person.known_for_department == "Acting" ? `from-[#464e82d7]` : `from-[#658246d7]`} border border-white/50 px-3 rounded-lg font-regular`}>{person.known_for_department == "Acting" ? `Actor` : person.known_for_department == "Directing" ? `Director` : person.known_for_department}</p>
+                        <p className={`text-xs bg-linear-to-br to-[#2424249a] ${person?.known_for_department == "Acting" ? `from-[#464e82d7]` : `from-[#658246d7]`} border border-white/50 px-3 rounded-lg font-regular`}>{person.known_for_department == "Acting" ? `Actor` : person.known_for_department == "Directing" ? `Director` : person.known_for_department}</p>
                     </div>
-                    <div className='flex gap-2 text-sm'>
+                    <div className='flex flex-wrap justify-center gap-2 text-sm'>
                         <div className='flex gap-2 items-center border px-3 py-2 rounded-full'>
                             <Cake size={14} color='gray' />
                             <p className='text-white/50 font-semibold text-xs'>Birthday</p>
@@ -132,39 +132,41 @@ function Person() {
                             </button>
                         </div>
                     </div>
-                    <div className=' flex flex-col gap-5 mt-10 w-full items-start'>
+                    <div className='flex flex-col gap-5 mt-10 w-full items-start'>
                         <h1 className='font-bold text-2xl'>Essential Films</h1>
-                        <div className='flex gap-3'>
+                        <div className='overflow-y-scroll h-full w-full py-2 no-scrollbar px-2'>
 
-                            {(person?.known_for_department === "Acting"
-                                ? person?.combined_credits?.cast
-                                : person?.combined_credits?.crew
-                            )
-                                ?.filter(
-                                    (item) =>
-                                        item.media_type === "movie" &&
-                                        item.poster_path
+                            <div className='flex w-full justify-between gap-2 overflow-visible'>
+                                {(person?.known_for_department === "Acting"
+                                    ? person?.combined_credits?.cast
+                                    : person?.combined_credits?.crew
                                 )
-                                ?.filter(
-                                    (item, index, self) =>
-                                        index ===
-                                        self.findIndex((m) => m.id === item.id)
-                                )
-                                .sort((a, b) => b.vote_count - a.vote_count)
-                                .slice(0, 9)
-                                .map((m, i) => (
-                                    <img
-                                        key={`${m.id}-${i}`}
-                                        src={`https://image.tmdb.org/t/p/w185${m.poster_path}`}
-                                        className='w-35 aspect-2/3 rounded-lg transition-all duration-200 hover:brightness-80 hover:scale-105 cursor-pointer'
-                                        onClick={() => navigate(`/movie/${m.id}`)}
-                                    />
-                                ))}
+                                    ?.filter(
+                                        (item) =>
+                                            item.media_type === "movie" &&
+                                            item.poster_path
+                                    )
+                                    ?.filter(
+                                        (item, index, self) =>
+                                            index ===
+                                            self.findIndex((m) => m.id === item.id)
+                                    )
+                                    .sort((a, b) => b.vote_count - a.vote_count)
+                                    .slice(0, 9)
+                                    .map((m, i) => (
+                                        <img
+                                            key={`${m.id}-${i}`}
+                                            src={`https://image.tmdb.org/t/p/w185${m.poster_path}`}
+                                            className='w-35 aspect-2/3 rounded-lg transition-all duration-200 hover:brightness-80 hover:scale-105 cursor-pointer'
+                                            onClick={() => navigate(`/movie/${m.id}`)}
+                                        />
+                                    ))}
+                            </div>
 
                         </div>
                     </div>
-                    <div className=''>
-                        <h1 className='px-20 text-2xl font-bold mt-10'>Career Timeline</h1>
+                    <div className=' flex flex-col mt-10 w-full items-start'>
+                        <h1 className='text-2xl font-bold'>Career Timeline</h1>
                         <CareerTimeline
                             movies={
                                 person?.known_for_department === "Acting"

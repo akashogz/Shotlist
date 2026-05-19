@@ -34,7 +34,7 @@ const CareerTimeline = ({ movies }) => {
                     ).length * spacing + 400;
 
     return (
-        <div className="overflow-x-scroll w-screen overflow-visible pt-10 no-scrollbar">
+        <div className="overflow-x-scroll w-screen overflow-visible pt-10 no-scrollbar -ml-5 md:-ml-20">
 
             <div
                 className="relative h-75"
@@ -55,7 +55,6 @@ const CareerTimeline = ({ movies }) => {
                     />
                 </svg>
 
-                {/* MOVIES */}
                 {movies?.filter(
                         (movie) =>
                             movie.release_date &&
