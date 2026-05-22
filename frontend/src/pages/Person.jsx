@@ -44,7 +44,7 @@ function Person() {
 
     if (loading) {
         return (
-            <div className='w-full h-screen flex items-center justify-center bg-[#242424]'>
+            <div className='w-full h-screen flex items-center justify-center'>
                 <l-tailspin
                     size="40"
                     stroke="4"

@@ -29,7 +29,7 @@ function App() {
   }, [fetchMe]);
 
   return (
-    <>
+    <div className='dots-bg'>
       <Toaster
         position="top-right"
         toastOptions={{
@@ -64,7 +64,7 @@ function App() {
           <Route path='/login' element={<Login />} />
         </Route>
       </Routes>
-    </>
+    </div>
   );
 }
 

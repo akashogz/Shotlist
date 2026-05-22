@@ -98,7 +98,7 @@ function Info() {
 
     if (loading) {
         return (
-            <div className='w-full h-screen flex items-center justify-center bg-[#242424]'>
+            <div className='w-full h-screen flex items-center justify-center'>
                 <l-tailspin
                     size="40"
                     stroke="4"
@@ -110,7 +110,7 @@ function Info() {
     }
 
     if (!movie) {
-        return <div className="h-screen bg-[#242424]" />;
+        return <div className="h-screen" />;
     }
 
     const handleAddToWatched = async () => {
@@ -204,7 +204,7 @@ function Info() {
     }
 
     return (
-        <div className="w-screen bg-[#242424] text-white overflow-x-hidden -z-10">
+        <div className="w-screen text-white overflow-x-hidden -z-10">
             <div className={`relative h-100 sm:h-96 md:h-150 ${openTrailer ? `blur-lg` : ``} duration-300 ease-in-out`}>
                 <img
                     src={`https://image.tmdb.org/t/p/w1280/${movie.backdrop_path}`}
