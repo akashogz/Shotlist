@@ -195,11 +195,11 @@ function Info() {
                 </title>
                 <meta
                     name="description"
-                    content={movie?.overview}
+                    content={movie?.overview || "Movie details on Shotlist"}
                 />
                 <meta
                     name="keywords"
-                    content={`${movie?.title || ""}, ${movie?.genres?.map(g => g.name).join(", ") || ""}, movie reviews`}
+                    content={`${movie?.title || ""}, ${movie?.genres?.map(g => g.name).join(", ") || ""}, movie reviews, movie database, shotlist`}
                 />
                 <meta
                     property="og:title"
@@ -207,11 +207,19 @@ function Info() {
                 />
                 <meta
                     property="og:description"
-                    content={movie?.overview}
+                    content={movie?.overview || "Movie details on Shotlist"}
                 />
                 <meta
                     property="og:image"
                     content={`https://image.tmdb.org/t/p/w1280${movie?.backdrop_path}`}
+                />
+                <meta
+                    property="og:image:width"
+                    content="1280"
+                />
+                <meta
+                    property="og:image:height"
+                    content="720"
                 />
                 <meta
                     property="og:type"
@@ -220,6 +228,22 @@ function Info() {
                 <meta
                     property="og:url"
                     content={`https://shotlist.uk/movie/${movie?.id}`}
+                />
+                <meta
+                    name="twitter:card"
+                    content="summary_large_image"
+                />
+                <meta
+                    name="twitter:title"
+                    content={`${movie?.title} | Shotlist`}
+                />
+                <meta
+                    name="twitter:description"
+                    content={movie?.overview || "Movie details on Shotlist"}
+                />
+                <meta
+                    name="twitter:image"
+                    content={`https://image.tmdb.org/t/p/w1280${movie?.backdrop_path}`}
                 />
                 <meta
                     name="theme-color"
