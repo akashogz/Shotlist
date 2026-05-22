@@ -6,7 +6,8 @@ import {
   getMovieDetails,
   getDiscoverMovies,
   searchMovies,
-  getPersonDetails
+  getPersonDetails,
+  searchPerson
 } from "../controllers/movie.controller.js";
 
 const router = express.Router();
@@ -14,8 +15,9 @@ const router = express.Router();
 router.get("/popular", getPopularMovies);
 router.get("/trending", getTrendingMovies);
 router.get("/top_rated", getTopRatedMovies);
-router.get("/search", searchMovies);
+router.get("/search-movie", searchMovies);
 router.get("/discover", getDiscoverMovies);
+router.get("/search-person", searchPerson);
 router.get("/:movieId", getMovieDetails);
 router.get("/person/:personId", getPersonDetails);
 

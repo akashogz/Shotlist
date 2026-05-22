@@ -136,3 +136,11 @@ export const getPersonDetails = async (req, res) => {
     });
   }
 };
+
+export const searchPerson = async (req, res) => {
+  try {
+    const { data } = await tmdbApi.get("/search/person", { params: { query: req.query.query, include_adult: false, page: 1 } });
+    console.log(data)
+    res.json(data.results)
+  } catch (err) { res.status(500).json({ error: "Search unavailable" }); }
+};
