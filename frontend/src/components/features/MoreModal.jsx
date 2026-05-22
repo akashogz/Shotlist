@@ -24,9 +24,9 @@ function MoreModal({ open, items, title, setOpenMore }) {
                     items.map((item, index) => (
                         <div className='flex flex-col items-center gap-2' key={index}>
                             {item.poster_path || item.profile_path ?
-                            <img key={index} src={`https://image.tmdb.org/t/p/w500${item.poster_path || item.profile_path}`} className='h-40 md:h-55 w-30 md:w-40 rounded-lg object-cover hover:scale-102 ease-in-out duration-200 bg-[#4d4d4d]' onClick={() => navigate(`movie/${item?.id}`)}></img>
+                            <img key={index} src={`https://image.tmdb.org/t/p/w500${item.poster_path || item.profile_path}`} className='h-40 md:h-55 w-30 md:w-40 rounded-lg object-cover hover:scale-102 ease-in-out duration-200 bg-[#4d4d4d]' onClick={() => navigate(`/${item.media_type == "movie" ? `movie` : `person`}/${item?.id}`)}></img>
                             : <div className='rounded-lg h-40 md:h-55 w-30 md:w-40  bg-[#4d4d4d] flex items-center justify-center'>
-                                <img key={index} src={`/logo.png`} className='p-10 hover:scale-102 ease-in-out duration-200' onClick={() => navigate(`movie/${item?.id}`)}></img>
+                                <img key={index} src={`/logo.png`} className='p-10 hover:scale-102 ease-in-out duration-200' onClick={() => navigate(`/${item.media_type}/${item?.id}`)}></img>
                             </div>}
                             <div className='flex flex-col items-center w-30 md:w-40'>
                                 <p className='text-md font-bold items-center text-center'>{item.title || item.name}</p>
