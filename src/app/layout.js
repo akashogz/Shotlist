@@ -1,6 +1,7 @@
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import AuthProvider from "@/components/layout/AuthProvider";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 export const metadata = {
   title: "Shotlist",
@@ -60,6 +61,7 @@ export default function RootLayout({ children }) {
           }}
         />
         <AuthProvider>{children}</AuthProvider>
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
       </body>
     </html>
   );
