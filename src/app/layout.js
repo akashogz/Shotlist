@@ -1,7 +1,11 @@
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import AuthProvider from "@/components/layout/AuthProvider";
-import { GoogleAnalytics } from "@next/third-parties/google";
+import { GoogleAnalytics } from "@next/third-parties/google";import { Inter } from "next/font/google";
+
+const inter = Inter({
+  subsets: ["latin"],
+});
 
 export const metadata = {
   title: "Shotlist",
@@ -52,7 +56,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className="dots-bg">
+      <body className={`dots-bg ${inter.className}`}>
         <Toaster
           position="top-right"
           toastOptions={{
