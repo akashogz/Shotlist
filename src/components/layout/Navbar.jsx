@@ -45,20 +45,23 @@ export default function Navbar() {
           <Link href="/" className="font-bold text-2xl md:text-3xl">shotlist</Link>
         </div>
 
-        <div className="hidden md:flex border rounded-full p-1 gap-2 items-center pr-2 shadow-sm w-80">
-          <div className="border rounded-full p-2"><Search size={16} /></div>
-          <input
-            type="text"
-            placeholder="Search for anything..."
-            className="text-sm focus:outline-none w-full bg-transparent"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-          />
+        <div className="w-full -ml-20  flex items-center justify-center absolute">
+          <div className="hidden md:flex border rounded-full p-1 gap-2 items-center pr-2 shadow-sm w-80">
+            <div className="border rounded-full p-2"><Search size={16} /></div>
+            <input
+              type="text"
+              placeholder="Search for anything..."
+              className="text-sm focus:outline-none w-full bg-transparent"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            />
+          </div>
         </div>
 
         <div className="hidden md:flex gap-5 items-center text-sm">
           <Link href="/browse">Browse</Link>
+          <Link href={"feed"}>Community Feed</Link>
           {isLoggedIn ? (
             <img
               src={`https://api.dicebear.com/9.x/glass/svg?seed=${user.avatarSeed}`}
