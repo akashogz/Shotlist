@@ -116,6 +116,12 @@ export default function Navbar() {
             className="bg-transparent px-2 outline-none text-sm"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key == "Enter") {
+                handleSearch();
+                setSearchIsOpen(false);
+              }
+            }}
           />
           <button
             className="bg-white text-black px-3 p-2 rounded-full text-xs font-semibold"
