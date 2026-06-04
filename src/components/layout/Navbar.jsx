@@ -3,11 +3,12 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
-import { Search } from "lucide-react";
+import { Cross, Search, X } from "lucide-react";
 
 export default function Navbar() {
   const [profileIsOpen, setProfileIsOpen] = useState(false);
   const [searchIsOpen, setSearchIsOpen] = useState(false);
+  const [searchIsOpenDesktop, setSearchIsOpenDesktop] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
   const user = useAuthStore((s) => s.user);
@@ -45,21 +46,20 @@ export default function Navbar() {
           <Link href="/" className="font-bold text-2xl md:text-3xl">shotlist</Link>
         </div>
 
-        <div className="w-full -ml-20  flex items-center justify-center absolute">
-          <div className="hidden md:flex border rounded-full p-1 gap-2 items-center pr-2 shadow-sm w-80">
-            <div className="border rounded-full p-2"><Search size={16} /></div>
+        <div className="hidden md:flex gap-5 items-center text-sm">
+          {
+            searchIsOpenDesktop ? <X size={20} onClick={() => setSearchIsOpenDesktop(false)}/> : <Search size={20} onClick={() => setSearchIsOpenDesktop(true)}/>
+          }
+          <div className={`${searchIsOpenDesktop ? "w-60 border rounded-full p-1 gap-1 items-center pr-2 shadow-sm " : "w-0"} transition-all duration-200`}>
             <input
               type="text"
               placeholder="Search for anything..."
-              className="text-sm focus:outline-none w-full bg-transparent"
+              className="text-sm focus:outline-none w-full rounded-full p-1 px-2"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             />
           </div>
-        </div>
-
-        <div className="hidden md:flex gap-5 items-center text-sm">
           <Link href="/browse">Browse</Link>
           <Link href={"feed"}>Community Feed</Link>
           {isLoggedIn ? (
@@ -74,7 +74,7 @@ export default function Navbar() {
           )}
         </div>
 
-        <div className="flex md:hidden gap-4 items-center">
+        <div className="flex md:hidden gap-4 items-center md:pointer-events-none">
           <img src="/search.png" className="size-7 cursor-pointer" onClick={() => setSearchIsOpen(!searchIsOpen)} alt="search" />
           {isLoggedIn ? (
             <img
@@ -107,7 +107,7 @@ export default function Navbar() {
 
       <div
         ref={searchRef}
-        className={`md:hidden absolute left-0 right-0 top-16 flex justify-center z-50 ${searchIsOpen ? "flex" : "hidden"}`}
+        className={`md:hidden absolute left-0 right-0 top-16 flex justify-center z-50 ${searchIsOpen ? "flex md:hidden" : "hidden"}`}
       >
         <div className="flex gap-2 p-1.5 border border-white rounded-full shadow-md">
           <input
