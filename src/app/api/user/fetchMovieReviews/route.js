@@ -41,7 +41,7 @@ export async function GET(req) {
             $regex: includes,
             $options: "i",
           },
-        },
+        }
       ];
     }
 
