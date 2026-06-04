@@ -34,7 +34,7 @@ export default function Navbar() {
 
   const handleSearch = () => {
     if (!searchQuery.trim()) return;
-    router.push(`/search/${searchQuery}`);
+    router.push(`/search?query=${searchQuery}`);
     setSearchQuery("");
   };
 

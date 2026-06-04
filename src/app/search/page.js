@@ -1,12 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import api from "@/lib/api/api";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Heart } from "lucide-react";
-import handleLike from "../../../lib/utilities/handleLike";
+import handleLike from "../../lib/utilities/handleLike";
 
 export default function SearchPage() {
   const [movies, setMovies] = useState([]);
@@ -14,16 +14,17 @@ export default function SearchPage() {
   const [reviews, setReviews] = useState([]);
   const [selected, setSelected] = useState("Movies");
   const [loading, setLoading] = useState(true);
-  const { searchQuery } = useParams();
+  const searchParams = useSearchParams();
+  const query = searchParams.get("query");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         const [moviesRes, personRes, reviewsRes] = await Promise.all([
-          api.get(`movie/search-movie?query=${searchQuery}`),
-          api.get(`movie/search-person?query=${searchQuery}`),
-          api.get(`user/fetchMovieReviews?includes=${searchQuery}`)
+          api.get(`movie/search-movie?query=${query}`),
+          api.get(`movie/search-person?query=${query}`),
+          api.get(`user/fetchMovieReviews?includes=${query}`)
         ]);
 
         setMovies(moviesRes.data);
@@ -33,7 +34,7 @@ export default function SearchPage() {
       finally { setLoading(false); }
     };
     fetchData();
-  }, [searchQuery]);
+  }, [query]);
 
   return (
     <>
@@ -47,7 +48,7 @@ export default function SearchPage() {
         {!loading && (
           <div className="flex flex-col gap-5">
             <div className="flex flex-col gap-2">
-              <p className="text-sm font-bold">Search results for &ldquo;{searchQuery}&rdquo;</p>
+              <p className="text-sm font-bold">Search results for &ldquo;{query}&rdquo;</p>
               <div className="font-semibold text-xs flex gap-2">
                 <button className={`px-3 rounded-full p-1 hover:bg-[#5e5e5e] ${selected === "Movies" ? "bg-[#5e5e5e]" : "bg-[#404040]"}`} onClick={() => setSelected("Movies")}>Movies ({movies.length})</button>
                 <button className={`px-3 rounded-full p-1 hover:bg-[#5e5e5e] ${selected === "People" ? "bg-[#5e5e5e]" : "bg-[#404040]"}`} onClick={() => setSelected("People")}>People ({person.length})</button>
@@ -81,70 +82,72 @@ export default function SearchPage() {
                   </div>
                 </div>
               ))}
-              {selected == "Reviews" && reviews.map((r, index) => (
-                <div key={r._id} className="flex flex-col gap-3 bg-[#303030] rounded-lg p-3 justify-between w-full max-w-md">
-                  <div className="flex flex-col gap-2">
-                    <div className='flex justify-between items-start'>
-                      <div className="flex flex-col gap-2 w-full">
-                        <div className="flex">
-                          <div className="flex flex-col gap-2 w-full">
-                            <div className=''>
-                              <div className="flex gap-2">
-                                <img
-                                  src={`https://api.dicebear.com/9.x/glass/svg?seed=${r.avatarSeed}`}
-                                  className="size-9 rounded-full object-cover"
-                                  alt={r.username}
-                                />
-                                <div>
-                                  <p className="font-medium text-white/50 text-sm">{r.username}</p>
-                                  <p className="text-xs text-white/50">
-                                    {new Date(r.createdAt).toLocaleDateString('en-GB', {
-                                      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-                                    })}
-                                  </p>
+              <div className="flex flex-wrap gap-5">
+                {selected == "Reviews" && reviews.map((r, index) => (
+                  <div key={r._id} className="flex flex-col gap-3 bg-[#303030] rounded-lg p-3 justify-between w-full max-w-md lg:w-110">
+                    <div className="flex flex-col gap-2">
+                      <div className='flex justify-between items-start'>
+                        <div className="flex flex-col gap-2 w-full">
+                          <div className="flex">
+                            <div className="flex flex-col gap-2 w-full">
+                              <div className=''>
+                                <div className="flex gap-2">
+                                  <img
+                                    src={`https://api.dicebear.com/9.x/glass/svg?seed=${r.avatarSeed}`}
+                                    className="size-9 rounded-full object-cover"
+                                    alt={r.username}
+                                  />
+                                  <div>
+                                    <p className="font-medium text-white/50 text-sm">{r.username}</p>
+                                    <p className="text-xs text-white/50">
+                                      {new Date(r.createdAt).toLocaleDateString('en-GB', {
+                                        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+                                      })}
+                                    </p>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                            <span className='flex gap-1 text-sm'><p className='font-semibold text-white text-[14px]'>{r.movieName}</p></span>
-                            <div className='flex items-center gap-1 h-full'>
-                              <div className='flex'>
-                                {[1, 2, 3, 4, 5].map((idx) => (
-                                  <div key={idx} className='flex'>
-                                    {idx - 0.5 <= r.rating && <img src='/star-half-left.png' className='h-4' />}
-                                    {idx <= r.rating && <img src='/star-half-right.png' className='h-4' />}
-                                    {idx - 0.5 > r.rating && <img src='/star-half.png' className='h-4' />}
-                                    {idx > r.rating && <img src='/star-half-r.png' className='h-4' />}
-                                  </div>
-                                ))}
+                              <span className='flex gap-1 text-sm'><p className='font-semibold text-white text-[14px]'>{r.movieName}</p></span>
+                              <div className='flex items-center gap-1 h-full'>
+                                <div className='flex'>
+                                  {[1, 2, 3, 4, 5].map((idx) => (
+                                    <div key={idx} className='flex'>
+                                      {idx - 0.5 <= r.rating && <img src='/star-half-left.png' className='h-4' />}
+                                      {idx <= r.rating && <img src='/star-half-right.png' className='h-4' />}
+                                      {idx - 0.5 > r.rating && <img src='/star-half.png' className='h-4' />}
+                                      {idx > r.rating && <img src='/star-half-r.png' className='h-4' />}
+                                    </div>
+                                  ))}
+                                </div>
+                                <p className='text-sm text-white/50'>({r.rating})</p>
                               </div>
-                              <p className='text-sm text-white/50'>({r.rating})</p>
                             </div>
+                            <img src={`https://image.tmdb.org/t/p/w154/${r.posterPath}`} className="h-23 rounded-lg aspect-2/3" />
                           </div>
-                          <img src={`https://image.tmdb.org/t/p/w154/${r.posterPath}`} className="h-23 rounded-lg aspect-2/3" />
+                          <p className={`text-sm leading-relaxed text-white/90 duration-150 transition-opacity`} >{r.text}</p>
                         </div>
-                        <p className={`text-sm leading-relaxed text-white/90 duration-150 transition-opacity`} >{r.text}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end items-center gap-1.5 text-xs text-white/60">
+                      <div className='flex gap-1 items-center'>
+                        <div className="flex items-center justify-center">
+                          <Heart
+                            size={14}
+                            className={`cursor-pointer transition-all ${r.isLiked ? "fill-red-500 text-red-500 scale-110" : "hover:text-white"}`}
+                            onClick={() => handleLike(r._id)}
+                          />
+                        </div>
+                        <p className="leading-none select-none">
+                          {r.likesCount || 0} Likes
+                        </p>
                       </div>
                     </div>
                   </div>
+                ))
 
-                  <div className="flex justify-end items-center gap-1.5 text-xs text-white/60">
-                    <div className='flex gap-1 items-center'>
-                      <div className="flex items-center justify-center">
-                        <Heart
-                          size={14}
-                          className={`cursor-pointer transition-all ${r.isLiked ? "fill-red-500 text-red-500 scale-110" : "hover:text-white"}`}
-                          onClick={() => handleLike(r._id)}
-                        />
-                      </div>
-                      <p className="leading-none select-none">
-                        {r.likesCount || 0} Likes
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))
-
-              }
+                }
+              </div>
             </div>
           </div>
         )}
