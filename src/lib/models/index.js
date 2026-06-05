@@ -96,4 +96,6 @@ const followSchema = new Schema(
   { timestamps: true }
 );
 
+
+
 export const Follow = models.Follow || model("Follow", followSchema);

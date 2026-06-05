@@ -5,16 +5,14 @@ import api from '@/lib/api/api';
 import { Heart, Pencil, Trash, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
-import { FlipCard } from '../ui/FlipCard';
-import {tailspin} from 'ldrs'
+import { FlipCard } from '../ui/FlipCard.jsx';
 
-function ProfileCards({ tab, displayUser }) {
+function ProfileCards({ tab, displayUser, isOwnProfile }) {
   const [items, setItems] = useState([])
   const user = useAuthStore((s) => s.user);
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  
-  tailspin.register()
+
 
   useEffect(() => {
     const fetchReview = async () => {
@@ -121,8 +119,8 @@ function ProfileCards({ tab, displayUser }) {
           {items.length > 0 && tab.label != "Reviews" && (
             <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-5 place-items-center'>
               {
-                items.map((i) => (
-                  <FlipCard item={i} />
+                items.map((i, index) => (
+                  <FlipCard item={i} isOwnProfile={isOwnProfile} key={index}/>
                 ))
               }
             </div>

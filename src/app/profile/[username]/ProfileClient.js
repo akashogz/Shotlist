@@ -4,16 +4,17 @@ import Footer from "@/components/layout/Footer";
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
-import { Bookmark, Check, MessageSquareMore, Pencil, Plus, Star } from 'lucide-react';
+import { Bookmark, Check, MessageSquareMore, Pencil, Plus, Scroll, Star } from 'lucide-react';
 import ProfileCards from '@/components/features/ProfileCards';
 import ProfileModal from '@/components/features/ProfileModal';
 import api from '@/lib/api/api';
 import toast from 'react-hot-toast';
 import FollowCard from '@/components/features/FollowCard';
+import path from "node:path";
 
 function Profile({
-  initialProfile,
-  username,
+    initialProfile,
+    username,
 }) {
     const router = useRouter();
 
@@ -49,6 +50,7 @@ function Profile({
         { label: "Watched", icon: Check, path: "watched" },
         { label: "Reviews", icon: MessageSquareMore, path: "reviews" },
         { label: "Watchlist", icon: Bookmark, path: "watchlist" },
+        { label: "Lists", icon: Scroll, path: "lists" },
     ];
     const [active, setActive] = useState(tabs[0]);
 
@@ -146,7 +148,7 @@ function Profile({
                 </div>
             </div>
 
-            <ProfileCards tab={active} displayUser={displayUser} />
+            <ProfileCards tab={active} displayUser={displayUser} isOwnProfile={isOwnProfile} />
 
             {openProfileModal && <ProfileModal setOpenProfileModal={setOpenProfileModal} openProfileModel={openProfileModal} />}
             {
@@ -158,13 +160,13 @@ function Profile({
 }
 
 export default function ProfileClient({
-  initialProfile,
-  username,
+    initialProfile,
+    username,
 }) {
-  return (
-    <Profile
-      initialProfile={initialProfile}
-      username={username}
-    />
-  );
+    return (
+        <Profile
+            initialProfile={initialProfile}
+            username={username}
+        />
+    );
 }

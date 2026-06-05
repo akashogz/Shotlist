@@ -11,7 +11,7 @@ export default function Tiles({ movies = [], title, loading }) {
   return (
     <div className="flex gap-8 md:gap-25 overflow-x-auto rounded-lg no-scrollbar">
       {loading && Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="h-50 md:h-55 min-w-32 md:w-40 rounded-lg bg-gradient-to-r from-[#55555584] to-[#3030307c] animate-pulse" />
+        <div key={i} className="h-50 md:h-55 min-w-32 md:w-40 rounded-lg bg-linear-to-r from-[#55555584] to-[#3030307c] animate-pulse" />
       ))}
 
       {!loading && movies.slice(0, 5).map((movie) => (
@@ -29,7 +29,7 @@ export default function Tiles({ movies = [], title, loading }) {
                        group-hover:brightness-75 transition-all duration-300"
           />
           <div className="hidden group-hover:flex flex-col justify-between items-center
-                          min-w-32 md:w-40 bg-gradient-to-bl from-[#3c3c3c3b]
+                          min-w-32 md:w-40 bg-linear-to-bl from-[#3c3c3c3b]
                           to-[#60606038] rounded-lg p-2">
             <p className="w-32 md:w-38 truncate text-center font-bold text-sm">{movie.title}</p>
             <p className="text-xs">{Math.round(movie.vote_average * 10) / 10}</p>
