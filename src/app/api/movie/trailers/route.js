@@ -6,7 +6,6 @@ export async function GET() {
   try {
     const apiKey = process.env.YOUTUBE_API_KEY;
 
-    // Get uploads playlist
     const channelRes = await fetch(
       `https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${CHANNEL_ID}&key=${apiKey}`
     );
@@ -16,7 +15,6 @@ export async function GET() {
     const uploadsPlaylistId =
       channelData.items[0].contentDetails.relatedPlaylists.uploads;
 
-    // Get latest 50 uploads
     const playlistRes = await fetch(
       `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&playlistId=${uploadsPlaylistId}&maxResults=50&key=${apiKey}`
     );
@@ -27,7 +25,6 @@ export async function GET() {
       .map((item) => item.contentDetails.videoId)
       .join(",");
 
-    // Get durations
     const videosRes = await fetch(
       `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${videoIds}&key=${apiKey}`
     );
@@ -56,7 +53,7 @@ export async function GET() {
         const duration =
           durationMap[item.contentDetails.videoId];
 
-        return !isShort(duration);
+        return !isShort(duration) && (item.snippet.title.toLowerCase().includes("trailer") || item.snippet.title.toLowerCase().includes("teaser"));
       })
       .slice(0, 10)
       .map((item) => ({
