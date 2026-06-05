@@ -93,7 +93,7 @@ export default function FilterSystem({ setFilters }) {
         )}
       </div>
 
-      <aside className="hidden lg:flex flex-col w-72 bg-[#303030] border-r border-[#262626] h-screen fixed left-0 top-0 pt-24 p-6 overflow-y-auto no-scrollbar">
+      <aside className="hidden lg:flex flex-col w-72 bg-[#303030] border-r border-[#262626] h-screen fixed left-0 top-0 pt-24 p-6 overflow-y-auto no-scrollbar rounded-r-lg">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl font-bold">Filters</h2>
           {activeFilters.length > 0 && (

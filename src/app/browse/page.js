@@ -5,13 +5,14 @@ import FilterSystem from "@/components/features/FilterSystem";
 import Footer from "@/components/layout/Footer";
 import Navbar from "@/components/layout/Navbar";
 import api from "@/lib/api/api";
+import TrailerBar from "../../components/features/TrailerBar";
 
 function MoviePoster({ movie }) {
   const [loaded, setLoaded] = useState(false);
   const router = useRouter();
   return (
     <div className="group relative cursor-pointer items-center flex flex-col" onClick={() => router.push(`/movie/${movie?.id}`)}>
-      <div className="aspect-[2/3] w-35 md:w-45 rounded-xl bg-[#1A1A1A] group overflow-hidden relative">
+      <div className="aspect-2/3 w-25 md:w-35 rounded-xl bg-[#1A1A1A] group overflow-hidden relative">
         {!loaded && <div className="absolute inset-0 animate-pulse bg-[#262626]" />}
         <img
           loading="lazy"
@@ -50,9 +51,10 @@ export default function BrowsePage() {
     <div className="flex flex-col min-h-screen">
       <Navbar />
       <FilterSystem setFilters={setFilters} />
+      <TrailerBar/>
       <div className="flex-1 flex flex-col lg:ml-65">
         <div className="p-2 pt-5 sm:p-5 md:p-10 lg:p-20">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-6 place-items-center">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 xl:grid-cols-5 gap-6 place-items-center">
             {movies.map((movie) => <MoviePoster key={movie.id} movie={movie} />)}
           </div>
           <div className="flex flex-col w-full justify-center items-center mt-12 gap-4">
