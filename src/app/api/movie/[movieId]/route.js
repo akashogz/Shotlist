@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { tmdbFetch, getCachedOrFetch } from "@/lib/tmdb";
+import { getOrCreateMovie } from "@/lib/services/movie";
 
 export async function GET(req, { params }) {
   try {
@@ -12,8 +13,10 @@ export async function GET(req, { params }) {
         tmdbFetch(`/movie/${movieId}`, {
           append_to_response: "credits,videos,recommendations,watch/providers",
         }),
-      604800 // 7 days
+      604800
     );
+
+    getOrCreateMovie(movie);
 
     return NextResponse.json(movie);
   } catch {

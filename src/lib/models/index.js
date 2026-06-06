@@ -96,6 +96,40 @@ const followSchema = new Schema(
   { timestamps: true }
 );
 
-
+followSchema.index({ followerId: 1, followeeId: 1 }, { unique: true });
 
 export const Follow = models.Follow || model("Follow", followSchema);
+
+// ─── Movie ────────────────────────────────────────────────────────────────────
+const movieSchema = new Schema(
+  {
+    tmdbId: { type: Number, required: true },
+    movieName: { type: String, required: true, trim: true },
+    posterPath: { type: String, required: true },
+    backdropPath: { type: String },
+    releaseDate: { type: String },
+    director: { type: String },
+    genres: [
+      {
+        id: Number,
+        name: String,
+      },
+    ],
+    voteAverage: { type: Number },
+    reviewCount: { type: Number, default: 0 },
+    watchedCount: { type: Number, default: 0 },
+    watchlistCount: { type: Number, default: 0 },
+    collectionCount: { type: Number, default: 0 },
+    lastSynced: { type: Date, default: Date.now },
+  },
+  { timestamps: true }
+);
+
+movieSchema.index({ tmdbId: 1 }, { unique: true });
+movieSchema.index({ director: 1 });
+movieSchema.index({ releaseDate: -1 });
+movieSchema.index({
+  movieName: "text",
+});
+
+export const Movie = models.Movie || model("Movie", movieSchema);

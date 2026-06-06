@@ -34,8 +34,6 @@ function Person({
 
     return (
         <>
-
-
             {loading ? (
                 <div className='w-full h-screen flex items-center justify-center'>
                     <div className="w-10 h-10 border-2 border-white rounded-full border-t-transparent animate-spin mx-auto" />
@@ -45,12 +43,12 @@ function Person({
             ) : (
                 <div className={`md:p-20 p-5 pt-20 md:pt-28 h-full w-full flex flex-col gap-2 max-w-screen overflow-hidden ${loading ? `opacity-0` : `opacity-100`} transition-opacity duration-500 `}>
                     <div className=''>
-                        <div className='bg-linear-to-b blur-sm from-[#464e8234] to-[#24242400] absolute w-screen h-80 -mt-20 md:-mt-28 -ml-5 md:-ml-20 -z-10'>
+                        <div className='bg-linear-to-b blur-sm from-[#464e8234] to-[#24242400] absolute w-screen h-80 -mt-20 md:-mt-28 -ml-5 md:-ml-20 '>
                             <img src={`https://image.tmdb.org/t/p/original${person?.profile_path}`} className='w-full h-80 blur-[120px] object-fit brightness-80'></img>
                         </div>
-                        <div className='flex flex-col gap-5  items-center '>
+                        <div className='flex flex-col gap-5 items-center'>
                             <img
-                                className='w-40 aspect-2/3 object-cover rounded-lg'
+                                className='w-40 aspect-2/3 object-cover z-100 rounded-lg'
                                 src={`https://image.tmdb.org/t/p/original${person?.profile_path}`}
                             />
                             <div className='flex gap-2 items-center'>
