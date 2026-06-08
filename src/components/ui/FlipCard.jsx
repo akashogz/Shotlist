@@ -9,7 +9,7 @@ export const FlipCard = ({ item, isOwnProfile }) => {
   const router = useRouter();
 
   const handleRemove = async () => {
-    const res = await api.post('/user/removeFromWatched', { tmdbId: item.movieId });
+    const res = await api.post('/user/removeFromWatched', { tmdbId: item?.movie?.tmdbId });
 
     toast.success(res.data.message);
   }
@@ -23,12 +23,12 @@ export const FlipCard = ({ item, isOwnProfile }) => {
       <div className={`relative h-full w-full duration-500 transition-all transform-3d ${isFlipped ? 'transform-[rotateY(180deg)]' : ''}`}>
 
         <div className="absolute inset-0 w-full h-full bg-zinc-800 text-white flex items-center justify-center rounded-xl backface-hidden">
-          <img src={`https://image.tmdb.org/t/p/w185/${item.posterPath}`} className='w-35 rounded-lg hover:scale-105 ease-in-out duration-200' />
+          <img src={`https://image.tmdb.org/t/p/w185/${item?.movie?.posterPath}`} className='w-35 rounded-lg hover:scale-105 ease-in-out duration-200' />
         </div>
 
         <div className="absolute inset-0 w-full h-full bg-[#202020] text-white flex flex-col items-center justify-between rounded-xl transform-[rotateY(180deg)] backface-hidden border border-[#505050] p-4">
-          <h1 className='text-sm text-center font-bold cursor-pointer hover:underline underline-offset-3' onClick={() => router.push(`/movie/${item.movieId}`)}>{item.title}</h1>
-          <p className="text-xs text-center">Added at: {new Date(item.addedAt).toLocaleDateString('en-GB', {
+          <a className='text-sm text-center font-bold cursor-pointer hover:underline underline-offset-3' href={`/movie/${item?.movie?.tmdbId}`}>{item?.movie?.movieName}</a>
+          <p className="text-xs text-center">Added at: {new Date(item?.addedAt).toLocaleDateString('en-GB', {
             weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
           })}</p>
           {isOwnProfile &&

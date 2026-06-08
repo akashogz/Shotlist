@@ -7,7 +7,12 @@ export async function GET(req, { params }) {
     const { id: userId } = await params;
     await connectDB();
 
-    const watchlist = await Watchlist.find({ userId }).sort({ addedAt: -1 });
+    const watchlist = await Watchlist.find({ userId })
+      .populate(
+        "movie",
+        "tmdbId movieName posterPath releaseDate director voteAverage"
+      )
+      .sort({ addedAt: -1 });
     return NextResponse.json({ message: "Fetched watchlist", watchlist });
   } catch (error) {
     console.error("Error fetching watchlist:", error);

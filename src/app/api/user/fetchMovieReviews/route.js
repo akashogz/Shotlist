@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import mongoose, { Types } from "mongoose";
 import connectDB from "@/lib/db/mongodb";
-import { Review } from "@/lib/models";
-import { text } from "stream/consumers";
+import { Review, Movie } from "@/lib/models";
 
 export async function GET(req) {
   try {
@@ -24,20 +23,23 @@ export async function GET(req) {
     const match = {
     };
 
-    if (tmdbId) {
-      match.tmdbId = movieNumberId
-    }
+    const movie = await Movie.findOne({
+      tmdbId: movieNumberId
+    });
+
+    if (!movie)
+      return NextResponse.json({
+        reviews: [],
+        nextCursor: null,
+        hasMore: false,
+      });
+
+    match.movie = movie._id
 
     if (includes?.trim()) {
       match.$or = [
         {
           text: {
-            $regex: includes,
-            $options: "i",
-          },
-        },
-        {
-          movieName: {
             $regex: includes,
             $options: "i",
           },
@@ -67,6 +69,24 @@ export async function GET(req) {
       { $addFields: { username: "$userDetails.username", avatarSeed: "$userDetails.avatarSeed" } },
       {
         $lookup: {
+          from: "movies",
+          localField: "movie",
+          foreignField: "_id",
+          as: "movieDetails",
+        },
+      },
+      {
+        $unwind: "$movieDetails",
+      },
+      {
+        $addFields: {
+          movieName: "$movieDetails.movieName",
+          posterPath: "$movieDetails.posterPath",
+          tmdbId: "$movieDetails.tmdbId",
+        },
+      },
+      {
+        $lookup: {
           from: "reviewlikes",
           let: { reviewId: "$_id" },
           pipeline: [
@@ -85,7 +105,13 @@ export async function GET(req) {
         },
       },
       { $addFields: { isLiked: { $gt: [{ $size: "$userLike" }, 0] } } },
-      { $project: { userDetails: 0, userLike: 0 } },
+      {
+        $project: {
+          userDetails: 0,
+          userLike: 0,
+          movieDetails: 0,
+        },
+      },
       { $sort: { _id: -1 } },
       { $limit: limit + 1 },
     ];

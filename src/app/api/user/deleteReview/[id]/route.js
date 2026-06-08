@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/db/mongodb";
 import { requireAuth } from "@/lib/auth";
 import { Review } from "@/lib/models";
+import { Movie } from "@/lib/models";
 
 export async function DELETE(req, { params }) {
   const auth = await requireAuth();
@@ -13,7 +14,7 @@ export async function DELETE(req, { params }) {
 
     await connectDB();
 
-    const review = await Review.findById(reviewId);
+    const review = await Review.findById(reviewId).select("user movie");
     if (!review) return NextResponse.json({ message: "Review doesn't exist" }, { status: 404 });
 
     if (review.user.toString() !== userId.toString()) {
@@ -21,6 +22,15 @@ export async function DELETE(req, { params }) {
     }
 
     await Review.deleteOne({ _id: reviewId });
+
+    await Movie.updateOne(
+      { _id: review.movie },
+      {
+        $inc: {
+          reviewCount: -1,
+        },
+      }
+    );
 
     return NextResponse.json({ message: "Review deleted successfully" });
   } catch (error) {

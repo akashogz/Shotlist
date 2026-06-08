@@ -7,7 +7,12 @@ export async function GET(req, { params }) {
     const { id: userId } = await params;
     await connectDB();
 
-    const watched = await Watched.find({ userId }).sort({ addedAt: -1 });
+    const watched = await Watched.find({ userId })
+      .populate(
+        "movie",
+        "tmdbId movieName posterPath releaseDate director voteAverage"
+      )
+      .sort({ addedAt: -1 });
     return NextResponse.json({ message: "Fetched watched", watched });
   } catch (error) {
     console.error("Error in fetchWatched:", error);

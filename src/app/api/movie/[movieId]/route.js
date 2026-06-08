@@ -16,7 +16,7 @@ export async function GET(req, { params }) {
       604800
     );
 
-    getOrCreateMovie(movie);
+    getOrCreateMovie(movieId);
 
     return NextResponse.json(movie);
   } catch {

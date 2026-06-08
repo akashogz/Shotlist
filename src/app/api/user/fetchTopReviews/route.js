@@ -21,6 +21,7 @@ export async function GET() {
       .sort({ likesCount: -1 })
       .limit(2)
       .populate("user", "username avatarSeed")
+      .populate("movie", "tmdbId movieName posterPath releaseDate director voteAverage")
       .lean();
 
     if (topReviews.length > 0) {

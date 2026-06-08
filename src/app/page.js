@@ -45,15 +45,19 @@ export default function Home() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [popularData, trendingData, allTimeData] = await Promise.all([
+        const [popularData, trendingData, allTimeData, topReviews] = await Promise.all([
           api.get("/movie/popular"),
           api.get("/movie/trending"),
           api.get("/movie/top_rated"),
+          api.get("/user/fetchTopReviews")
         ]);
         setSlides(popularData.data.slice(0, 5));
         setPopular(popularData.data);
         setTrending(trendingData.data);
         setAllTime(allTimeData.data);
+        setTopReviews(topReviews.data.topReviews)
+
+        console.log(topReviews.data.topReviews)
       } catch (error) {
         console.error("Failed to sync data:", error);
       } finally {

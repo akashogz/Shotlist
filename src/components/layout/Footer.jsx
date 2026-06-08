@@ -6,7 +6,7 @@ export default function Footer() {
         <p className="text-xs font-semibold text-white/50">Powered by</p>
         <img src="/tmdblogo.png" className="w-17" alt="TMDB" />
       </div>
-      <p className="text-xs text-white/50">This product uses the TMDB API but is not endorsed or certified by TMDB</p>
+      <p className="text-xs text-white/50 px-10">This product uses the TMDB API but is not endorsed or certified by TMDB</p>
     </div>
   );
 }

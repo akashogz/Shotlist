@@ -25,7 +25,30 @@ export async function GET(req, { params }) {
       },
       { $unwind: { path: "$userDetails", preserveNullAndEmptyArrays: true } },
       { $addFields: { username: "$userDetails.username", avatarSeed: "$userDetails.avatarSeed" } },
-      { $project: { userDetails: 0 } },
+      {
+        $lookup: {
+          from: "movies",
+          localField: "movie",
+          foreignField: "_id",
+          as: "movieDetails",
+        },
+      },
+      {
+        $unwind: "$movieDetails",
+      },
+      {
+        $addFields: {
+          movieName: "$movieDetails.movieName",
+          posterPath: "$movieDetails.posterPath",
+          tmdbId: "$movieDetails.tmdbId",
+        },
+      },
+      {
+        $project: {
+          userDetails: 0,
+          movieDetails: 0,
+        },
+      },
     ];
 
     if (viewerId && Types.ObjectId.isValid(viewerId)) {

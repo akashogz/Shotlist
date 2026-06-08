@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/db/mongodb";
 import { requireAuth } from "@/lib/auth";
 import { Watched, Watchlist } from "@/lib/models";
+import { getOrCreateMovie } from "@/lib/services/movie";
 
 export async function GET(req, { params }) {
   const auth = await requireAuth();
@@ -14,13 +15,14 @@ export async function GET(req, { params }) {
 
     await connectDB();
 
+    const movie = await getOrCreateMovie(tmdbId);
+
     const [isWatched, isWatchlisted] = await Promise.all([
-      Watched.findOne({ movieId: tmdbId, userId }),
-      Watchlist.findOne({ movieId: tmdbId, userId }),
+      Watched.findOne({ movie: movie._id, userId }),
+      Watchlist.findOne({ movie: movie._id, userId }),
     ]);
 
     return NextResponse.json({
-      message: "Fetched",
       isWatched: !!isWatched,
       isWatchlisted: !!isWatchlisted,
     });

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db/mongodb";
 import { requireAuth } from "@/lib/auth";
-import { Watchlist } from "@/lib/models";
+import { Watchlist, Movie } from "@/lib/models";
 
 export async function POST(req) {
   const auth = await requireAuth();
@@ -15,7 +15,20 @@ export async function POST(req) {
 
     await connectDB();
 
-    const deleted = await Watchlist.findOneAndDelete({ movieId: tmdbId, userId });
+    const movie = await Movie.findOne({ tmdbId });
+
+    const deleted = await Watchlist.findOneAndDelete({ movie: movie._id, userId });
+
+    if (deleted) {
+      await Movie.updateOne(
+        { _id: movie._id },
+        {
+          $inc: {
+            watchlistCount: -1,
+          },
+        }
+      );
+    }
 
     return NextResponse.json({ message: "Removed from watchlist", watchlist: deleted });
   } catch (error) {

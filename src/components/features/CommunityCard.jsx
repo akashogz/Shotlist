@@ -11,7 +11,7 @@ export default function CommunityCard({ topReviews = [] }) {
       {topReviews.map((review, index) => (
         <div
           key={review._id || index}
-          className="bg-[#60606071] hover:bg-[#393939] ease-in-out duration-300 rounded-lg p-3 flex flex-col gap-3 cursor-pointer"
+          className="bg-[#303030] hover:bg-[#393939] ease-in-out duration-300 rounded-lg p-3 flex flex-col gap-3 cursor-pointer"
           onClick={() => router.push(`/movie/${review.tmdbId}`)}
         >
           <div className="flex gap-3 w-full items-center">

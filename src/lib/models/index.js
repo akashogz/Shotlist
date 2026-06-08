@@ -30,9 +30,7 @@ export const User = models.User || model("User", userSchema);
 const reviewSchema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    posterPath: { type: String, required: true },
-    movieName: { type: String, required: true },
-    tmdbId: { type: Number, required: true },
+    movie: { type: Schema.Types.ObjectId, ref: "Movie", required: true },
     text: { type: String, trim: true },
     spoiler: { type: Boolean, default: false },
     likesCount: { type: Number, default: 0 },
@@ -40,7 +38,7 @@ const reviewSchema = new Schema(
   },
   { timestamps: true }
 );
-reviewSchema.index({ user: 1, tmdbId: 1 }, { unique: true });
+reviewSchema.index({ user: 1, movie: 1 }, { unique: true });
 
 export const Review = models.Review || model("Review", reviewSchema);
 
@@ -60,15 +58,12 @@ export const ReviewLike = models.ReviewLike || model("ReviewLike", reviewLikeSch
 const watchedSchema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true, index: true },
-    movieId: { type: String, required: true },
-    title: { type: String, required: true },
-    posterPath: { type: String },
-    genres: [{ type: String }],
+    movie: { type: Schema.Types.ObjectId, ref: "Movie", required: true },
     addedAt: { type: Date, default: Date.now },
   },
   { timestamps: true }
 );
-watchedSchema.index({ userId: 1, movieId: 1 }, { unique: true });
+watchedSchema.index({ userId: 1, movie: 1 }, { unique: true });
 
 export const Watched = models.Watched || model("Watched", watchedSchema);
 
@@ -76,14 +71,12 @@ export const Watched = models.Watched || model("Watched", watchedSchema);
 const watchlistSchema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true, index: true },
-    movieId: { type: String, required: true },
-    title: { type: String, required: true },
-    posterPath: { type: String },
+    movie: { type: Schema.Types.ObjectId, ref: "Movie", required: true },
     addedAt: { type: Date, default: Date.now },
   },
   { timestamps: true }
 );
-watchlistSchema.index({ userId: 1, movieId: 1 }, { unique: true });
+watchlistSchema.index({ userId: 1, movie: 1 }, { unique: true });
 
 export const Watchlist = models.Watchlist || model("Watchlist", watchlistSchema);
 

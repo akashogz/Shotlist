@@ -1,46 +1,66 @@
 import { NextResponse } from "next/server";
-import mongoose from "mongoose";
 import connectDB from "@/lib/db/mongodb";
 import { requireAuth } from "@/lib/auth";
 import { Review, Watched } from "@/lib/models";
+import { getOrCreateMovie } from "@/lib/services/movie";
+import { Movie } from "@/lib/models";
 
 export async function POST(req) {
   const auth = await requireAuth();
   if (auth.error) return NextResponse.json({ message: auth.message }, { status: auth.status });
 
   try {
-    const { tmdbId, text, rating, username, avatarSeed, movieName, posterPath } = await req.json();
+    const { tmdbId, text, rating, } = await req.json();
     const userId = auth.user._id;
 
-    if (!tmdbId || !rating || !username || !movieName) {
+    if (!tmdbId || !rating) {
       return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
     }
 
     await connectDB();
 
+    const movie = await getOrCreateMovie(tmdbId);
+
     const exists = await Review.findOne({
-      tmdbId,
-      user: new mongoose.Types.ObjectId(userId),
+      movie: movie._id,
+      user: userId,
     });
     if (exists) return NextResponse.json({ message: "Already reviewed!" }, { status: 400 });
 
+
     const review = await Review.create({
       user: userId,
-      tmdbId,
+      movie: movie._id,
       text,
-      rating,
-      username,
-      avatarSeed,
-      movieName,
-      posterPath,
+      rating
     });
 
     const watchedExists = await Watched.findOne({
-      tmdbId,
-      user: new mongoose.Types.ObjectId(userId),
+      movie: movie._id,
+      userId,
     });
 
-    if (!wacthedExists) await Watched.create({ userId, movieId: tmdbId, title: movieName, posterPath });
+    if (!watchedExists) {
+      await Watched.create({ userId, movie: movie._id });
+
+      await Movie.updateOne(
+        { _id: movie._id },
+        {
+          $inc: {
+            watchedCount: 1,
+          },
+        }
+      );
+    }
+
+    await Movie.updateOne(
+      { _id: movie._id },
+      {
+        $inc: {
+          reviewCount: 1,
+        },
+      }
+    );
 
     return NextResponse.json({ message: "Review added successfully", review }, { status: 201 });
   } catch (error) {

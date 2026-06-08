@@ -20,7 +20,7 @@ import toast from "react-hot-toast";
 import MoreModal from "@/components/features/MoreModal";
 import VideoPlayer from "@/components/features/VideoPlayer";
 import { ReviewSkeleton } from "./ReviewSkeleton";
-import handleLike from "../../../lib/utilities/handleLike";
+import handleLike from "@/lib/utilities/handleLike";
 
 
 
@@ -398,7 +398,7 @@ function Info({
                                                     <Heart
                                                         size={14}
                                                         className={`cursor-pointer transition-all ${i.isLiked ? "fill-red-500 text-red-500 scale-110" : "hover:text-white"}`}
-                                                        onClick={() => handleLike(i._id)}
+                                                        onClick={() => handleLike(i._id, loggedIn, setReviews, router)}
                                                     />
                                                 </div>
                                                 <p className="leading-none select-none">

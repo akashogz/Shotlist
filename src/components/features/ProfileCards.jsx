@@ -34,6 +34,7 @@ function ProfileCards({ tab, displayUser, isOwnProfile }) {
         setLoading(true);
         const res = await api.get(`/user/fetchWatched/${displayUser._id}`);
         setItems(res.data.watched || []);
+        console.log(res.data.watched)
         setLoading(false);
       } catch (error) {
         console.log(error);
