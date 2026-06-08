@@ -12,7 +12,7 @@ const BACKEND_URL =
 
 const FRONTEND_URL =
   process.env.NODE_ENV === "production"
-    ? "https://shotlist.uk"
+    ? "https://www.shotlist.uk"
     : "http://localhost:3000";
 
 const googleTokenURL = "https://oauth2.googleapis.com/token";
@@ -67,6 +67,8 @@ export async function GET(req) {
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRES_IN,
     });
+
+    console.log(cookieOptions)
 
     const response = NextResponse.redirect(FRONTEND_URL);
     response.cookies.set("token", token, cookieOptions);
