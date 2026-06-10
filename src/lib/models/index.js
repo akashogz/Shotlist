@@ -139,6 +139,7 @@ const collectionSchema = new Schema(
       addedAt: { type: Date, default: Date.now, }, 
       note: String,
     }],
+    isRanked: { type: Boolean, default: false, required: true },
     tags: [{ type: String, lowercase: true, trim: true }],
     visibility: { type: String, enum: ["public", "private", "unlisted"], default: "public" },
     likesCount: { type: Number, default: 0 },
