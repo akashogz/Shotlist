@@ -126,3 +126,30 @@ movieSchema.index({
 });
 
 export const Movie = models.Movie || model("Movie", movieSchema);
+
+// ─── Collections ────────────────────────────────────────────────────────────────────
+const collectionSchema = new Schema(
+  {
+    title: { type: String, required: true, trim: true, maxlength: 100 },
+    description: { type: String, maxlength: 1000, trim: true },
+    owner: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    movies: [{
+      movie: { type: Schema.Types.ObjectId, ref: "Movie", required: true },
+      position: { type: Number, required: true }, 
+      addedAt: { type: Date, default: Date.now, }, 
+      note: String,
+    }],
+    tags: [{ type: String, lowercase: true, trim: true }],
+    visibility: { type: String, enum: ["public", "private", "unlisted"], default: "public" },
+    likesCount: { type: Number, default: 0 },
+    slug: { type: String, unique: true, trim: true, lowercase: true, required: true },
+    saveCount: { type: Number, default: 0 },
+
+  }, { timestamps: true }
+)
+
+collectionSchema.index({title: "text",});
+collectionSchema.index({owner: 1, visibility: 1,});
+collectionSchema.index({tags: 1,});
+
+export const Collection = models.Collection || model("Collection", collectionSchema);

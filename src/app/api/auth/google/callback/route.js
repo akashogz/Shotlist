@@ -68,8 +68,6 @@ export async function GET(req) {
       expiresIn: process.env.JWT_EXPIRES_IN,
     });
 
-    console.log(cookieOptions)
-
     const response = NextResponse.redirect(FRONTEND_URL);
     response.cookies.set("token", token, cookieOptions);
     return response;
